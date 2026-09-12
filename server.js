@@ -7,306 +7,654 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // مسارات ملفات التخزين المحلي السحابي
 const DATA_FILE = path.join(__dirname, 'citizens.json');
 const ARCHIVE_FILE = path.join(__dirname, 'archive.json');
+const AGENTS_FILE = path.join(__dirname, 'agents.json');
+const OWNER_FILE = path.join(__dirname, 'owner.json');
 
-// تهيئة قاعدة البيانات بالـ 500 مواطن إذا لم تكن موجودة
+// بيانات الأونر الافتراضية
+const DEFAULT_OWNER = {
+  username: 'admin',
+  password: 'admin2026',
+  name: 'المالك العام للمنظومة',
+  role: 'owner'
+};
+
+function getOwnerConfig() {
+  if (fs.existsSync(OWNER_FILE)) {
+    try { return JSON.parse(fs.readFileSync(OWNER_FILE, 'utf8')); } catch (_) {}
+  }
+  return DEFAULT_OWNER;
+}
+
+function saveOwnerConfig(cfg) {
+  fs.writeFileSync(OWNER_FILE, JSON.stringify(cfg, null, 2), 'utf8');
+}
+
+// قراءة وحفظ الوكلاء
+function getAgents() {
+  if (!fs.existsSync(AGENTS_FILE)) return [];
+  try { return JSON.parse(fs.readFileSync(AGENTS_FILE, 'utf8')); } catch (_) { return []; }
+}
+
+function saveAgents(data) {
+  fs.writeFileSync(AGENTS_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
+
+// قراءة وحفظ المواطنين المتعددين
+function getAllCitizensMap() {
+  if (!fs.existsSync(DATA_FILE)) return {};
+  try {
+    const raw = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+    if (Array.isArray(raw)) return { '868': raw };
+    return raw || {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveAllCitizensMap(map) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(map, null, 2), 'utf8');
+}
+
+function getCitizensByAgency(agency = '868') {
+  const map = getAllCitizensMap();
+  return map[String(agency)] || [];
+}
+
+function saveCitizensByAgency(agency = '868', list = []) {
+  const map = getAllCitizensMap();
+  map[String(agency)] = list;
+  saveAllCitizensMap(map);
+}
+
+// قراءة وحفظ الأرشيف المتعدد
+function getAllArchiveMap() {
+  if (!fs.existsSync(ARCHIVE_FILE)) return {};
+  try {
+    const raw = JSON.parse(fs.readFileSync(ARCHIVE_FILE, 'utf8'));
+    if (Array.isArray(raw)) return { '868': raw };
+    return raw || {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveAllArchiveMap(map) {
+  fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(map, null, 2), 'utf8');
+}
+
+function getArchiveByAgency(agency = '868') {
+  const map = getAllArchiveMap();
+  return map[String(agency)] || [];
+}
+
+function saveArchiveByAgency(agency = '868', list = []) {
+  const map = getAllArchiveMap();
+  map[String(agency)] = list;
+  saveAllArchiveMap(map);
+}
+
+
+// تهيئة قاعدة البيانات بالوكيل الافتراضي والـ 1042 مواطن
 function initData() {
-    const seedPath = fs.existsSync(path.join(__dirname, 'citizens_500.json'))
-        ? path.join(__dirname, 'citizens_500.json')
-        : path.join(__dirname, '..', 'citizens_500.json');
+  const agents = getAgents();
+  if (agents.length === 0) {
+    saveAgents([
+      {
+        id: 'agent_868',
+        username: 'user',
+        password: '00000000',
+        name: 'فاضل عباس كريم',
+        agencyNumber: '868',
+        licenseNumber: '000699',
+        type: 'ghiz',
+        governorate: 'ذي قار',
+        branch: 'فرع تموين ذي قار',
+        createdAt: new Date().toISOString()
+      }
+    ]);
+  }
 
-    let current = [];
-    if (fs.existsSync(DATA_FILE)) {
-        try { current = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); } catch (_) {}
-    }
-
-    if (!fs.existsSync(DATA_FILE) || current.length === 0) {
-        let initialCitizens = [];
-        if (fs.existsSync(seedPath)) {
-            initialCitizens = JSON.parse(fs.readFileSync(seedPath, 'utf8')).map(c => ({
-                id: c.seq,
-                name: c.name,
-                cardNumber: c.cardNumber,
-                oldCardNumber: c.oldCard || '',
-                familyCount: c.total,
-                eligibleCount: c.eligible,
-                blockedCount: c.blocked,
-                isWelfare: c.isWelfare,
-                isReceived: false,
-                receivedAt: null,
-                items: { oil: false, flour: false, rice: false, sugar: false, paste: false, milk: false },
-                customItems: [],
-                notes: ''
-            }));
+  const map = getAllCitizensMap();
+  if (!map['868'] || map['868'].length < 1000) {
+    const seed1042 = path.join(__dirname, 'citizens_1042.json');
+    if (fs.existsSync(seed1042)) {
+      try {
+        const raw = JSON.parse(fs.readFileSync(seed1042, 'utf8'));
+        if (Array.isArray(raw) && raw.length > 0) {
+          saveCitizensByAgency('868', raw);
+          console.log('Seeded agency 868 with 1,042 citizens');
         }
-        fs.writeFileSync(DATA_FILE, JSON.stringify(initialCitizens, null, 2), 'utf8');
-        console.log(`Initialized citizens database with ${initialCitizens.length} citizens.`);
+      } catch(_) {}
     }
-
-    if (!fs.existsSync(ARCHIVE_FILE)) {
-        const sampleArchive = [
-            {
-                id: 'm_arch_prev1',
-                monthTitle: 'شهر أيلول 2025',
-                archivedAt: '2025-09-01T00:00:00.000Z',
-                totalCitizens: 500,
-                receivedCount: 485,
-                citizens: []
-            }
-        ];
-        fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(sampleArchive, null, 2), 'utf8');
-    }
+  }
 }
-
 initData();
-
-function getCitizens() {
-    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-}
-
-function saveCitizens(data) {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
-}
-
-function getArchive() {
-    return JSON.parse(fs.readFileSync(ARCHIVE_FILE, 'utf8'));
-}
-
-function saveArchive(data) {
-    fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(data, null, 2), 'utf8');
-}
 
 // ══ ROUTES ══
 
 // فحص صحة السيرفر
 app.get('/', (req, res) => {
-    res.json({
-        status: 'online',
-        message: 'سيرفر وكيل لإدارة الحصص التموينية يعمل بنجاح على Render 🚀',
-        version: '1.0.1',
-        time: new Date().toISOString()
-    });
+  const agents = getAgents();
+  res.json({
+    status: 'online',
+    message: 'سيرفر منظومة وكيل لإدارة الوكلاء والحصص التموينية يعمل بنجاح 🚀',
+    version: '1.0.9',
+    totalAgents: agents.length,
+    time: new Date().toISOString()
+  });
 });
 
-// 0. التحقق من إصدار التطبيق والتحديث السحابي OTA
+// فحص إصدار التطبيق والتحديث المباشر
 app.get('/api/app-version', (req, res) => {
-    res.json({
-        version: '1.0.2',
-        notes: 'إلغاء الشريط الأبيض أعلى الشاشة وإزالة نص تنبيه الأوفلاين التوضيحي',
-        updatedAt: new Date().toISOString()
-    });
+  res.json({
+    version: '1.0.8',
+    downloadUrl: 'https://files.catbox.moe/htzjg1.apk',
+    notes: 'لوحة تحكم المالك الشاملة (Owner Dashboard) وإدارة الوكلاء المتعددين',
+    updatedAt: new Date().toISOString()
+  });
 });
 
-// خدمة ملف التطبيق لتحديث الأجهزة
+// خدمة ملف التطبيق
 app.get('/app.html', (req, res) => {
-    const p1 = path.join(__dirname, 'public', 'index.html');
-    const p2 = path.join(__dirname, 'index.html');
-    if (fs.existsSync(p1)) return res.sendFile(p1);
-    if (fs.existsSync(p2)) return res.sendFile(p2);
-    res.status(404).send('Not found');
+  const p1 = path.join(__dirname, 'public', 'index.html');
+  const p2 = path.join(__dirname, 'index.html');
+  if (fs.existsSync(p1)) return res.sendFile(p1);
+  if (fs.existsSync(p2)) return res.sendFile(p2);
+  res.status(404).send('Not found');
 });
 
-// إعادة تهيئة وتعبئة الـ 500 مواطن
-app.get('/api/seed', (req, res) => {
-    const seedPath = fs.existsSync(path.join(__dirname, 'citizens_500.json'))
-        ? path.join(__dirname, 'citizens_500.json')
-        : path.join(__dirname, '..', 'citizens_500.json');
-
-    if (!fs.existsSync(seedPath)) {
-        return res.status(404).json({ error: 'ملف citizens_500.json غير موجود' });
-    }
-
-    const initialCitizens = JSON.parse(fs.readFileSync(seedPath, 'utf8')).map(c => ({
-        id: c.seq,
-        name: c.name,
-        cardNumber: c.cardNumber,
-        oldCardNumber: c.oldCard || '',
-        familyCount: c.total,
-        eligibleCount: c.eligible,
-        blockedCount: c.blocked,
-        isWelfare: c.isWelfare,
-        isReceived: false,
-        receivedAt: null,
-        items: { oil: false, flour: false, rice: false, sugar: false, paste: false, milk: false },
-        customItems: [],
-        notes: ''
-    }));
-
-    saveCitizens(initialCitizens);
-    res.json({ success: true, message: `تمت تعبئة قاعدة البيانات بـ ${initialCitizens.length} مواطن بنجاح!`, count: initialCitizens.length });
+// خدمة ملف الـ APK
+app.get('/wakil.apk', (req, res) => {
+  const apkPath = path.join(__dirname, 'public', 'wakil.apk');
+  if (fs.existsSync(apkPath)) {
+    res.download(apkPath, 'wakil.apk');
+  } else {
+    res.status(404).send('APK file not found');
+  }
 });
 
-// 1. تسجيل الدخول
+// ══ 1. AUTHENTICATION (تسجيل الدخول الذكي: مالك أو وكيل) ══
 app.post('/api/login', (req, res) => {
-    const { username, password, agentType } = req.body;
-    if (username === 'user' && password === '00000000') {
-        res.json({
-            success: true,
-            token: 'wakil_session_token_' + Date.now(),
-            agent: {
-                name: 'فاضل عباس كريم',
-                agencyNumber: '868',
-                licenseNumber: '000699',
-                type: agentType || 'food'
-            }
-        });
-    } else {
-        res.status(401).json({ success: false, message: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
-    }
+  const { username, password, agentType } = req.body;
+  const u = (username || '').trim().toLowerCase();
+  const p = (password || '').trim();
+
+  // 1. فحص حساب الأونر / المالك العام
+  const owner = getOwnerConfig();
+  if ((u === owner.username.toLowerCase() || u === 'owner' || u === 'admin') && p === owner.password) {
+    return res.json({
+      success: true,
+      role: 'owner',
+      token: 'owner_session_' + Date.now(),
+      owner: {
+        username: owner.username,
+        name: owner.name || 'المالك العام للمنظومة',
+        role: 'owner'
+      }
+    });
+  }
+
+  // 2. فحص حسابات الوكلاء المسجلين
+  const agents = getAgents();
+  const matched = agents.find(ag => ag.username.toLowerCase() === u && ag.password === p);
+  if (matched) {
+    return res.json({
+      success: true,
+      role: 'agent',
+      token: 'agent_session_' + Date.now(),
+      agent: {
+        id: matched.id,
+        name: matched.name,
+        agencyNumber: matched.agencyNumber,
+        licenseNumber: matched.licenseNumber || '',
+        type: matched.type || agentType || 'ghiz',
+        governorate: matched.governorate || 'ذي قار',
+        branch: matched.branch || 'فرع تموين ذي قار',
+        username: matched.username
+      }
+    });
+  }
+
+  return res.status(401).json({ success: false, message: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
 });
 
-// 2. جلب قائمة المواطنين والإحصائيات
-app.get('/api/citizens', (req, res) => {
-    const query = (req.query.search || '').trim().toLowerCase();
-    let list = getCitizens();
+// ══ 2. OWNER MANAGEMENT APIS (خاصة بالمالك فقط) ══
 
-    if (query) {
-        list = list.filter(c =>
-            c.name.toLowerCase().includes(query) ||
-            c.cardNumber.includes(query) ||
-            c.oldCardNumber.includes(query)
-        );
-    }
+// جلب قائمة الوكلاء وإحصائياتهم الشاملة
+app.get('/api/owner/agents', (req, res) => {
+  const agents = getAgents();
+  const map = getAllCitizensMap();
 
+  const enriched = agents.map(ag => {
+    const list = map[String(ag.agencyNumber)] || [];
     const total = list.length;
-    const received = list.filter(c => c.isReceived).length;
+    const received = list.filter(c => c.isReceived || c.done).length;
     const pending = total - received;
+    const pct = total ? Math.round((received / total) * 100) : 0;
 
-    res.json({
-        stats: { total, received, pending },
-        citizens: list
-    });
+    return {
+      ...ag,
+      stats: {
+        totalCitizens: total,
+        receivedCount: received,
+        pendingCount: pending,
+        completionPct: pct
+      }
+    };
+  });
+
+  res.json({
+    success: true,
+    totalAgents: agents.length,
+    agents: enriched
+  });
 });
 
-// 3. تفاصيل مواطن واحد
+
+// مزامنة ودمج الوكلاء سحابياً دفعة واحدة (Push / Sync)
+app.post('/api/owner/agents/sync', (req, res) => {
+  const { agents: incoming } = req.body;
+  if (!Array.isArray(incoming)) {
+    return res.status(400).json({ success: false, message: 'قائمة الوكلاء غير صحيحة' });
+  }
+
+  const existing = getAgents();
+  let changed = false;
+
+  incoming.forEach(inAg => {
+    if (!inAg || !inAg.username || !inAg.password) return;
+    const idx = existing.findIndex(e => e.username.toLowerCase() === inAg.username.toLowerCase() || String(e.agencyNumber) === String(inAg.agencyNumber));
+    if (idx === -1) {
+      existing.push({
+        id: inAg.id || ('agent_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4)),
+        name: inAg.name,
+        username: inAg.username,
+        password: inAg.password,
+        agencyNumber: String(inAg.agencyNumber),
+        type: inAg.type || 'ghiz',
+        governorate: inAg.governorate || 'ذي قار',
+        branch: inAg.branch || 'فرع التموين',
+        createdAt: inAg.createdAt || new Date().toISOString()
+      });
+      changed = true;
+    } else {
+      existing[idx] = {
+        ...existing[idx],
+        password: inAg.password || existing[idx].password,
+        name: inAg.name || existing[idx].name,
+        type: inAg.type || existing[idx].type
+      };
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    saveAgents(existing);
+  }
+
+  console.log(`Cloud sync: total agents is now ${existing.length}`);
+  res.json({ success: true, message: `تمت مزامنة ${existing.length} وكيل سحابياً بنجاح!`, agents: existing });
+});
+
+// إضافة وكيل جديد
+app.post('/api/owner/agents', (req, res) => {
+  const { name, username, password, agencyNumber, type, governorate, branch, licenseNumber } = req.body;
+
+  if (!name || !username || !password || !agencyNumber) {
+    return res.status(400).json({ success: false, message: 'يرجى إدخال كافة الحقول المطلوبة (الاسم، اليوزر، الباسورد، رمز الوكالة)' });
+  }
+
+  const agents = getAgents();
+  const uClean = username.trim();
+  const codeClean = String(agencyNumber).trim();
+
+  if (agents.some(a => a.username.toLowerCase() === uClean.toLowerCase())) {
+    return res.status(400).json({ success: false, message: 'اسم المستخدم هذا مستخدم بالفعل من قبل وكيل آخر' });
+  }
+  if (agents.some(a => String(a.agencyNumber) === codeClean)) {
+    return res.status(400).json({ success: false, message: 'رمز الوكالة هذا مسجل مسبقاً لوكيل آخر' });
+  }
+
+  const newAgent = {
+    id: 'agent_' + Date.now(),
+    name: name.trim(),
+    username: uClean,
+    password: password.trim(),
+    agencyNumber: codeClean,
+    licenseNumber: (licenseNumber || '').trim(),
+    type: type === 'tahn' ? 'tahn' : 'ghiz',
+    governorate: (governorate || 'ذي قار').trim(),
+    branch: (branch || 'فرع التموين').trim(),
+    createdAt: new Date().toISOString()
+  };
+
+  agents.push(newAgent);
+  saveAgents(agents);
+
+  // تهيئة قائمة مواطنين فارغة لهذا الوكيل
+  saveCitizensByAgency(codeClean, []);
+
+  console.log(`New agent created by Owner: ${newAgent.name} (User: ${newAgent.username}, Agency: ${newAgent.agencyNumber})`);
+
+  res.json({
+    success: true,
+    message: `تم إنشاء الوكيل (${newAgent.name}) بنجاح!`,
+    agent: newAgent
+  });
+});
+
+// تعديل بيانات الوكيل أو كلمة مروره
+app.put('/api/owner/agents/:id', (req, res) => {
+  const id = req.params.id;
+  const agents = getAgents();
+  const idx = agents.findIndex(a => a.id === id || a.agencyNumber === id);
+
+  if (idx === -1) {
+    return res.status(404).json({ success: false, message: 'الوكيل غير موجود' });
+  }
+
+  const { name, username, password, type, governorate, branch, licenseNumber } = req.body;
+  const current = agents[idx];
+
+  if (username && username.trim().toLowerCase() !== current.username.toLowerCase()) {
+    if (agents.some((a, i) => i !== idx && a.username.toLowerCase() === username.trim().toLowerCase())) {
+      return res.status(400).json({ success: false, message: 'اسم المستخدم مستخدم لوكيل آخر' });
+    }
+  }
+
+  agents[idx] = {
+    ...current,
+    name: name !== undefined ? name.trim() : current.name,
+    username: username !== undefined ? username.trim() : current.username,
+    password: password !== undefined ? password.trim() : current.password,
+    type: type !== undefined ? (type === 'tahn' ? 'tahn' : 'ghiz') : current.type,
+    governorate: governorate !== undefined ? governorate.trim() : current.governorate,
+    branch: branch !== undefined ? branch.trim() : current.branch,
+    licenseNumber: licenseNumber !== undefined ? licenseNumber.trim() : current.licenseNumber,
+    updatedAt: new Date().toISOString()
+  };
+
+  saveAgents(agents);
+  res.json({ success: true, message: 'تم تحديث بيانات الوكيل بنجاح', agent: agents[idx] });
+});
+
+// حذف وكيل
+app.delete('/api/owner/agents/:id', (req, res) => {
+  const id = req.params.id;
+  let agents = getAgents();
+  const agent = agents.find(a => a.id === id || a.agencyNumber === id);
+
+  if (!agent) {
+    return res.status(404).json({ success: false, message: 'الوكيل غير موجود' });
+  }
+
+  agents = agents.filter(a => a.id !== id && a.agencyNumber !== id);
+  saveAgents(agents);
+
+  // حذف مواطني الوكيل وأرشيفه
+  const map = getAllCitizensMap();
+  delete map[String(agent.agencyNumber)];
+  saveAllCitizensMap(map);
+
+  const archMap = getAllArchiveMap();
+  delete archMap[String(agent.agencyNumber)];
+  saveAllArchiveMap(archMap);
+
+  console.log(`Agent deleted: ${agent.name} (${agent.agencyNumber})`);
+  res.json({ success: true, message: `تم حذف الوكيل (${agent.name}) وكافة بياناته بنجاح` });
+});
+
+// جلب مواطني وكيل معين للمالك (للتصفح والطباعة)
+app.get('/api/owner/agents/:id/citizens', (req, res) => {
+  const id = req.params.id;
+  const agents = getAgents();
+  const agent = agents.find(a => a.id === id || a.agencyNumber === id);
+
+  if (!agent) {
+    return res.status(404).json({ success: false, message: 'الوكيل غير موجود' });
+  }
+
+  const list = getCitizensByAgency(agent.agencyNumber);
+  const total = list.length;
+  const received = list.filter(c => c.isReceived || c.done).length;
+
+  res.json({
+    success: true,
+    agent,
+    stats: { total, received, pending: total - received },
+    citizens: list
+  });
+});
+
+// إحصائيات المنظومة العامة للمالك
+app.get('/api/owner/stats', (req, res) => {
+  const agents = getAgents();
+  const map = getAllCitizensMap();
+
+  let totalCitizensAll = 0;
+  let totalReceivedAll = 0;
+
+  agents.forEach(ag => {
+    const list = map[String(ag.agencyNumber)] || [];
+    totalCitizensAll += list.length;
+    totalReceivedAll += list.filter(c => c.isReceived || c.done).length;
+  });
+
+  const ghizCount = agents.filter(a => a.type === 'ghiz').length;
+  const tahnCount = agents.filter(a => a.type === 'tahn').length;
+
+  res.json({
+    totalAgents: agents.length,
+    ghizAgents: ghizCount,
+    tahnAgents: tahnCount,
+    totalCitizensAll,
+    totalReceivedAll,
+    overallPct: totalCitizensAll ? Math.round((totalReceivedAll / totalCitizensAll) * 100) : 0
+  });
+});
+
+// ══ 3. MULTI-TENANT CITIZENS & ARCHIVE APIS (للوكلاء والمالك) ══
+
+// استيراد وحفظ كشف مواطنين كامل سحابياً لوكيل معين
+app.post('/api/citizens/import', (req, res) => {
+  const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
+  const incoming = req.body.citizens;
+
+  if (!Array.isArray(incoming) || incoming.length === 0) {
+    return res.status(400).json({ success: false, error: 'قائمة المواطنين فارغة أو غير صحيحة' });
+  }
+
+  const formatted = incoming.map(c => ({
+    id: c.id || c.seq,
+    name: c.name,
+    cardNumber: c.card || c.cardNumber,
+    oldCardNumber: c.oldCard || c.oldCardNumber || '',
+    familyCount: c.fam !== undefined ? c.fam : (c.familyCount || 0),
+    eligibleCount: c.eligible !== undefined ? c.eligible : (c.eligibleCount || 0),
+    blockedCount: c.blocked !== undefined ? c.blocked : (c.blockedCount || 0),
+    isWelfare: !!c.welfare || !!c.isWelfare,
+    isReceived: !!c.done || !!c.isReceived,
+    receivedAt: c.doneAt || c.receivedAt || null,
+    items: c.items || { oil: false, flour: false, rice: false, sugar: false, paste: false, milk: false },
+    customItems: c.custom || c.customItems || [],
+    notes: c.notes || ''
+  }));
+
+  saveCitizensByAgency(agency, formatted);
+  console.log(`Saved ${formatted.length} citizens for agency ${agency}`);
+  res.json({ success: true, message: `تم حفظ ${formatted.length} مواطناً سحابياً بنجاح للوكالة (${agency})!`, count: formatted.length });
+});
+
+// جلب قائمة المواطنين للوكيل الحالي
+app.get('/api/citizens', (req, res) => {
+  const agency = req.query.agencyNumber || '868';
+  const query = (req.query.search || '').trim().toLowerCase();
+  let list = getCitizensByAgency(agency);
+
+  if (query) {
+    list = list.filter(c =>
+      c.name.toLowerCase().includes(query) ||
+      c.cardNumber.includes(query) ||
+      c.oldCardNumber.includes(query)
+    );
+  }
+
+  const total = list.length;
+  const received = list.filter(c => c.isReceived).length;
+  const pending = total - received;
+
+  res.json({
+    stats: { total, received, pending },
+    citizens: list
+  });
+});
+
+// تفاصيل مواطن واحد
 app.get('/api/citizens/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const list = getCitizens();
-    const citizen = list.find(c => c.id === id);
+  const agency = req.query.agencyNumber || '868';
+  const id = parseInt(req.params.id);
+  const list = getCitizensByAgency(agency);
+  const citizen = list.find(c => c.id === id);
 
-    if (!citizen) {
-        return res.status(404).json({ error: 'المواطن غير موجود' });
-    }
-    res.json(citizen);
+  if (!citizen) {
+    return res.status(404).json({ error: 'المواطن غير موجود' });
+  }
+  res.json(citizen);
 });
 
-// 4. تحديث أو استلام الحصة وتعديل المواد
+// تحديث استلام الحصة
 app.put('/api/citizens/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    let list = getCitizens();
-    const idx = list.findIndex(c => c.id === id);
+  const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
+  const id = parseInt(req.params.id);
+  let list = getCitizensByAgency(agency);
+  const idx = list.findIndex(c => c.id === id);
 
-    if (idx === -1) {
-        return res.status(404).json({ error: 'المواطن غير موجود' });
-    }
+  if (idx === -1) {
+    return res.status(404).json({ error: 'المواطن غير موجود' });
+  }
 
-    const current = list[idx];
-    const { name, isReceived, items, customItems, notes } = req.body;
+  const current = list[idx];
+  const { name, isReceived, items, customItems, notes } = req.body;
 
-    list[idx] = {
-        ...current,
-        name: name !== undefined ? name : current.name,
-        isReceived: isReceived !== undefined ? isReceived : current.isReceived,
-        receivedAt: isReceived ? (current.receivedAt || new Date().toISOString()) : null,
-        items: items !== undefined ? items : current.items,
-        customItems: customItems !== undefined ? customItems : current.customItems,
-        notes: notes !== undefined ? notes : current.notes
-    };
+  list[idx] = {
+    ...current,
+    name: name !== undefined ? name : current.name,
+    isReceived: isReceived !== undefined ? isReceived : current.isReceived,
+    receivedAt: isReceived ? (current.receivedAt || new Date().toISOString()) : null,
+    items: items !== undefined ? items : current.items,
+    customItems: customItems !== undefined ? customItems : current.customItems,
+    notes: notes !== undefined ? notes : current.notes
+  };
 
-    saveCitizens(list);
-    res.json({ success: true, citizen: list[idx] });
+  saveCitizensByAgency(agency, list);
+  res.json({ success: true, citizen: list[idx] });
 });
 
-// 5. إلغاء استلام الحصة
+// إلغاء استلام الحصة
 app.post('/api/citizens/:id/cancel', (req, res) => {
-    const id = parseInt(req.params.id);
-    let list = getCitizens();
-    const idx = list.findIndex(c => c.id === id);
+  const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
+  const id = parseInt(req.params.id);
+  let list = getCitizensByAgency(agency);
+  const idx = list.findIndex(c => c.id === id);
 
-    if (idx === -1) {
-        return res.status(404).json({ error: 'المواطن غير موجود' });
-    }
+  if (idx === -1) {
+    return res.status(404).json({ error: 'المواطن غير موجود' });
+  }
 
-    list[idx] = {
-        ...list[idx],
-        isReceived: false,
-        receivedAt: null,
-        items: { oil: false, flour: false, rice: false, sugar: false, paste: false, milk: false },
-        customItems: []
-    };
+  list[idx] = {
+    ...list[idx],
+    isReceived: false,
+    receivedAt: null,
+    items: { oil: false, flour: false, rice: false, sugar: false, paste: false, milk: false },
+    customItems: []
+  };
 
-    saveCitizens(list);
-    res.json({ success: true, message: 'تم إلغاء الاستلام بنجاح', citizen: list[idx] });
+  saveCitizensByAgency(agency, list);
+  res.json({ success: true, message: 'تم إلغاء الاستلام بنجاح', citizen: list[idx] });
 });
 
-// 6. إنهاء وأرشفة الشهر
+// إنهاء وأرشفة الشهر
 app.post('/api/archive/finish-month', (req, res) => {
-    const { monthTitle } = req.body;
-    if (!monthTitle) {
-        return res.status(400).json({ error: 'يرجى تزويد اسم للشهر الأرشيفي' });
-    }
+  const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
+  const { monthTitle, citizens: clientCitizens } = req.body;
+  if (!monthTitle) {
+    return res.status(400).json({ error: 'يرجى تزويد اسم للشهر الأرشيفي' });
+  }
 
-    const citizens = getCitizens();
-    const receivedCount = citizens.filter(c => c.isReceived).length;
+  let citizensToArchive = getCitizensByAgency(agency);
+  if (Array.isArray(clientCitizens) && clientCitizens.length > 0) {
+    citizensToArchive = clientCitizens;
+  }
+  const receivedCount = citizensToArchive.filter(c => c.isReceived || c.done).length;
 
-    const archive = getArchive();
-    const snapshot = {
-        id: 'm_arch_' + Date.now(),
-        monthTitle: monthTitle.trim(),
-        archivedAt: new Date().toISOString(),
-        totalCitizens: citizens.length,
-        receivedCount: receivedCount,
-        citizens: citizens
-    };
+  const archive = getArchiveByAgency(agency);
+  const snapshot = {
+    id: 'm_arch_' + Date.now(),
+    monthTitle: monthTitle.trim(),
+    label: monthTitle.trim(),
+    archivedAt: new Date().toISOString(),
+    date: new Date().toISOString(),
+    totalCitizens: citizensToArchive.length,
+    receivedCount: receivedCount,
+    citizens: citizensToArchive
+  };
 
-    archive.unshift(snapshot);
-    saveArchive(archive);
+  archive.unshift(snapshot);
+  saveArchiveByAgency(agency, archive);
 
-    // تصفير الشهر الحالي لبدء شهر جديد
-    const resetCitizens = citizens.map(c => ({
-        ...c,
-        isReceived: false,
-        receivedAt: null,
-        items: { oil: false, flour: false, rice: false, sugar: false, paste: false, milk: false },
-        customItems: []
-    }));
-    saveCitizens(resetCitizens);
+  // تصفير الشهر الحالي لهذا الوكيل
+  const current = getCitizensByAgency(agency);
+  const resetCitizens = current.map(c => ({
+    ...c,
+    isReceived: false,
+    receivedAt: null,
+    items: { oil: false, flour: false, rice: false, sugar: false, paste: false, milk: false },
+    customItems: []
+  }));
+  saveCitizensByAgency(agency, resetCitizens);
 
-    res.json({
-        success: true,
-        message: `تمت أرشفة (${monthTitle}) بنجاح وتصفير السجل للشهر الجديد!`,
-        snapshot
-    });
+  res.json({
+    success: true,
+    message: `تمت أرشفة (${monthTitle}) بنجاح للوكالة (${agency}) وتصفير السجل للشهر الجديد!`,
+    snapshot
+  });
 });
 
-// 7. جلب قائمة الأشهر المؤرشفة
+// جلب قائمة أرشيف الأشهر لوكيل معين
 app.get('/api/archive', (req, res) => {
-    res.json(getArchive());
+  const agency = req.query.agencyNumber || '868';
+  res.json(getArchiveByAgency(agency));
 });
 
-// 8. تعديل اسم الشهر في الأرشيف
+// تعديل اسم شهر في الأرشيف
 app.put('/api/archive/:id', (req, res) => {
-    const id = req.params.id;
-    const { newTitle } = req.body;
+  const agency = req.query.agencyNumber || '868';
+  const id = req.params.id;
+  const { newTitle } = req.body;
 
-    let archive = getArchive();
-    const month = archive.find(m => m.id === id);
+  let archive = getArchiveByAgency(agency);
+  const month = archive.find(m => m.id === id);
 
-    if (!month) {
-        return res.status(404).json({ error: 'الشهر غير موجود في الأرشيف' });
-    }
+  if (!month) {
+    return res.status(404).json({ error: 'الشهر غير موجود في الأرشيف' });
+  }
 
-    month.monthTitle = newTitle.trim();
-    saveArchive(archive);
+  month.monthTitle = newTitle.trim();
+  saveArchiveByAgency(agency, archive);
 
-    res.json({ success: true, month });
+  res.json({ success: true, month });
 });
 
-app.listen(PORT, () => {
+module.exports = app;
+
+if (require.main === module) {
+  app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
-});
+  });
+}
