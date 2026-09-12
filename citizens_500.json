@@ -1,0 +1,5002 @@
+[
+  {
+    "seq": 1,
+    "name": "رزيقه مهدي رياض النهر",
+    "cardNumber": "7296064",
+    "oldCard": "0005137",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 2,
+    "name": "جميلة عيدان محمد",
+    "cardNumber": "7898599",
+    "oldCard": "0005896",
+    "total": 11,
+    "eligible": 4,
+    "blocked": 7,
+    "isWelfare": false
+  },
+  {
+    "seq": 3,
+    "name": "زينب كامل جولان الياس",
+    "cardNumber": "6797694",
+    "oldCard": "0007917",
+    "total": 7,
+    "eligible": 6,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 4,
+    "name": "انتصار محمد علي حسين غرباوي",
+    "cardNumber": "7794802",
+    "oldCard": "0009729",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 5,
+    "name": "عباس محمد جابر",
+    "cardNumber": "6791920",
+    "oldCard": "0012920",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 6,
+    "name": "ثجيل يارس معيلو الدرباش",
+    "cardNumber": "6960691",
+    "oldCard": "0015493",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 7,
+    "name": "كاظم حمود محمد ال صخي",
+    "cardNumber": "7342625",
+    "oldCard": "0020604",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 8,
+    "name": "محمد صالح حميد كريديس",
+    "cardNumber": "6996950",
+    "oldCard": "0024994",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 9,
+    "name": "مطرش عاشور عوده المصدق",
+    "cardNumber": "7092104",
+    "oldCard": "0025845",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 10,
+    "name": "مطر راشد لفته الصبحي",
+    "cardNumber": "7082155",
+    "oldCard": "0033829",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 11,
+    "name": "صبيحة مدلول منشد الحصونه",
+    "cardNumber": "7225706",
+    "oldCard": "0036732",
+    "total": 8,
+    "eligible": 6,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 12,
+    "name": "حنس محينس حميدي",
+    "cardNumber": "6895816",
+    "oldCard": "0036914",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 13,
+    "name": "محمد كاظم بجاي",
+    "cardNumber": "6989424",
+    "oldCard": "0056715",
+    "total": 8,
+    "eligible": 6,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 14,
+    "name": "صبيحة كريم عطيه الخفاجي",
+    "cardNumber": "7482024",
+    "oldCard": "0060051",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 15,
+    "name": "غالب مهدي طالب البكاء",
+    "cardNumber": "7562242",
+    "oldCard": "0065057",
+    "total": 8,
+    "eligible": 6,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 16,
+    "name": "كريم معيلو جيثوم",
+    "cardNumber": "8052865",
+    "oldCard": "0070575",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 17,
+    "name": "عبد الله مهدي صالح الحاتمي",
+    "cardNumber": "6882413",
+    "oldCard": "0073554",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 18,
+    "name": "عزيز معيلو جيثوم",
+    "cardNumber": "7203501",
+    "oldCard": "0076265",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 19,
+    "name": "كرار جواد قاسم",
+    "cardNumber": "7589873",
+    "oldCard": "0098003",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 20,
+    "name": "دهدارة رومي عايص",
+    "cardNumber": "9011596",
+    "oldCard": "0098623",
+    "total": 1,
+    "eligible": 0,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 21,
+    "name": "جميلة سلمان عبد",
+    "cardNumber": "8133569",
+    "oldCard": "0101718",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 22,
+    "name": "أحمد شاكر ضايف ال ف علي",
+    "cardNumber": "7084926",
+    "oldCard": "0103301",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 23,
+    "name": "عبد الحسين مسري كاطع",
+    "cardNumber": "9831412",
+    "oldCard": "0106296",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 24,
+    "name": "ايمان محمد خفيف",
+    "cardNumber": "8176414",
+    "oldCard": "0107004",
+    "total": 3,
+    "eligible": 2,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 25,
+    "name": "حيدر احمد جاسم",
+    "cardNumber": "8897191",
+    "oldCard": "0109552",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 26,
+    "name": "نجمة عبد الله مهدي الحاتمي",
+    "cardNumber": "6883478",
+    "oldCard": "0110720",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 27,
+    "name": "ابراهيم كشاش نعيمه المشاخيل",
+    "cardNumber": "7936727",
+    "oldCard": "0113668",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 28,
+    "name": "فطومة تعبان خلف",
+    "cardNumber": "7458991",
+    "oldCard": "0113848",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 29,
+    "name": "جبار حسين علي",
+    "cardNumber": "8695883",
+    "oldCard": "0114449",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 30,
+    "name": "فاطمه كاظم عبد الحسين",
+    "cardNumber": "8906281",
+    "oldCard": "0115357",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 31,
+    "name": "مليحة هاشم جساس",
+    "cardNumber": "8559814",
+    "oldCard": "0116935",
+    "total": 7,
+    "eligible": 5,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 32,
+    "name": "عزيز عبد الحسين شناوه ال شناوه",
+    "cardNumber": "7395591",
+    "oldCard": "0117148",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 33,
+    "name": "ملكيه محمد كردوش",
+    "cardNumber": "6972029",
+    "oldCard": "0117159",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 34,
+    "name": "شكية فجر عويد الحسينات",
+    "cardNumber": "7874597",
+    "oldCard": "0117558",
+    "total": 9,
+    "eligible": 8,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 35,
+    "name": "نعيم عجيمي مزعل البلش",
+    "cardNumber": "7041842",
+    "oldCard": "0117615",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 36,
+    "name": "حليمة مسري مهوس الرحمه",
+    "cardNumber": "7021954",
+    "oldCard": "0118053",
+    "total": 11,
+    "eligible": 11,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 37,
+    "name": "فاضل عبد زوير",
+    "cardNumber": "7241711",
+    "oldCard": "0118910",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 38,
+    "name": "ماجد محيبس جاسم",
+    "cardNumber": "7864637",
+    "oldCard": "0119311",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 39,
+    "name": "حسين عباس كاظم",
+    "cardNumber": "8430093",
+    "oldCard": "0119312",
+    "total": 2,
+    "eligible": 0,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 40,
+    "name": "رضية عجريش محمد الحسيناوي",
+    "cardNumber": "7919801",
+    "oldCard": "0120192",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 41,
+    "name": "كريم كاطع فليح",
+    "cardNumber": "7287113",
+    "oldCard": "0122733",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 42,
+    "name": "عبود شاكر مانع الذرب",
+    "cardNumber": "7029354",
+    "oldCard": "0122932",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 43,
+    "name": "مياسة غركان رديين الذرب",
+    "cardNumber": "7942629",
+    "oldCard": "0122934",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 44,
+    "name": "عزيزة جرب حميدي الذرب",
+    "cardNumber": "8112213",
+    "oldCard": "0122935",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 45,
+    "name": "بشه زبالة رديين الذرب",
+    "cardNumber": "8030560",
+    "oldCard": "0122937",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 46,
+    "name": "رحيمة كريم عبد الحسين االمري",
+    "cardNumber": "7954461",
+    "oldCard": "0122939",
+    "total": 4,
+    "eligible": 3,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 47,
+    "name": "حياة فرهود مطلك السبع",
+    "cardNumber": "8873194",
+    "oldCard": "0122940",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 48,
+    "name": "عبد الحسين جرب مطلك السبع",
+    "cardNumber": "7501834",
+    "oldCard": "0122941",
+    "total": 12,
+    "eligible": 11,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 49,
+    "name": "كاظميه دارش منحوش ال هريبش",
+    "cardNumber": "8707314",
+    "oldCard": "0122942",
+    "total": 3,
+    "eligible": 1,
+    "blocked": 2,
+    "isWelfare": true
+  },
+  {
+    "seq": 50,
+    "name": "انور عباس خميس الخريمه",
+    "cardNumber": "8528399",
+    "oldCard": "0122946",
+    "total": 5,
+    "eligible": 4,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 51,
+    "name": "فاطمة جابر مسري الذرب",
+    "cardNumber": "7412746",
+    "oldCard": "0122948",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 52,
+    "name": "عبدالزهره حاجم حنتوش",
+    "cardNumber": "8475860",
+    "oldCard": "0122949",
+    "total": 12,
+    "eligible": 11,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 53,
+    "name": "عبد حنت دهيم العسكري",
+    "cardNumber": "7183913",
+    "oldCard": "0122950",
+    "total": 14,
+    "eligible": 9,
+    "blocked": 5,
+    "isWelfare": false
+  },
+  {
+    "seq": 54,
+    "name": "مسري ريسان زباله الذرب",
+    "cardNumber": "8173574",
+    "oldCard": "0122952",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 55,
+    "name": "عدنان غركان رديين الذرب",
+    "cardNumber": "8904307",
+    "oldCard": "0122953",
+    "total": 11,
+    "eligible": 11,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 56,
+    "name": "سكندر صعيصع عطشان",
+    "cardNumber": "7449338",
+    "oldCard": "0122955",
+    "total": 3,
+    "eligible": 0,
+    "blocked": 3,
+    "isWelfare": true
+  },
+  {
+    "seq": 57,
+    "name": "رحيم فهد علي الموسوي",
+    "cardNumber": "8312370",
+    "oldCard": "0122957",
+    "total": 5,
+    "eligible": 4,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 58,
+    "name": "سفرية سلمان غركان الذرب",
+    "cardNumber": "8046922",
+    "oldCard": "0122958",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 59,
+    "name": "عقيل كريم فهد الموسوي",
+    "cardNumber": "7101738",
+    "oldCard": "0122959",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 60,
+    "name": "هضيمه عدوان شمخي",
+    "cardNumber": "8235309",
+    "oldCard": "0122960",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 61,
+    "name": "كاظم شاتول عريان الخريمه",
+    "cardNumber": "8131000",
+    "oldCard": "0122961",
+    "total": 7,
+    "eligible": 5,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 62,
+    "name": "ماجد مراد فرعون الكريم",
+    "cardNumber": "8955068",
+    "oldCard": "0122963",
+    "total": 3,
+    "eligible": 2,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 63,
+    "name": "صباح كريم شمخي الحمد",
+    "cardNumber": "7252813",
+    "oldCard": "0122966",
+    "total": 5,
+    "eligible": 4,
+    "blocked": 1,
+    "isWelfare": true
+  },
+  {
+    "seq": 64,
+    "name": "خلف حبيب عايد",
+    "cardNumber": "8512932",
+    "oldCard": "0122967",
+    "total": 3,
+    "eligible": 1,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 65,
+    "name": "قندة كاظم يارس",
+    "cardNumber": "8608511",
+    "oldCard": "0122968",
+    "total": 5,
+    "eligible": 4,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 66,
+    "name": "عبد الكريم محسن بازل الحنس",
+    "cardNumber": "8272280",
+    "oldCard": "0122969",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 67,
+    "name": "حيدر عبد الساده محسن الحنس",
+    "cardNumber": "8585375",
+    "oldCard": "0122970",
+    "total": 12,
+    "eligible": 12,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 68,
+    "name": "علي حسين عمران البكاء",
+    "cardNumber": "8000631",
+    "oldCard": "0122971",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 69,
+    "name": "عبد الزهره حامد علي المحمد",
+    "cardNumber": "8403207",
+    "oldCard": "0122973",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 70,
+    "name": "جوده فاضل حلوف الجثري",
+    "cardNumber": "7623835",
+    "oldCard": "0122974",
+    "total": 14,
+    "eligible": 13,
+    "blocked": 1,
+    "isWelfare": true
+  },
+  {
+    "seq": 71,
+    "name": "حليمة حنس محي الكريم",
+    "cardNumber": "8106321",
+    "oldCard": "0122975",
+    "total": 2,
+    "eligible": 1,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 72,
+    "name": "كريم عاكول كاظم النارصي",
+    "cardNumber": "8552147",
+    "oldCard": "0122976",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 73,
+    "name": "عبدالكاظم محسن بازل الحنس",
+    "cardNumber": "9851375",
+    "oldCard": "0122977",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 74,
+    "name": "حميد هاني ادريس البكاء",
+    "cardNumber": "7604744",
+    "oldCard": "0122978",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 75,
+    "name": "خالد حسين كريم الداود",
+    "cardNumber": "8156488",
+    "oldCard": "0122979",
+    "total": 5,
+    "eligible": 2,
+    "blocked": 3,
+    "isWelfare": false
+  },
+  {
+    "seq": 76,
+    "name": "لطيف شاكر نور البكاء",
+    "cardNumber": "6914013",
+    "oldCard": "0122980",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 77,
+    "name": "عباس موحان وايل الجثري",
+    "cardNumber": "7943786",
+    "oldCard": "0122981",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 78,
+    "name": "وقيه عيىس سعدون الكسار",
+    "cardNumber": "8551580",
+    "oldCard": "0122984",
+    "total": 8,
+    "eligible": 4,
+    "blocked": 4,
+    "isWelfare": false
+  },
+  {
+    "seq": 79,
+    "name": "عبد الحسين صعيصع عطشان الخريمه",
+    "cardNumber": "8339465",
+    "oldCard": "0122987",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 80,
+    "name": "علية زماط دنبوس",
+    "cardNumber": "8213164",
+    "oldCard": "0122992",
+    "total": 7,
+    "eligible": 5,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 81,
+    "name": "حسنه محمد هاشم",
+    "cardNumber": "8540338",
+    "oldCard": "0122993",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 82,
+    "name": "عطيه خميس عريان الخريمه",
+    "cardNumber": "8724519",
+    "oldCard": "0122997",
+    "total": 4,
+    "eligible": 3,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 83,
+    "name": "عبد العايل دخل خلف الموسوي",
+    "cardNumber": "7220408",
+    "oldCard": "0123000",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 84,
+    "name": "فريضه هاني ادريس البكاء",
+    "cardNumber": "7358105",
+    "oldCard": "0123002",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 85,
+    "name": "عدنان صاحب منشد الذرب",
+    "cardNumber": "8498205",
+    "oldCard": "0123004",
+    "total": 12,
+    "eligible": 12,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 86,
+    "name": "مجيد شليبه مطوس الرحمه",
+    "cardNumber": "7459908",
+    "oldCard": "0123006",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 87,
+    "name": "حمديه مفتاح حسين الداخل",
+    "cardNumber": "8066890",
+    "oldCard": "0123007",
+    "total": 5,
+    "eligible": 3,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 88,
+    "name": "جليل جيجان مطوس الذرب",
+    "cardNumber": "6970548",
+    "oldCard": "0123943",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 89,
+    "name": "عبد هاشم محمد",
+    "cardNumber": "7321769",
+    "oldCard": "0124526",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 90,
+    "name": "جواد طالل عزوز العايص",
+    "cardNumber": "6966026",
+    "oldCard": "0124658",
+    "total": 8,
+    "eligible": 6,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 91,
+    "name": "منصور فلغوص شذر",
+    "cardNumber": "8111880",
+    "oldCard": "0126018",
+    "total": 7,
+    "eligible": 6,
+    "blocked": 1,
+    "isWelfare": true
+  },
+  {
+    "seq": 92,
+    "name": "شونه حسين علي الحسيناوي",
+    "cardNumber": "7391204",
+    "oldCard": "0127148",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 93,
+    "name": "مسلم حاتم علي",
+    "cardNumber": "6998895",
+    "oldCard": "0127149",
+    "total": 12,
+    "eligible": 11,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 94,
+    "name": "علي محمد عزيز البو سعيد",
+    "cardNumber": "7890298",
+    "oldCard": "0127437",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 95,
+    "name": "عدنان محسن عوفي",
+    "cardNumber": "7532835",
+    "oldCard": "0128988",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 96,
+    "name": "كريمه رشيد حنس",
+    "cardNumber": "7208521",
+    "oldCard": "0129462",
+    "total": 5,
+    "eligible": 3,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 97,
+    "name": "عدنان عبد الحسين عداي",
+    "cardNumber": "7813190",
+    "oldCard": "0129463",
+    "total": 7,
+    "eligible": 6,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 98,
+    "name": "فيصل عبد الحسين عداي",
+    "cardNumber": "7192246",
+    "oldCard": "0129464",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 99,
+    "name": "عادل كاظم شهد",
+    "cardNumber": "7138408",
+    "oldCard": "0129470",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 100,
+    "name": "جليل كاظم شهد",
+    "cardNumber": "7327251",
+    "oldCard": "0129471",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 101,
+    "name": "فالح مهدي سكر",
+    "cardNumber": "6869268",
+    "oldCard": "0129476",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 102,
+    "name": "عزيز كريم عباس",
+    "cardNumber": "8254008",
+    "oldCard": "0129478",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 103,
+    "name": "رسيله علي خلف",
+    "cardNumber": "8052340",
+    "oldCard": "0129481",
+    "total": 2,
+    "eligible": 1,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 104,
+    "name": "ليىل جبار سعدون",
+    "cardNumber": "8106079",
+    "oldCard": "0129487",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 105,
+    "name": "جبار كاظم فيصل",
+    "cardNumber": "7977755",
+    "oldCard": "0129494",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 106,
+    "name": "امليح محينس كريدي",
+    "cardNumber": "7291132",
+    "oldCard": "0129496",
+    "total": 3,
+    "eligible": 2,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 107,
+    "name": "بدريه برغش جباره",
+    "cardNumber": "8062094",
+    "oldCard": "0129503",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 108,
+    "name": "حنس جخيور ثامر",
+    "cardNumber": "7070237",
+    "oldCard": "0129509",
+    "total": 3,
+    "eligible": 2,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 109,
+    "name": "بطاقة مطر عبد الله ال مطري",
+    "cardNumber": "8370767",
+    "oldCard": "0129536",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 110,
+    "name": "علي جوني عزيز",
+    "cardNumber": "8366622",
+    "oldCard": "0129537",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 111,
+    "name": "حسين جوني عزيز",
+    "cardNumber": "7895351",
+    "oldCard": "0129559",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 112,
+    "name": "سهيله فيصل كريم الداود",
+    "cardNumber": "8350119",
+    "oldCard": "0130637",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 113,
+    "name": "طوعه خزعل سهر الحوايس",
+    "cardNumber": "8562429",
+    "oldCard": "0130752",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 114,
+    "name": "حسين ناصر حميد",
+    "cardNumber": "7221899",
+    "oldCard": "0131958",
+    "total": 9,
+    "eligible": 8,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 115,
+    "name": "كامل منشد بروان",
+    "cardNumber": "7257288",
+    "oldCard": "0132207",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 116,
+    "name": "قيرص جبار منشد",
+    "cardNumber": "8477677",
+    "oldCard": "0132216",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 117,
+    "name": "احالم طعيمه رويعي",
+    "cardNumber": "6985042",
+    "oldCard": "0132699",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 118,
+    "name": "نجاح صبار احمد",
+    "cardNumber": "7498639",
+    "oldCard": "0133029",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 119,
+    "name": "رقية حنس طاهر",
+    "cardNumber": "7574253",
+    "oldCard": "0133042",
+    "total": 4,
+    "eligible": 2,
+    "blocked": 2,
+    "isWelfare": true
+  },
+  {
+    "seq": 120,
+    "name": "مرصيه كريم مطوس الذرب",
+    "cardNumber": "7610802",
+    "oldCard": "0133126",
+    "total": 5,
+    "eligible": 4,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 121,
+    "name": "ابتسام مظلوم عويد العبودي",
+    "cardNumber": "8179104",
+    "oldCard": "0133175",
+    "total": 2,
+    "eligible": 1,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 122,
+    "name": "سعد جميل حميد",
+    "cardNumber": "6980897",
+    "oldCard": "0133589",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 123,
+    "name": "جاسم عبد الصاحب محينه",
+    "cardNumber": "7961054",
+    "oldCard": "0134860",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 124,
+    "name": "اياد محمد خزعل الكواز",
+    "cardNumber": "7996980",
+    "oldCard": "0135388",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 125,
+    "name": "فضيله غضبان ابراهيم العرييب",
+    "cardNumber": "8529562",
+    "oldCard": "0137025",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 126,
+    "name": "سجاد عبد الحسين جاسم",
+    "cardNumber": "8164636",
+    "oldCard": "0137332",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 127,
+    "name": "عزيزة دخيل عويف",
+    "cardNumber": "7133121",
+    "oldCard": "0137334",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 128,
+    "name": "جابر حطاب ذهب",
+    "cardNumber": "8553960",
+    "oldCard": "0137336",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 129,
+    "name": "يحيى عطيه حمد",
+    "cardNumber": "6946837",
+    "oldCard": "0137337",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 130,
+    "name": "موىس كريم نجم",
+    "cardNumber": "7239914",
+    "oldCard": "0137338",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 131,
+    "name": "حميد سلطان خشان",
+    "cardNumber": "7822303",
+    "oldCard": "0137348",
+    "total": 5,
+    "eligible": 4,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 132,
+    "name": "جبار يارس حمد",
+    "cardNumber": "6875195",
+    "oldCard": "0137349",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 133,
+    "name": "رضية كريم عطيه الخفاجي",
+    "cardNumber": "7031855",
+    "oldCard": "0137351",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 134,
+    "name": "علي مزهر شهد",
+    "cardNumber": "8254171",
+    "oldCard": "0137352",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 135,
+    "name": "كرار علي رحيمة",
+    "cardNumber": "7048691",
+    "oldCard": "0137355",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 136,
+    "name": "صبار صويحي مكطوف",
+    "cardNumber": "7271593",
+    "oldCard": "0137357",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 137,
+    "name": "عبد اللة لطيف حاجم",
+    "cardNumber": "8441430",
+    "oldCard": "0137359",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 138,
+    "name": "جميل زغري حفيت",
+    "cardNumber": "6753123",
+    "oldCard": "0137361",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 139,
+    "name": "خميسة محسن عوفي",
+    "cardNumber": "8597149",
+    "oldCard": "0137363",
+    "total": 7,
+    "eligible": 5,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 140,
+    "name": "ابراهيم حنس عليوي",
+    "cardNumber": "7270526",
+    "oldCard": "0137364",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 141,
+    "name": "هيله غفوري زادخان",
+    "cardNumber": "8331282",
+    "oldCard": "0137365",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 142,
+    "name": "حياة مسري برغوث",
+    "cardNumber": "7212386",
+    "oldCard": "0137366",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 143,
+    "name": "شكريه عبد مهلهل",
+    "cardNumber": "8916921",
+    "oldCard": "0137367",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 144,
+    "name": "حسين عليوي شنيور",
+    "cardNumber": "7101150",
+    "oldCard": "0137368",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 145,
+    "name": "عليه عنيد رحيمة",
+    "cardNumber": "8106439",
+    "oldCard": "0137369",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 146,
+    "name": "زكيه حسين لفلوف",
+    "cardNumber": "7403374",
+    "oldCard": "0137370",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 147,
+    "name": "ملكيه محمد جرب",
+    "cardNumber": "9858422",
+    "oldCard": "0137372",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 148,
+    "name": "صبرية عبد الله شنيار",
+    "cardNumber": "6913191",
+    "oldCard": "0137373",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 149,
+    "name": "فليح كريم لفلوف",
+    "cardNumber": "8077978",
+    "oldCard": "0137374",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 150,
+    "name": "محسن غفوري زادخان",
+    "cardNumber": "8814021",
+    "oldCard": "0137375",
+    "total": 3,
+    "eligible": 2,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 151,
+    "name": "هديه زغري جايد",
+    "cardNumber": "8216198",
+    "oldCard": "0137376",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 152,
+    "name": "عيدة ناصر نافع الفضل",
+    "cardNumber": "7860787",
+    "oldCard": "0137377",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 153,
+    "name": "صباح هادي كاظم",
+    "cardNumber": "7030223",
+    "oldCard": "0137378",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 154,
+    "name": "وسيله فرحان صباح الداود",
+    "cardNumber": "8408659",
+    "oldCard": "0137379",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 155,
+    "name": "جبار محمد خلف",
+    "cardNumber": "7406169",
+    "oldCard": "0137382",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 156,
+    "name": "خلف علي خلف",
+    "cardNumber": "7069359",
+    "oldCard": "0137383",
+    "total": 6,
+    "eligible": 4,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 157,
+    "name": "كاظم حسين لفلوف",
+    "cardNumber": "7011476",
+    "oldCard": "0137384",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 158,
+    "name": "رسم يحيى شياع",
+    "cardNumber": "8221470",
+    "oldCard": "0137385",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 159,
+    "name": "حميد نعمه عسكر",
+    "cardNumber": "6783667",
+    "oldCard": "0137389",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 160,
+    "name": "نجيه خلف علي",
+    "cardNumber": "7109883",
+    "oldCard": "0137390",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 161,
+    "name": "احمد نعمه عسكر",
+    "cardNumber": "8215097",
+    "oldCard": "0137391",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 162,
+    "name": "ثجيله خضري نايف",
+    "cardNumber": "7926822",
+    "oldCard": "0137393",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 163,
+    "name": "مهدي كاطع دعيم",
+    "cardNumber": "8059514",
+    "oldCard": "0137394",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 164,
+    "name": "خركان كاطع دعيم",
+    "cardNumber": "8238191",
+    "oldCard": "0137395",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 165,
+    "name": "حسنه عبيد ذياب",
+    "cardNumber": "7492650",
+    "oldCard": "0137396",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 166,
+    "name": "نوال فزع دعيم الصعمه",
+    "cardNumber": "7765370",
+    "oldCard": "0137399",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 167,
+    "name": "جرداغة كاظم حسين",
+    "cardNumber": "8158585",
+    "oldCard": "0137401",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 168,
+    "name": "ماعود جرمد جيل",
+    "cardNumber": "8889564",
+    "oldCard": "0137403",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 169,
+    "name": "موىس كريم صالح",
+    "cardNumber": "7128063",
+    "oldCard": "0137404",
+    "total": 7,
+    "eligible": 6,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 170,
+    "name": "معصومة كاظم بجاي",
+    "cardNumber": "7577261",
+    "oldCard": "0137405",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 171,
+    "name": "عبد كاظم حسين",
+    "cardNumber": "8155698",
+    "oldCard": "0137406",
+    "total": 12,
+    "eligible": 11,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 172,
+    "name": "حورى خبري خالطي",
+    "cardNumber": "7575769",
+    "oldCard": "0137410",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 173,
+    "name": "حميد عبيد كاطع",
+    "cardNumber": "7490104",
+    "oldCard": "0137412",
+    "total": 7,
+    "eligible": 6,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 174,
+    "name": "غريجه عنيد عظام",
+    "cardNumber": "7119811",
+    "oldCard": "0137413",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 175,
+    "name": "فطومة غايل جرب",
+    "cardNumber": "7786051",
+    "oldCard": "0137414",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 176,
+    "name": "جبار هادي معيدي",
+    "cardNumber": "7290438",
+    "oldCard": "0137415",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 177,
+    "name": "محمد جابر حطاب",
+    "cardNumber": "8737230",
+    "oldCard": "0137416",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 178,
+    "name": "سندس كريم فهد الموسوي",
+    "cardNumber": "9834595",
+    "oldCard": "0137417",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 179,
+    "name": "رباب حسين عليوي",
+    "cardNumber": "7593893",
+    "oldCard": "0137418",
+    "total": 4,
+    "eligible": 1,
+    "blocked": 3,
+    "isWelfare": false
+  },
+  {
+    "seq": 180,
+    "name": "مرصيه حسين لفلوف",
+    "cardNumber": "8036047",
+    "oldCard": "0137419",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 181,
+    "name": "صالح مطر محينس",
+    "cardNumber": "7588241",
+    "oldCard": "0137420",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 182,
+    "name": "ضحى طعان نعمه",
+    "cardNumber": "7766863",
+    "oldCard": "0137867",
+    "total": 7,
+    "eligible": 6,
+    "blocked": 1,
+    "isWelfare": true
+  },
+  {
+    "seq": 183,
+    "name": "هليل عبد مطر",
+    "cardNumber": "7615335",
+    "oldCard": "0137934",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 184,
+    "name": "نعيم شمخي عبد",
+    "cardNumber": "7463627",
+    "oldCard": "0137937",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 185,
+    "name": "وايل خزعل هذال",
+    "cardNumber": "9833157",
+    "oldCard": "0137938",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 186,
+    "name": "اسكينه حطاب احويش",
+    "cardNumber": "8238532",
+    "oldCard": "0137939",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 187,
+    "name": "محمد عطيه عبد",
+    "cardNumber": "8042534",
+    "oldCard": "0137940",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 188,
+    "name": "قاسم حواس عويف",
+    "cardNumber": "8996328",
+    "oldCard": "0137942",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 189,
+    "name": "نرصه حنس راشد الصبحي",
+    "cardNumber": "8174712",
+    "oldCard": "0137943",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 190,
+    "name": "علي شمخي عبد مطر",
+    "cardNumber": "7608582",
+    "oldCard": "0137945",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 191,
+    "name": "سلمان مكطوف عبد الله",
+    "cardNumber": "7854496",
+    "oldCard": "0137946",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 192,
+    "name": "حنس ريسان عبد الحسين",
+    "cardNumber": "7407624",
+    "oldCard": "0137947",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 193,
+    "name": "عباس جواد كاظم السلمان",
+    "cardNumber": "8426799",
+    "oldCard": "0137950",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 194,
+    "name": "احمد جرب نشمي",
+    "cardNumber": "7098219",
+    "oldCard": "0137954",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 195,
+    "name": "كاظميه محمد سعيد",
+    "cardNumber": "8265792",
+    "oldCard": "0137956",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 196,
+    "name": "خوله هلول زغري الدردوكي",
+    "cardNumber": "7185960",
+    "oldCard": "0137958",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 197,
+    "name": "صبحه صخي فزيع",
+    "cardNumber": "8739458",
+    "oldCard": "0137959",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 198,
+    "name": "ميثم محمد جرب",
+    "cardNumber": "8433327",
+    "oldCard": "0137962",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 199,
+    "name": "حسين درش حسوني الذويخات",
+    "cardNumber": "7154101",
+    "oldCard": "0137963",
+    "total": 11,
+    "eligible": 9,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 200,
+    "name": "حسين حمد دهراب",
+    "cardNumber": "7349552",
+    "oldCard": "0137965",
+    "total": 11,
+    "eligible": 11,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 201,
+    "name": "حكيمه عكله عنيد",
+    "cardNumber": "6781840",
+    "oldCard": "0137966",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 202,
+    "name": "عجيل عبد ثجيل",
+    "cardNumber": "7626324",
+    "oldCard": "0137969",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 203,
+    "name": "علي مزهر بلبص",
+    "cardNumber": "7540336",
+    "oldCard": "0137972",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 204,
+    "name": "صالح عباس كاظم",
+    "cardNumber": "6935872",
+    "oldCard": "0137974",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 205,
+    "name": "شوين مطري حرمس",
+    "cardNumber": "7618062",
+    "oldCard": "0137975",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 206,
+    "name": "انتصار كاظم فيصل",
+    "cardNumber": "8781993",
+    "oldCard": "0137976",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 207,
+    "name": "شكريه صباح بلبص",
+    "cardNumber": "7538954",
+    "oldCard": "0137979",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 208,
+    "name": "بهية سعيد طالل",
+    "cardNumber": "7533155",
+    "oldCard": "0137981",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 209,
+    "name": "مكطوف عبدهللا صبيح",
+    "cardNumber": "7867242",
+    "oldCard": "0137982",
+    "total": 2,
+    "eligible": 1,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 210,
+    "name": "غنيه سعيد طالل",
+    "cardNumber": "7319138",
+    "oldCard": "0137985",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 211,
+    "name": "حميده هلول زغري",
+    "cardNumber": "7765839",
+    "oldCard": "0137987",
+    "total": 4,
+    "eligible": 3,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 212,
+    "name": "بري بلبص عبد",
+    "cardNumber": "8072215",
+    "oldCard": "0137989",
+    "total": 11,
+    "eligible": 10,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 213,
+    "name": "عويره خزعل هذال",
+    "cardNumber": "6888746",
+    "oldCard": "0137990",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 214,
+    "name": "فطومة عبيد خلف",
+    "cardNumber": "8089154",
+    "oldCard": "0137991",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 215,
+    "name": "وليد صحن حطاب",
+    "cardNumber": "8454036",
+    "oldCard": "0137994",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 216,
+    "name": "كاظم محمد سعيد",
+    "cardNumber": "7472723",
+    "oldCard": "0137995",
+    "total": 8,
+    "eligible": 0,
+    "blocked": 8,
+    "isWelfare": false
+  },
+  {
+    "seq": 217,
+    "name": "قاسم محمد سعيد",
+    "cardNumber": "7542123",
+    "oldCard": "0137997",
+    "total": 12,
+    "eligible": 12,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 218,
+    "name": "كريم ناصر داخل",
+    "cardNumber": "7580697",
+    "oldCard": "0137999",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 219,
+    "name": "مجيد كاظم محمد",
+    "cardNumber": "8478077",
+    "oldCard": "0138000",
+    "total": 2,
+    "eligible": 0,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 220,
+    "name": "بدرية جويد دخيل",
+    "cardNumber": "6933904",
+    "oldCard": "0138001",
+    "total": 9,
+    "eligible": 8,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 221,
+    "name": "علي هادي مشاي",
+    "cardNumber": "7864049",
+    "oldCard": "0138002",
+    "total": 13,
+    "eligible": 13,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 222,
+    "name": "كاظميه ناصر داخل",
+    "cardNumber": "7173514",
+    "oldCard": "0138003",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 223,
+    "name": "رشاك صالح راشد",
+    "cardNumber": "7341798",
+    "oldCard": "0138007",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 224,
+    "name": "قاسميه محمد سعيد",
+    "cardNumber": "7297265",
+    "oldCard": "0138008",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 225,
+    "name": "ونسيمه عاشور رشيد الجاميل",
+    "cardNumber": "8067084",
+    "oldCard": "0138009",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 226,
+    "name": "سعيده سوادي رشت",
+    "cardNumber": "7074987",
+    "oldCard": "0138010",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 227,
+    "name": "كميلة يحيى حاشوش",
+    "cardNumber": "7971005",
+    "oldCard": "0138011",
+    "total": 8,
+    "eligible": 6,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 228,
+    "name": "صبار حنس علي",
+    "cardNumber": "6917513",
+    "oldCard": "0138014",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 229,
+    "name": "كريمه كاظم عبد",
+    "cardNumber": "7083035",
+    "oldCard": "0138018",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 230,
+    "name": "نضال مهدي طالب البكاء",
+    "cardNumber": "6880013",
+    "oldCard": "0138019",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 231,
+    "name": "صبيحة جميل حميد",
+    "cardNumber": "6914627",
+    "oldCard": "0138020",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 232,
+    "name": "عباس فاضل يارس اليوراني",
+    "cardNumber": "7535122",
+    "oldCard": "0138137",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 233,
+    "name": "خليل ابراهيم عنيد الواجد",
+    "cardNumber": "8338746",
+    "oldCard": "0138621",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 234,
+    "name": "وهيبة جبار زغريون",
+    "cardNumber": "8308733",
+    "oldCard": "0138628",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 235,
+    "name": "زهراء عالء زغري اليازع",
+    "cardNumber": "8148450",
+    "oldCard": "0138685",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 236,
+    "name": "علي كريم سلمان",
+    "cardNumber": "8054066",
+    "oldCard": "0138686",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 237,
+    "name": "رحيمة خزعل هذال",
+    "cardNumber": "7862691",
+    "oldCard": "0138703",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 238,
+    "name": "محمد لفته مزيعل",
+    "cardNumber": "9846815",
+    "oldCard": "0139588",
+    "total": 10,
+    "eligible": 9,
+    "blocked": 1,
+    "isWelfare": true
+  },
+  {
+    "seq": 239,
+    "name": "مسلم ثجيل خضري",
+    "cardNumber": "8525605",
+    "oldCard": "0141420",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 240,
+    "name": "كاظم حنس عليوي",
+    "cardNumber": "6943461",
+    "oldCard": "0141523",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 241,
+    "name": "امل كريم لفلوف",
+    "cardNumber": "7931806",
+    "oldCard": "0141524",
+    "total": 8,
+    "eligible": 6,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 242,
+    "name": "مكيه ثجيل شيال",
+    "cardNumber": "8352251",
+    "oldCard": "0141525",
+    "total": 2,
+    "eligible": 1,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 243,
+    "name": "عبد االمري عليوي شنيور",
+    "cardNumber": "7134291",
+    "oldCard": "0141527",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 244,
+    "name": "مشكله كاظم لهمود",
+    "cardNumber": "8263572",
+    "oldCard": "0141531",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 245,
+    "name": "وسيله يوسف محسن",
+    "cardNumber": "8772354",
+    "oldCard": "0141533",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 246,
+    "name": "ليىل صحن حطاب",
+    "cardNumber": "8135931",
+    "oldCard": "0141534",
+    "total": 10,
+    "eligible": 9,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 247,
+    "name": "حيدر حنس جاسم",
+    "cardNumber": "8561628",
+    "oldCard": "0141539",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 248,
+    "name": "طاهر عباس رستم",
+    "cardNumber": "8112250",
+    "oldCard": "0141541",
+    "total": 5,
+    "eligible": 0,
+    "blocked": 5,
+    "isWelfare": false
+  },
+  {
+    "seq": 249,
+    "name": "جميل علي حسين الحسين",
+    "cardNumber": "8207690",
+    "oldCard": "0142680",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 250,
+    "name": "غانم مزعل بدن المرهش",
+    "cardNumber": "6820814",
+    "oldCard": "0145870",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 251,
+    "name": "قاسم طفيح صفر",
+    "cardNumber": "6872155",
+    "oldCard": "0145871",
+    "total": 5,
+    "eligible": 0,
+    "blocked": 5,
+    "isWelfare": false
+  },
+  {
+    "seq": 252,
+    "name": "رزاق عيىس سعدون الكسار",
+    "cardNumber": "8178763",
+    "oldCard": "0145897",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 253,
+    "name": "حيدر يارس حمد",
+    "cardNumber": "7465060",
+    "oldCard": "0145950",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 254,
+    "name": "الزم مزعل بدن المرهش",
+    "cardNumber": "8208548",
+    "oldCard": "0145969",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 255,
+    "name": "وليد كاظم شهد",
+    "cardNumber": "7772715",
+    "oldCard": "0145989",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 256,
+    "name": "كاظم مسعد علي العبادي",
+    "cardNumber": "7759690",
+    "oldCard": "0145996",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 257,
+    "name": "عدنان كاظم فيصل",
+    "cardNumber": "8030903",
+    "oldCard": "0146009",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 258,
+    "name": "احمد كاظم فيصل",
+    "cardNumber": "8059158",
+    "oldCard": "0146011",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 259,
+    "name": "عبد الرزاق مسعد ضيدان الداود",
+    "cardNumber": "9859301",
+    "oldCard": "0146018",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 260,
+    "name": "يوسف جميل حميد",
+    "cardNumber": "7935827",
+    "oldCard": "0146056",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 261,
+    "name": "نزار جبار بستان الحنس",
+    "cardNumber": "6891330",
+    "oldCard": "0146634",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 262,
+    "name": "عبد المجيد مسري جوده",
+    "cardNumber": "7315592",
+    "oldCard": "0147032",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 263,
+    "name": "نعيم زغري عطشان",
+    "cardNumber": "8362390",
+    "oldCard": "0147799",
+    "total": 7,
+    "eligible": 5,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 264,
+    "name": "شهيد اسكندر صعيصع الخريمه",
+    "cardNumber": "7186541",
+    "oldCard": "0153341",
+    "total": 9,
+    "eligible": 8,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 265,
+    "name": "محمد غركان رديين الذرب",
+    "cardNumber": "7240151",
+    "oldCard": "0153372",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 266,
+    "name": "عباس باجي مطوس الذرب",
+    "cardNumber": "7081602",
+    "oldCard": "0153463",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": true
+  },
+  {
+    "seq": 267,
+    "name": "صبار عطيه عبد",
+    "cardNumber": "6954706",
+    "oldCard": "0153464",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 268,
+    "name": "احمد زغري صويحي",
+    "cardNumber": "6902209",
+    "oldCard": "0153540",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 269,
+    "name": "ت حسين علي خرض الحسيين",
+    "cardNumber": "6781780",
+    "oldCard": "0153850",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 270,
+    "name": "علي هاتف موىس الحسيين",
+    "cardNumber": "6897801",
+    "oldCard": "0155210",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 271,
+    "name": "علي حسين حنيش",
+    "cardNumber": "7545726",
+    "oldCard": "0156396",
+    "total": 5,
+    "eligible": 4,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 272,
+    "name": "ليىل ريسان علوان",
+    "cardNumber": "7986114",
+    "oldCard": "0156399",
+    "total": 10,
+    "eligible": 9,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 273,
+    "name": "علي جميل حنس",
+    "cardNumber": "6789990",
+    "oldCard": "0156405",
+    "total": 7,
+    "eligible": 0,
+    "blocked": 7,
+    "isWelfare": true
+  },
+  {
+    "seq": 274,
+    "name": "بدر كاظم ناصر الصوافي",
+    "cardNumber": "7874803",
+    "oldCard": "0156410",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 275,
+    "name": "وفيه حسين صخل الطحيىل",
+    "cardNumber": "7562226",
+    "oldCard": "0156470",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 276,
+    "name": "مصطفى محمد حنس الحجيمي",
+    "cardNumber": "7093623",
+    "oldCard": "0156695",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 277,
+    "name": "طيبه مجيد منعرث السعيد",
+    "cardNumber": "9836435",
+    "oldCard": "0157104",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 278,
+    "name": "هديه حنبوت فجر",
+    "cardNumber": "7084432",
+    "oldCard": "0158199",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 279,
+    "name": "ايات سالم جخم",
+    "cardNumber": "6744926",
+    "oldCard": "0158661",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 280,
+    "name": "حيدر فهد صالح",
+    "cardNumber": "6871013",
+    "oldCard": "0159548",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 281,
+    "name": "هاشم مزهر بلبص",
+    "cardNumber": "8201241",
+    "oldCard": "0160314",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 282,
+    "name": "هند نعيم خضري",
+    "cardNumber": "7428486",
+    "oldCard": "0161395",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 283,
+    "name": "محمد جخيور عنيد",
+    "cardNumber": "7609001",
+    "oldCard": "0162664",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 284,
+    "name": "محمد حسين عليوي",
+    "cardNumber": "7926351",
+    "oldCard": "0162665",
+    "total": 11,
+    "eligible": 11,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 285,
+    "name": "حسين عبد صالح",
+    "cardNumber": "7418961",
+    "oldCard": "0164192",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 286,
+    "name": "ناظم نعيمه عطيوي",
+    "cardNumber": "8101230",
+    "oldCard": "0164212",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 287,
+    "name": "كريم عطيه حمد",
+    "cardNumber": "8067812",
+    "oldCard": "0164220",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 288,
+    "name": "صبار زباله رديين الذرب",
+    "cardNumber": "8276313",
+    "oldCard": "0164239",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 289,
+    "name": "احمد دخل خلف الموسوي",
+    "cardNumber": "7160585",
+    "oldCard": "0164977",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 290,
+    "name": "رحيم كاظم بجاي",
+    "cardNumber": "7996290",
+    "oldCard": "0164986",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 291,
+    "name": "عالء عبد السادة محسن الحنس",
+    "cardNumber": "8466742",
+    "oldCard": "0166405",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 292,
+    "name": "عادل مراد فرعون الكريم",
+    "cardNumber": "7069974",
+    "oldCard": "0166431",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 293,
+    "name": "فليحه حسين علي االمري",
+    "cardNumber": "7189856",
+    "oldCard": "0167121",
+    "total": 6,
+    "eligible": 4,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 294,
+    "name": "سالم نعيمه عطيوي",
+    "cardNumber": "7515200",
+    "oldCard": "0168047",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 295,
+    "name": "حميد كاظم ناصر الصوافي",
+    "cardNumber": "8484734",
+    "oldCard": "0168239",
+    "total": 7,
+    "eligible": 6,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 296,
+    "name": "يحيى عبدأالمري عبد الحسين",
+    "cardNumber": "6865689",
+    "oldCard": "0169318",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 297,
+    "name": "حسين ريسان عبد الحسين",
+    "cardNumber": "6934110",
+    "oldCard": "0170068",
+    "total": 4,
+    "eligible": 0,
+    "blocked": 4,
+    "isWelfare": false
+  },
+  {
+    "seq": 298,
+    "name": "علي عبدالكاظم حنس",
+    "cardNumber": "8379089",
+    "oldCard": "0170355",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 299,
+    "name": "عدي عباس ضيدان الزهريي",
+    "cardNumber": "6967774",
+    "oldCard": "0173106",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 300,
+    "name": "حكيم محمد سعيد",
+    "cardNumber": "6978115",
+    "oldCard": "0176441",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 301,
+    "name": "ظاهر عبد الحسين شناوه ال شناوه",
+    "cardNumber": "8182376",
+    "oldCard": "0176457",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 302,
+    "name": "صالح مهدي كاطع",
+    "cardNumber": "7495965",
+    "oldCard": "0176485",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 303,
+    "name": "ثامر جخيور ثامر",
+    "cardNumber": "7157930",
+    "oldCard": "0176579",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 304,
+    "name": "ماجد شالل معارج الذويخات",
+    "cardNumber": "7943597",
+    "oldCard": "0176692",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 305,
+    "name": "حنس موىس كريم",
+    "cardNumber": "7946908",
+    "oldCard": "0176703",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 306,
+    "name": "حسين محيبس عبد",
+    "cardNumber": "8539961",
+    "oldCard": "0176712",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 307,
+    "name": "باسم مكطوف عبدهللا",
+    "cardNumber": "7214277",
+    "oldCard": "0176857",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 308,
+    "name": "حسين مليح محينس",
+    "cardNumber": "7294637",
+    "oldCard": "0176888",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 309,
+    "name": "عوده فاضل حلوف الجثري",
+    "cardNumber": "8341578",
+    "oldCard": "0176958",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 310,
+    "name": "كاظم محيبس جاسم",
+    "cardNumber": "7133973",
+    "oldCard": "0177064",
+    "total": 6,
+    "eligible": 0,
+    "blocked": 6,
+    "isWelfare": false
+  },
+  {
+    "seq": 311,
+    "name": "سهام عليوي حنس",
+    "cardNumber": "7374472",
+    "oldCard": "0177068",
+    "total": 8,
+    "eligible": 5,
+    "blocked": 3,
+    "isWelfare": false
+  },
+  {
+    "seq": 312,
+    "name": "جبار رياض زماط",
+    "cardNumber": "9831289",
+    "oldCard": "0177125",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 313,
+    "name": "هالل منعرث ربيع",
+    "cardNumber": "7851419",
+    "oldCard": "0177174",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 314,
+    "name": "عادل علي كاظم",
+    "cardNumber": "7459606",
+    "oldCard": "0177242",
+    "total": 5,
+    "eligible": 0,
+    "blocked": 5,
+    "isWelfare": false
+  },
+  {
+    "seq": 315,
+    "name": "هاشم حنس كاظم",
+    "cardNumber": "8808951",
+    "oldCard": "0177247",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 316,
+    "name": "جميل عوده فرعون",
+    "cardNumber": "8915014",
+    "oldCard": "0177253",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 317,
+    "name": "أحمد عيىس سعدون الكسار",
+    "cardNumber": "8572983",
+    "oldCard": "0177294",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 318,
+    "name": "جليل عوده فرعون",
+    "cardNumber": "7999289",
+    "oldCard": "0177296",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 319,
+    "name": "سمري عودة فرعون",
+    "cardNumber": "9841704",
+    "oldCard": "0177307",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 320,
+    "name": "ناظم سمري ساجت",
+    "cardNumber": "6891044",
+    "oldCard": "0177321",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 321,
+    "name": "هاني نعيمه عباس",
+    "cardNumber": "7587049",
+    "oldCard": "0177330",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 322,
+    "name": "عزه صبار صويحي",
+    "cardNumber": "7487685",
+    "oldCard": "0177352",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 323,
+    "name": "حيدر ريسان عبد الحسين",
+    "cardNumber": "7360020",
+    "oldCard": "0177353",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 324,
+    "name": "ستار جبار صويحي",
+    "cardNumber": "7158839",
+    "oldCard": "0177366",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 325,
+    "name": "عذاب مطري حرمس",
+    "cardNumber": "7490873",
+    "oldCard": "0177407",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 326,
+    "name": "علي عبد الكاظم محسن الحنس",
+    "cardNumber": "8507785",
+    "oldCard": "0177516",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 327,
+    "name": "بسنه كاظم اسويد ال حمدان",
+    "cardNumber": "8038563",
+    "oldCard": "0177560",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 328,
+    "name": "مجيد محمد سعيد",
+    "cardNumber": "7259544",
+    "oldCard": "0177582",
+    "total": 10,
+    "eligible": 1,
+    "blocked": 9,
+    "isWelfare": false
+  },
+  {
+    "seq": 329,
+    "name": "حيدر ماعود جرمد",
+    "cardNumber": "7509193",
+    "oldCard": "0177690",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 330,
+    "name": "حسين محمد جلود العلياوي",
+    "cardNumber": "6868091",
+    "oldCard": "0181437",
+    "total": 12,
+    "eligible": 11,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 331,
+    "name": "عباس عبد الله مهدي الحاتمي",
+    "cardNumber": "6894582",
+    "oldCard": "0184408",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 332,
+    "name": "محمد ثجيل ناصر الخفاجي",
+    "cardNumber": "7382340",
+    "oldCard": "0187024",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 333,
+    "name": "زينب جبار حسون",
+    "cardNumber": "8133944",
+    "oldCard": "0190583",
+    "total": 3,
+    "eligible": 2,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 334,
+    "name": "رحيم حسين كريم الداود",
+    "cardNumber": "8229133",
+    "oldCard": "0194515",
+    "total": 9,
+    "eligible": 8,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 335,
+    "name": "قاسم كريم عبد الحسين االمري",
+    "cardNumber": "6967451",
+    "oldCard": "0194545",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 336,
+    "name": "حمزه مسعد ضيدان الداود",
+    "cardNumber": "8073923",
+    "oldCard": "0194546",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 337,
+    "name": "رائد جواد كاظم",
+    "cardNumber": "7227730",
+    "oldCard": "0194590",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 338,
+    "name": "حبيب حمود عداي",
+    "cardNumber": "7211506",
+    "oldCard": "0194636",
+    "total": 9,
+    "eligible": 8,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 339,
+    "name": "علي عكله عنيد",
+    "cardNumber": "7120649",
+    "oldCard": "0194672",
+    "total": 10,
+    "eligible": 9,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 340,
+    "name": "علي مسعد ضيدان الداود",
+    "cardNumber": "8551392",
+    "oldCard": "0194700",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 341,
+    "name": "اكرم عبد االمري كريم",
+    "cardNumber": "8360861",
+    "oldCard": "0194735",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 342,
+    "name": "سهام كاظم طرش الحنتوش",
+    "cardNumber": "7348043",
+    "oldCard": "0194737",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 343,
+    "name": "وسام عباس عالوي",
+    "cardNumber": "8365545",
+    "oldCard": "0195910",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 344,
+    "name": "مصطفى عبد المجيد مسري",
+    "cardNumber": "8373374",
+    "oldCard": "0198368",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 345,
+    "name": "احمد جبار طعني",
+    "cardNumber": "6769444",
+    "oldCard": "0201931",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 346,
+    "name": "جمعه رياض زماط",
+    "cardNumber": "9847470",
+    "oldCard": "0201962",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 347,
+    "name": "جاسب ياسني حبيب الموسوي",
+    "cardNumber": "8776819",
+    "oldCard": "0201963",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 348,
+    "name": "قاسم اليج معيدي",
+    "cardNumber": "8235409",
+    "oldCard": "0202050",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 349,
+    "name": "حنس شبيب عايد الكريم",
+    "cardNumber": "8549212",
+    "oldCard": "0202074",
+    "total": 11,
+    "eligible": 11,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 350,
+    "name": "حيدر مسعد ضيدان الداود",
+    "cardNumber": "9840459",
+    "oldCard": "0202076",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 351,
+    "name": "رحيم شمخي عبد مطر",
+    "cardNumber": "7462795",
+    "oldCard": "0202105",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 352,
+    "name": "التفات محمد يوسف",
+    "cardNumber": "8108953",
+    "oldCard": "0202113",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 353,
+    "name": "عليوي فاضل حلوف الجثري",
+    "cardNumber": "8751393",
+    "oldCard": "0202122",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 354,
+    "name": "محمد عبد الخالق كريم",
+    "cardNumber": "6776735",
+    "oldCard": "0202147",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 355,
+    "name": "صدام كاطع عبد الرضا",
+    "cardNumber": "7984048",
+    "oldCard": "0202154",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 356,
+    "name": "احمد حنون نايف",
+    "cardNumber": "6895672",
+    "oldCard": "0202161",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 357,
+    "name": "جمعه ضباب ربيع",
+    "cardNumber": "7613955",
+    "oldCard": "0202174",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 358,
+    "name": "امجد كاظم فيصل",
+    "cardNumber": "7890773",
+    "oldCard": "0202194",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 359,
+    "name": "خري الله صكبان جرب الذويخات",
+    "cardNumber": "8169522",
+    "oldCard": "0204648",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 360,
+    "name": "محمد ارزيج حنبش",
+    "cardNumber": "9837835",
+    "oldCard": "0205581",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 361,
+    "name": "عباس غياض دحام",
+    "cardNumber": "9862888",
+    "oldCard": "0205754",
+    "total": 5,
+    "eligible": 3,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 362,
+    "name": "مسلم نعيمه عباس",
+    "cardNumber": "7362977",
+    "oldCard": "0209698",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 363,
+    "name": "خالد حنون علي",
+    "cardNumber": "6763485",
+    "oldCard": "0209704",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 364,
+    "name": "نجاة نعمه عسكر",
+    "cardNumber": "7091935",
+    "oldCard": "0209773",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 365,
+    "name": "جعفر عبد العايل دخل",
+    "cardNumber": "7199421",
+    "oldCard": "0209790",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 366,
+    "name": "باسم حسين علي أالمري",
+    "cardNumber": "7967585",
+    "oldCard": "0209800",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 367,
+    "name": "حامد دخل خلف الموسوي",
+    "cardNumber": "7164016",
+    "oldCard": "0209812",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 368,
+    "name": "كاظم جبار محينس",
+    "cardNumber": "7250014",
+    "oldCard": "0209827",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 369,
+    "name": "محمد هلول زغري",
+    "cardNumber": "7008491",
+    "oldCard": "0209842",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 370,
+    "name": "رحيمة طعيمه رويعي",
+    "cardNumber": "6768299",
+    "oldCard": "0209853",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 371,
+    "name": "عبد الساده حمد دهراب",
+    "cardNumber": "7769647",
+    "oldCard": "0209877",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 372,
+    "name": "شهيده نعمه عسكر",
+    "cardNumber": "7199672",
+    "oldCard": "0209898",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 373,
+    "name": "لفتةهللا بجاي كحيط",
+    "cardNumber": "7996108",
+    "oldCard": "0209908",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 374,
+    "name": "حيدر هليل عبد",
+    "cardNumber": "7134799",
+    "oldCard": "0209916",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 375,
+    "name": "غازي هليل عبد",
+    "cardNumber": "7746737",
+    "oldCard": "0209917",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 376,
+    "name": "عسله عوده كشاش",
+    "cardNumber": "7523530",
+    "oldCard": "0209922",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 377,
+    "name": "حازم مراد فرعون الكريم",
+    "cardNumber": "6931794",
+    "oldCard": "0209928",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 378,
+    "name": "باسم مراد فرعون الكريم",
+    "cardNumber": "8816724",
+    "oldCard": "0209929",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 379,
+    "name": "سالم مطر علي الحمد",
+    "cardNumber": "8513788",
+    "oldCard": "0209936",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 380,
+    "name": "علي امري كريم",
+    "cardNumber": "8052994",
+    "oldCard": "0209961",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 381,
+    "name": "كريم كاطع رجه",
+    "cardNumber": "8047459",
+    "oldCard": "0209992",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 382,
+    "name": "سعد حميد سلطان",
+    "cardNumber": "7918796",
+    "oldCard": "0210036",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 383,
+    "name": "كاظم عزيز كريم",
+    "cardNumber": "8023341",
+    "oldCard": "0210046",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 384,
+    "name": "خالد امري كريم",
+    "cardNumber": "7460615",
+    "oldCard": "0210047",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 385,
+    "name": "صاحب رشيد حنس",
+    "cardNumber": "8207009",
+    "oldCard": "0210082",
+    "total": 15,
+    "eligible": 15,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 386,
+    "name": "منري عدنان ناصر",
+    "cardNumber": "9024390",
+    "oldCard": "0211147",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 387,
+    "name": "صباح فاضل رشيف",
+    "cardNumber": "6764338",
+    "oldCard": "0211510",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 388,
+    "name": "هاشم محيبس هاشم",
+    "cardNumber": "8787402",
+    "oldCard": "0211544",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 389,
+    "name": "وحيد عبد هاشم",
+    "cardNumber": "7806504",
+    "oldCard": "0213396",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 390,
+    "name": "سهيله حسين علي",
+    "cardNumber": "7571290",
+    "oldCard": "0213651",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 391,
+    "name": "علي جواد كاظم",
+    "cardNumber": "7080786",
+    "oldCard": "0213904",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 392,
+    "name": "حمزه ثجيل خضري",
+    "cardNumber": "7805037",
+    "oldCard": "0213914",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": true
+  },
+  {
+    "seq": 393,
+    "name": "حنس جوني عزيز",
+    "cardNumber": "8024417",
+    "oldCard": "0213929",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 394,
+    "name": "حيدر امري كريم",
+    "cardNumber": "7066497",
+    "oldCard": "0213965",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 395,
+    "name": "حسين هادي مشاي",
+    "cardNumber": "6749865",
+    "oldCard": "0213971",
+    "total": 5,
+    "eligible": 4,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 396,
+    "name": "فارس شناوه حلو البدراوي",
+    "cardNumber": "6980245",
+    "oldCard": "0216337",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 397,
+    "name": "محمد فيصل ناجي",
+    "cardNumber": "6967078",
+    "oldCard": "0216458",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 398,
+    "name": "قسمه علوان جمعه الثواري",
+    "cardNumber": "7974634",
+    "oldCard": "0221447",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 399,
+    "name": "حيدر جليل عكلو الرنس",
+    "cardNumber": "7945026",
+    "oldCard": "0221472",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 400,
+    "name": "عدي كامل حميد الحسينات",
+    "cardNumber": "8519155",
+    "oldCard": "0224779",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 401,
+    "name": "جليل ماعود جرمد",
+    "cardNumber": "6765046",
+    "oldCard": "0224857",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 402,
+    "name": "حيدر جبار محينس",
+    "cardNumber": "7363218",
+    "oldCard": "0224896",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 403,
+    "name": "فوزي عبد الحسين شناوه ال شناوه",
+    "cardNumber": "7784583",
+    "oldCard": "0224898",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 404,
+    "name": "محمد حبيرت صرب",
+    "cardNumber": "7373167",
+    "oldCard": "0224906",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 405,
+    "name": "خليل جيجان مطوس الذرب",
+    "cardNumber": "8877904",
+    "oldCard": "0224992",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 406,
+    "name": "احمد عبد زوير",
+    "cardNumber": "6799926",
+    "oldCard": "0225038",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 407,
+    "name": "رحيمة نعيمه عباس",
+    "cardNumber": "8538261",
+    "oldCard": "0225039",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 408,
+    "name": "حاتم مزعل بدن المرهش",
+    "cardNumber": "8254529",
+    "oldCard": "0225041",
+    "total": 6,
+    "eligible": 0,
+    "blocked": 6,
+    "isWelfare": false
+  },
+  {
+    "seq": 409,
+    "name": "حنس عبد صالح",
+    "cardNumber": "8478133",
+    "oldCard": "0225103",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 410,
+    "name": "اديب كاظم شهد",
+    "cardNumber": "7746223",
+    "oldCard": "0225117",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 411,
+    "name": "سعديه هاشم جرب",
+    "cardNumber": "8224315",
+    "oldCard": "0225218",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 412,
+    "name": "شفيق كامل حميد الحسينات",
+    "cardNumber": "7626758",
+    "oldCard": "0225272",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 413,
+    "name": "بريه اليج معيدي",
+    "cardNumber": "8144179",
+    "oldCard": "0225297",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 414,
+    "name": "عقيل ماعود جرمد",
+    "cardNumber": "6754678",
+    "oldCard": "0225336",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 415,
+    "name": "ماجد الزم معارك",
+    "cardNumber": "7355450",
+    "oldCard": "0230034",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 416,
+    "name": "جبار اسكندر صعيصع الخريمه",
+    "cardNumber": "7447394",
+    "oldCard": "0230387",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 417,
+    "name": "رياض باجي مطوس الذرب",
+    "cardNumber": "8107473",
+    "oldCard": "0230388",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 418,
+    "name": "عزيز زباله رديين الذرب",
+    "cardNumber": "8508622",
+    "oldCard": "0230389",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 419,
+    "name": "محمد مطرش حسين الموسوي",
+    "cardNumber": "7536328",
+    "oldCard": "0230390",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 420,
+    "name": "عباس خميس عريان الخريمه",
+    "cardNumber": "9836753",
+    "oldCard": "0230391",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 421,
+    "name": "هاني عبد الحسين عبد الله الذرب",
+    "cardNumber": "8081119",
+    "oldCard": "0230392",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 422,
+    "name": "حميد فاضل رشيف",
+    "cardNumber": "7748238",
+    "oldCard": "0230570",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 423,
+    "name": "ليث مهدي كاطع",
+    "cardNumber": "7501743",
+    "oldCard": "0230571",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 424,
+    "name": "جبار حبيرت صرب",
+    "cardNumber": "8152735",
+    "oldCard": "0230587",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 425,
+    "name": "عباس عبد الحسين مسري",
+    "cardNumber": "9837992",
+    "oldCard": "0234330",
+    "total": 7,
+    "eligible": 6,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 426,
+    "name": "ناصر طعمه عبد ال كوماني",
+    "cardNumber": "8412054",
+    "oldCard": "0235325",
+    "total": 9,
+    "eligible": 8,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 427,
+    "name": "حبيب جاسم جبار الغزي",
+    "cardNumber": "7577918",
+    "oldCard": "0235478",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 428,
+    "name": "عبد العظيم مطر علي الحمد",
+    "cardNumber": "8512152",
+    "oldCard": "0235662",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 429,
+    "name": "علي جواد كاظم",
+    "cardNumber": "7583832",
+    "oldCard": "0235684",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 430,
+    "name": "محمد فاضل رشيف",
+    "cardNumber": "8327027",
+    "oldCard": "0235767",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 431,
+    "name": "رياض محمد عبدهللا",
+    "cardNumber": "6795946",
+    "oldCard": "0235778",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 432,
+    "name": "رشيف جميل فرحان الداود",
+    "cardNumber": "6869230",
+    "oldCard": "0235853",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 433,
+    "name": "رباب نهري كزار",
+    "cardNumber": "7550029",
+    "oldCard": "0236589",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 434,
+    "name": "خالد شاكر مانع الذرب",
+    "cardNumber": "8034252",
+    "oldCard": "0238237",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 435,
+    "name": "هادي كريم لفلوف",
+    "cardNumber": "9852544",
+    "oldCard": "0238350",
+    "total": 11,
+    "eligible": 11,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 436,
+    "name": "أحمد غضبان رياض الموسوي",
+    "cardNumber": "7025624",
+    "oldCard": "0238363",
+    "total": 9,
+    "eligible": 7,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 437,
+    "name": "برشى سامي خميس البحراني",
+    "cardNumber": "8587640",
+    "oldCard": "0240223",
+    "total": 4,
+    "eligible": 2,
+    "blocked": 2,
+    "isWelfare": false
+  },
+  {
+    "seq": 438,
+    "name": "عبد الكاظم غازي غفوري",
+    "cardNumber": "8601918",
+    "oldCard": "0241014",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 439,
+    "name": "كميله عباس زغري",
+    "cardNumber": "8274860",
+    "oldCard": "0241021",
+    "total": 3,
+    "eligible": 2,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 440,
+    "name": "رافد جواد كاظم الغزي",
+    "cardNumber": "8027352",
+    "oldCard": "0267405",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 441,
+    "name": "ناصر كاطع رجه",
+    "cardNumber": "7415144",
+    "oldCard": "0267887",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 442,
+    "name": "حيدر محمد نايش",
+    "cardNumber": "8779897",
+    "oldCard": "0268323",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 443,
+    "name": "ستار جبار كاظم",
+    "cardNumber": "8345269",
+    "oldCard": "0268556",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 444,
+    "name": "صالح هادي كاظم",
+    "cardNumber": "7319215",
+    "oldCard": "0268751",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 445,
+    "name": "سمري كاظم بجاي",
+    "cardNumber": "7205734",
+    "oldCard": "0268760",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 446,
+    "name": "عبد علي عباس عويف",
+    "cardNumber": "7972777",
+    "oldCard": "0268773",
+    "total": 11,
+    "eligible": 11,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 447,
+    "name": "عالوي حسين حمود الذرب",
+    "cardNumber": "7079893",
+    "oldCard": "0268789",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 448,
+    "name": "جبار حسين حمود الذرب",
+    "cardNumber": "8996402",
+    "oldCard": "0268790",
+    "total": 11,
+    "eligible": 11,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 449,
+    "name": "احمد كاظم مشتت",
+    "cardNumber": "8032154",
+    "oldCard": "0268796",
+    "total": 7,
+    "eligible": 0,
+    "blocked": 7,
+    "isWelfare": false
+  },
+  {
+    "seq": 450,
+    "name": "محمد زياد حامي الكريم",
+    "cardNumber": "8576763",
+    "oldCard": "0268801",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 451,
+    "name": "عوده حمد دهراب",
+    "cardNumber": "8101817",
+    "oldCard": "0268812",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 452,
+    "name": "عباس كريم شناوه",
+    "cardNumber": "7048317",
+    "oldCard": "0272899",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 453,
+    "name": "ماهر نعيم عجيمي",
+    "cardNumber": "7795824",
+    "oldCard": "0272966",
+    "total": 4,
+    "eligible": 3,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 454,
+    "name": "محسن غين سعيد",
+    "cardNumber": "7117173",
+    "oldCard": "0273541",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 455,
+    "name": "غازي غين سعيد",
+    "cardNumber": "7150280",
+    "oldCard": "0273666",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 456,
+    "name": "رحيم ناصر داخل",
+    "cardNumber": "8226798",
+    "oldCard": "0273679",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 457,
+    "name": "علي حمود عداي الصبحي",
+    "cardNumber": "8502486",
+    "oldCard": "0273722",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 458,
+    "name": "مطرش لفته مزيعل",
+    "cardNumber": "6865207",
+    "oldCard": "0273764",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 459,
+    "name": "علي حسين لفلوف",
+    "cardNumber": "8571941",
+    "oldCard": "0273773",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 460,
+    "name": "علي حبيرت صرب",
+    "cardNumber": "8224425",
+    "oldCard": "0273775",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 461,
+    "name": "حنس حبيرت صرب",
+    "cardNumber": "7798550",
+    "oldCard": "0273776",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 462,
+    "name": "محمد خميس عريان الخريمه",
+    "cardNumber": "8189674",
+    "oldCard": "0273843",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 463,
+    "name": "احالم منصور حمود الذرب",
+    "cardNumber": "7785027",
+    "oldCard": "0273909",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 464,
+    "name": "فالح حنس عريان",
+    "cardNumber": "7452629",
+    "oldCard": "0274921",
+    "total": 6,
+    "eligible": 5,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 465,
+    "name": "ليىل هالل ريس السعدون",
+    "cardNumber": "9835286",
+    "oldCard": "0277198",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 466,
+    "name": "مرتضى محمد حنس الحجيمي",
+    "cardNumber": "8983422",
+    "oldCard": "0281423",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 467,
+    "name": "عقيل مزعل كريم الوثايل",
+    "cardNumber": "7174921",
+    "oldCard": "0281735",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 468,
+    "name": "سناء عواد صالح",
+    "cardNumber": "8051242",
+    "oldCard": "0281812",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 469,
+    "name": "خالد محيبس صافي العكراوي",
+    "cardNumber": "8271309",
+    "oldCard": "0284283",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 470,
+    "name": "حيدر خالد محيبس العكراوي",
+    "cardNumber": "6879982",
+    "oldCard": "0284284",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 471,
+    "name": "احمد عطيه خضري العبري",
+    "cardNumber": "8391742",
+    "oldCard": "0286885",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 472,
+    "name": "رمضان شمخي عبد مطر",
+    "cardNumber": "8301907",
+    "oldCard": "0288608",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 473,
+    "name": "محمد عبيد عواد",
+    "cardNumber": "7454739",
+    "oldCard": "0288612",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 474,
+    "name": "علي عبيد عواد",
+    "cardNumber": "8099472",
+    "oldCard": "0288613",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 475,
+    "name": "سعد كاطع رجه",
+    "cardNumber": "7307118",
+    "oldCard": "0288641",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": false
+  },
+  {
+    "seq": 476,
+    "name": "حميد حسين حمود الذرب",
+    "cardNumber": "8128074",
+    "oldCard": "0288653",
+    "total": 8,
+    "eligible": 7,
+    "blocked": 1,
+    "isWelfare": true
+  },
+  {
+    "seq": 477,
+    "name": "لطيف منصور حمود الذرب",
+    "cardNumber": "6892707",
+    "oldCard": "0288680",
+    "total": 9,
+    "eligible": 9,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 478,
+    "name": "عبد الله بجاي كحيط",
+    "cardNumber": "7233134",
+    "oldCard": "0288753",
+    "total": 10,
+    "eligible": 10,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 479,
+    "name": "مسلم منصور حمود الذرب",
+    "cardNumber": "6973402",
+    "oldCard": "0288772",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 480,
+    "name": "حازم عواد كاظم",
+    "cardNumber": "8417698",
+    "oldCard": "0288779",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 481,
+    "name": "قيص عزيز كريم",
+    "cardNumber": "7498926",
+    "oldCard": "0288806",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 482,
+    "name": "اسعد كاظم فيصل",
+    "cardNumber": "6869018",
+    "oldCard": "0288807",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 483,
+    "name": "رسول عكله عنيد",
+    "cardNumber": "7421497",
+    "oldCard": "0288882",
+    "total": 5,
+    "eligible": 5,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 484,
+    "name": "سعد فليح عبد الحسين",
+    "cardNumber": "9859507",
+    "oldCard": "0292847",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 485,
+    "name": "جمهوريه عجيل رجه",
+    "cardNumber": "8497273",
+    "oldCard": "0294195",
+    "total": 3,
+    "eligible": 3,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 486,
+    "name": "رياض كاظم شاتول الخريمه",
+    "cardNumber": "7414078",
+    "oldCard": "0294209",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 487,
+    "name": "هاشم كريم عبد الحسين االمري",
+    "cardNumber": "7382364",
+    "oldCard": "0294332",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 488,
+    "name": "رياض رياض صبري",
+    "cardNumber": "7112995",
+    "oldCard": "0294384",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 489,
+    "name": "ناصر حسين لفلوف",
+    "cardNumber": "7894794",
+    "oldCard": "0294403",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 490,
+    "name": "احالم دخيل صيهود",
+    "cardNumber": "9851019",
+    "oldCard": "0296932",
+    "total": 3,
+    "eligible": 0,
+    "blocked": 3,
+    "isWelfare": true
+  },
+  {
+    "seq": 491,
+    "name": "حيدر عبد الحسين صبري",
+    "cardNumber": "7894682",
+    "oldCard": "0302385",
+    "total": 4,
+    "eligible": 4,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 492,
+    "name": "حيدر عباس كاظم",
+    "cardNumber": "6915004",
+    "oldCard": "0302436",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 493,
+    "name": "حربيه حواس عويف",
+    "cardNumber": "8465295",
+    "oldCard": "0302456",
+    "total": 2,
+    "eligible": 2,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 494,
+    "name": "حنس علي مانع",
+    "cardNumber": "7781667",
+    "oldCard": "0302458",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 495,
+    "name": "ميثم خلف علي",
+    "cardNumber": "8371888",
+    "oldCard": "0302519",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 496,
+    "name": "وسام جبار صويحي",
+    "cardNumber": "7273470",
+    "oldCard": "0302562",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 497,
+    "name": "عدنان صبار صويحي",
+    "cardNumber": "6984935",
+    "oldCard": "0302622",
+    "total": 7,
+    "eligible": 7,
+    "blocked": 0,
+    "isWelfare": true
+  },
+  {
+    "seq": 498,
+    "name": "غالب يارس فرج",
+    "cardNumber": "7851587",
+    "oldCard": "0302643",
+    "total": 6,
+    "eligible": 6,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 499,
+    "name": "قبيله كامل حميد الحسينات",
+    "cardNumber": "8489894",
+    "oldCard": "0302717",
+    "total": 1,
+    "eligible": 1,
+    "blocked": 0,
+    "isWelfare": false
+  },
+  {
+    "seq": 500,
+    "name": "مشتاق خركان كاطع",
+    "cardNumber": "8207867",
+    "oldCard": "0302770",
+    "total": 8,
+    "eligible": 8,
+    "blocked": 0,
+    "isWelfare": false
+  }
+]
