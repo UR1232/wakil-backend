@@ -160,11 +160,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.16',
-    versionCode: 16,
+    version: '1.0.17',
+    versionCode: 17,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
     downloadUrl: 'https://files.catbox.moe/yseyl4.apk',
-    notes: 'إصدار التحديث الهوائي الفوري (Live Updates) مع دعم كامل لتأكيد وإلغاء استلام الأرشيف',
+    notes: 'تحديث الواجهة: إزالة خيار تنزيل APK وجعل التحديث هوائياً وسلساً بضغطة زر',
     updatedAt: new Date().toISOString()
   });
 });

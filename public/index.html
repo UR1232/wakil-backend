@@ -604,7 +604,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <div class="sgroup">
-          <div class="sgroup-title">تحديثات التطبيق الذكية</div>
+          <div class="sgroup-title">تحديث التطبيق</div>
           
           <!-- Live OTA Update Row -->
           <div class="srow" onclick="checkOtaUpdate(true)">
@@ -612,22 +612,10 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.16 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.17 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
-          </div>
-
-          <!-- Direct APK Download Row -->
-          <div class="srow" onclick="downloadAppUpdateDirect()">
-            <div class="srow-L">
-              <div class="srow-ico" style="background:#E3F2FD;color:#1565C0;font-size:18px;">📦</div>
-              <div>
-                <div class="srow-t">تنزيل حزمة التطبيق (APK) كاملة</div>
-                <div class="srow-s">تنزيل ملف APK المباشر على الهاتف وتثبيته يدوياً</div>
-              </div>
-            </div>
-            <button class="add-btn" style="background:#1565C0;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();downloadAppUpdateDirect();">تحميل ⬇️</button>
           </div>
 
           <!-- Restore Factory Version Button (shown if OTA is active) -->
@@ -635,7 +623,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
             <div class="srow-L">
               <div class="srow-ico" style="background:#FFF3E0;color:#E65100;font-size:18px;">⏪</div>
               <div>
-                <div class="srow-t">استعادة النسخة الأصلية للـ APK</div>
+                <div class="srow-t">استعادة النسخة الأصلية للتطبيق</div>
                 <div class="srow-s">إلغاء التحديثات الهوائية والرجوع لنسخة المصنع</div>
               </div>
             </div>
