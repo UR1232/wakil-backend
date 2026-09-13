@@ -3881,14 +3881,14 @@ function syncOtaUiState() {
   const otaBundle = localStorage.getItem('wakil_ota_bundle');
   const elSub = document.getElementById('ota-ver-sub');
   const elRestore = document.getElementById('restore-apk-row');
+  if (elRestore) elRestore.remove();
+
   if (otaVer && otaBundle) {
     CURRENT_LIVE_VERSION = otaVer;
     if (elSub) elSub.innerHTML = '<span style="color:#2E7D32;font-weight:bold;">⚡ تحديث هوائي مفعل (v' + otaVer + ')</span> — الأساس (v' + BASE_APK_VERSION + ')';
-    if (elRestore) elRestore.style.display = 'flex';
   } else {
     CURRENT_LIVE_VERSION = BASE_APK_VERSION;
     if (elSub) elSub.textContent = 'الإصدار الأصلي: v' + BASE_APK_VERSION + ' — اضغط للفحص والتحديث فوراً';
-    if (elRestore) elRestore.style.display = 'none';
   }
 }
 
