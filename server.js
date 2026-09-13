@@ -163,7 +163,7 @@ app.get('/api/app-version', (req, res) => {
     version: '1.0.17',
     versionCode: 17,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/yseyl4.apk',
+    downloadUrl: 'https://files.catbox.moe/tja4pv.apk',
     notes: 'تحديث الواجهة: إزالة خيار تنزيل APK وجعل التحديث هوائياً وسلساً بضغطة زر',
     updatedAt: new Date().toISOString()
   });
