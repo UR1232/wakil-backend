@@ -10,6 +10,13 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// فحص الاتصال السريع (Ping/Health check)
+app.get('/api/ping', (req, res) => res.status(200).send('pong'));
+app.head('/api/ping', (req, res) => res.status(200).end());
+app.get('/ping', (req, res) => res.status(200).send('pong'));
+app.head('/ping', (req, res) => res.status(200).end());
+
+
 // مسارات ملفات التخزين المحلي السحابي
 const DATA_FILE = path.join(__dirname, 'citizens.json');
 const ARCHIVE_FILE = path.join(__dirname, 'archive.json');
@@ -144,7 +151,7 @@ app.get('/', (req, res) => {
   res.json({
     status: 'online',
     message: 'سيرفر منظومة وكيل لإدارة الوكلاء والحصص التموينية يعمل بنجاح 🚀',
-    version: '1.0.9',
+    version: '1.0.12',
     totalAgents: agents.length,
     time: new Date().toISOString()
   });
@@ -153,7 +160,7 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث المباشر
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.8',
+    version: '1.0.12',
     downloadUrl: 'https://files.catbox.moe/htzjg1.apk',
     notes: 'لوحة تحكم المالك الشاملة (Owner Dashboard) وإدارة الوكلاء المتعددين',
     updatedAt: new Date().toISOString()
@@ -462,6 +469,15 @@ app.get('/api/owner/stats', (req, res) => {
 // ══ 3. MULTI-TENANT CITIZENS & ARCHIVE APIS (للوكلاء والمالك) ══
 
 // استيراد وحفظ كشف مواطنين كامل سحابياً لوكيل معين
+
+// تصفير وحذف كشف المواطنين بالكامل لوكيل معين
+app.post('/api/citizens/clear', (req, res) => {
+  const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
+  saveCitizensByAgency(agency, []);
+  console.log(`Cleared all citizens for agency ${agency}`);
+  res.json({ success: true, message: `تم تصفير وحذف كشف المواطنين للوكالة (${agency}) بنجاح!` });
+});
+
 app.post('/api/citizens/import', (req, res) => {
   const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
   const incoming = req.body.citizens;
@@ -528,7 +544,25 @@ app.get('/api/citizens/:id', (req, res) => {
   res.json(citizen);
 });
 
-// تحديث استلام الحصة
+// تحديث وتعديل بيانات واستلام المواطن بالكامل
+
+// حذف مواطن معين لوكيل
+app.delete('/api/citizens/:id', (req, res) => {
+  const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
+  const id = parseInt(req.params.id);
+  let list = getCitizensByAgency(agency);
+  const idx = list.findIndex(c => c.id === id);
+
+  if (idx === -1) {
+    return res.status(404).json({ error: 'المواطن غير موجود' });
+  }
+
+  const deleted = list.splice(idx, 1);
+  saveCitizensByAgency(agency, list);
+  console.log(`Deleted citizen ${deleted[0].name} (ID: ${id}) from agency ${agency}`);
+  res.json({ success: true, message: `تم حذف المواطن (${deleted[0].name}) بنجاح`, citizen: deleted[0] });
+});
+
 app.put('/api/citizens/:id', (req, res) => {
   const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
   const id = parseInt(req.params.id);
@@ -540,13 +574,34 @@ app.put('/api/citizens/:id', (req, res) => {
   }
 
   const current = list[idx];
-  const { name, isReceived, items, customItems, notes } = req.body;
+  const {
+    name,
+    cardNumber, card,
+    oldCardNumber, oldCard,
+    familyCount, fam,
+    eligibleCount, elig,
+    blockedCount, blk,
+    isWelfare, welfare,
+    isReceived,
+    items,
+    customItems,
+    notes
+  } = req.body;
+
+  const updatedCard = cardNumber !== undefined ? cardNumber : (card !== undefined ? card : current.cardNumber);
+  const updatedOldCard = oldCardNumber !== undefined ? oldCardNumber : (oldCard !== undefined ? oldCard : current.oldCardNumber);
 
   list[idx] = {
     ...current,
-    name: name !== undefined ? name : current.name,
-    isReceived: isReceived !== undefined ? isReceived : current.isReceived,
-    receivedAt: isReceived ? (current.receivedAt || new Date().toISOString()) : null,
+    name: name !== undefined ? String(name).trim() : current.name,
+    cardNumber: updatedCard !== undefined ? String(updatedCard).trim() : current.cardNumber,
+    oldCardNumber: updatedOldCard !== undefined ? String(updatedOldCard).trim() : (current.oldCardNumber || ''),
+    familyCount: familyCount !== undefined ? parseInt(familyCount) : (fam !== undefined ? parseInt(fam) : current.familyCount),
+    eligibleCount: eligibleCount !== undefined ? parseInt(eligibleCount) : (elig !== undefined ? parseInt(elig) : current.eligibleCount),
+    blockedCount: blockedCount !== undefined ? parseInt(blockedCount) : (blk !== undefined ? parseInt(blk) : current.blockedCount),
+    isWelfare: isWelfare !== undefined ? !!isWelfare : (welfare !== undefined ? !!welfare : current.isWelfare),
+    isReceived: isReceived !== undefined ? !!isReceived : current.isReceived,
+    receivedAt: isReceived ? (current.receivedAt || new Date().toISOString()) : (isReceived === false ? null : current.receivedAt),
     items: items !== undefined ? items : current.items,
     customItems: customItems !== undefined ? customItems : current.customItems,
     notes: notes !== undefined ? notes : current.notes
@@ -650,6 +705,45 @@ app.put('/api/archive/:id', (req, res) => {
 
   res.json({ success: true, month });
 });
+
+// تعديل أو تأكيد أو إلغاء استلام مواطن داخل شهر في الأرشيف
+app.put('/api/archive/:id/citizen', (req, res) => {
+  const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
+  const monthId = req.params.id;
+  const { citizenId, items, customItems, isReceived, done, doneAt, name, card, oldCard, familyCount, eligibleCount, blockedCount, isWelfare, notes } = req.body;
+
+  let archive = getArchiveByAgency(agency);
+  const month = archive.find(m => m.id === monthId);
+  if (!month) {
+    return res.status(404).json({ error: 'الشهر غير موجود في الأرشيف' });
+  }
+
+  if (Array.isArray(month.citizens)) {
+    const cIdx = month.citizens.findIndex(c => c.id === citizenId);
+    if (cIdx !== -1) {
+      const cit = month.citizens[cIdx];
+      if (done !== undefined) cit.done = !!done;
+      if (isReceived !== undefined) cit.done = !!isReceived;
+      if (doneAt !== undefined) cit.doneAt = doneAt;
+      if (items !== undefined) cit.items = items;
+      if (customItems !== undefined) cit.custom = customItems;
+      if (name !== undefined) cit.name = name;
+      if (card !== undefined) cit.card = card;
+      if (oldCard !== undefined) cit.oldCard = oldCard;
+      if (familyCount !== undefined) cit.fam = familyCount;
+      if (eligibleCount !== undefined) cit.elig = eligibleCount;
+      if (blockedCount !== undefined) cit.blk = blockedCount;
+      if (isWelfare !== undefined) cit.welfare = isWelfare;
+      if (notes !== undefined) cit.notes = notes;
+
+      month.receivedCount = month.citizens.filter(c => c.done || c.isReceived).length;
+      saveArchiveByAgency(agency, archive);
+      return res.json({ success: true, citizen: cit, monthStats: { total: month.citizens.length, received: month.receivedCount } });
+    }
+  }
+  res.status(404).json({ error: 'المواطن غير موجود في هذا الشهر' });
+});
+
 
 module.exports = app;
 
