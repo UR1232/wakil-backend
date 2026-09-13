@@ -160,11 +160,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.19',
-    versionCode: 19,
+    version: '1.0.20',
+    versionCode: 20,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/tja4pv.apk',
-    notes: 'إزالة زر الاستعادة نهائياً من الواجهة وتحديث هوائي فوري نظيف',
+    downloadUrl: 'https://files.catbox.moe/14x5e1.apk',
+    notes: 'النسخة النهائية النظيفة v1.0.20: إزالة زر الاستعادة نهائياً والتحديث الهوائي الفوري المباشر',
     updatedAt: new Date().toISOString()
   });
 });
