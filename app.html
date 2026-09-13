@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.21";
+    var compiledVersion = "1.0.22";
     window.COMPILED_APP_VERSION = compiledVersion;
     var otaBundle = localStorage.getItem('wakil_ota_bundle');
     var otaVer = localStorage.getItem('wakil_ota_version');
@@ -29,7 +29,7 @@
     window.ACTIVE_APP_VERSION = (otaVer && otaBundle) ? otaVer : compiledVersion;
   } catch(e) {
     console.warn("OTA boot error:", e);
-    window.ACTIVE_APP_VERSION = "1.0.21";
+    window.ACTIVE_APP_VERSION = "1.0.22";
   }
 })();
 </script>
@@ -626,7 +626,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.21 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.22 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
@@ -3926,7 +3926,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.20';
+const BASE_APK_VERSION = '1.0.22';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -4042,6 +4042,666 @@ async function checkOtaUpdate(manual = false) {
   } catch(e) {
     console.error('OTA Update check error:', e);
     if (manual) toast('⚠️ حدث خطأ أثناء فحص التحديثات: ' + (e.message || e), false, 'red');
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// ══ NEW FEATURES: SESSIONS, DEVICES, ANNOUNCEMENTS, FREEZE, BACKUP ══
+// ══════════════════════════════════════════════════════════════════
+
+function getDeviceInfo() {
+  let deviceId = localStorage.getItem('wakil_device_id');
+  if (!deviceId) {
+    deviceId = 'dev_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem('wakil_device_id', deviceId);
+  }
+  let deviceName = 'هاتف غير معروف';
+  const ua = navigator.userAgent || '';
+  if (/iPhone/i.test(ua)) {
+    deviceName = 'Apple iPhone';
+  } else if (/iPad/i.test(ua)) {
+    deviceName = 'Apple iPad';
+  } else if (/Android/i.test(ua)) {
+    const match = ua.match(/;\s*([^;]+)\s*Build/i);
+    if (match && match[1]) {
+      deviceName = match[1].trim();
+    } else {
+      deviceName = 'هاتف أندرويد';
+    }
+  } else if (/Windows/i.test(ua)) {
+    deviceName = 'كمبيوتر ويندوز (Windows)';
+  } else if (/Macintosh|Mac OS/i.test(ua)) {
+    deviceName = 'كمبيوتر ماك (Mac)';
+  }
+  const platform = /Android/i.test(ua) ? 'Android' : (/iPhone|iPad/i.test(ua) ? 'iOS' : 'Web/PC');
+  return { deviceId, deviceName, platform };
+}
+
+function togglePasswordVisibilityField(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (!inp || !btn) return;
+  const isPass = inp.type === 'password';
+  inp.type = isPass ? 'text' : 'password';
+  btn.classList.toggle('active', isPass);
+}
+
+// ── 1. HEARTBEAT & REALTIME PING ──
+let sessionPingInterval = null;
+
+function startSessionHeartbeat() {
+  if (sessionPingInterval) clearInterval(sessionPingInterval);
+  pingSession();
+  sessionPingInterval = setInterval(pingSession, 30000);
+}
+
+async function pingSession() {
+  if (!navigator.onLine) return;
+  const sessionId = localStorage.getItem('wakil_session_id');
+  const sessionToken = localStorage.getItem('wakil_session_token');
+  const deviceInfo = getDeviceInfo();
+  const agencyNumber = currentAgent ? currentAgent.agencyNumber : null;
+  const userRole = currentUserRole || 'agent';
+
+  try {
+    const res = await fetch('https://wakil-api.onrender.com/api/sessions/ping', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        sessionToken,
+        deviceId: deviceInfo.deviceId,
+        userRole,
+        agencyNumber
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+
+      // Broadcast Announcement
+      if (data.announcement) {
+        renderBroadcastBanner(data.announcement);
+      }
+
+      // Check Account Freeze
+      if (data.isFrozen) {
+        showFrozenScreen();
+        return;
+      } else {
+        hideFrozenScreen();
+      }
+
+      // Check Revocation
+      if (data.revoked) {
+        handleRemoteRevokedSession();
+        return;
+      }
+    }
+  } catch(e) {
+    // Network errors ignored
+  }
+}
+
+function handleRemoteRevokedSession() {
+  if (sessionPingInterval) clearInterval(sessionPingInterval);
+  toast('⚠️ تم إنهاء جلستك على هذا الجهاز من قبل الإدارة أو من جهاز آخر.', true);
+  setTimeout(() => {
+    doLogout();
+  }, 1800);
+}
+
+function showFrozenScreen() {
+  const el = document.getElementById('m-frozen-screen');
+  if (el) el.style.display = 'flex';
+}
+
+function hideFrozenScreen() {
+  const el = document.getElementById('m-frozen-screen');
+  if (el) el.style.display = 'none';
+}
+
+// ── 2. BROADCAST ANNOUNCEMENT FUNCTIONS ──
+let currentActiveAnnouncement = null;
+
+function renderBroadcastBanner(ann) {
+  currentActiveAnnouncement = ann;
+  const banner = document.getElementById('home-broadcast-banner');
+  if (!banner) return;
+
+  if (!ann || !ann.active || !ann.text) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  const isUrgent = ann.priority === 'urgent';
+  banner.style.background = isUrgent
+    ? 'linear-gradient(135deg, #FFEBEE, #FFCDD2)'
+    : 'linear-gradient(135deg, #E8F5E9, #C8E6C9)';
+  banner.style.border = isUrgent ? '1.5px solid #EF5350' : '1.5px solid #4CAF50';
+  banner.style.display = 'block';
+
+  banner.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <span style="font-weight:900;font-size:13px;color:${isUrgent ? '#C62828' : '#1B5E20'};display:inline-flex;align-items:center;gap:6px;">
+        <span>${isUrgent ? '🚨' : '📢'}</span>
+        <span>${ann.title || (isUrgent ? 'تعميم عاجل وهام' : 'تعميم إداري رسمي')}</span>
+      </span>
+      <span style="background:${isUrgent ? '#C62828' : '#2E7D32'};color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;">
+        ${isUrgent ? 'عاجل' : 'رسمي'}
+      </span>
+    </div>
+    <div style="font-size:12.5px;font-weight:700;line-height:1.5;color:${isUrgent ? '#B71C1C' : '#2E7D32'};white-space:pre-line;">
+      ${ann.text}
+    </div>
+  `;
+}
+
+async function openBroadcastModal() {
+  showMod('m-broadcast-modal');
+  const badge = document.getElementById('broadcast-status-badge');
+  const btnDel = document.getElementById('btn-delete-broadcast');
+
+  try {
+    const res = await fetch('https://wakil-api.onrender.com/api/announcement');
+    if (res.ok) {
+      const ann = await res.json();
+      if (ann && ann.active) {
+        document.getElementById('broadcast-title-input').value = ann.title || '';
+        document.getElementById('broadcast-text-input').value = ann.text || '';
+        const radios = document.getElementsByName('broadcast-priority');
+        for (let r of radios) {
+          r.checked = (r.value === ann.priority);
+        }
+        if (badge) {
+          badge.style.display = 'block';
+          badge.innerHTML = `🟢 يوجد تعميم فعال حالياً: <b>${ann.title}</b> (${ann.priority === 'urgent' ? 'عاجل' : 'عادي'})`;
+        }
+        if (btnDel) btnDel.style.display = 'block';
+        return;
+      }
+    }
+  } catch(_) {}
+
+  if (badge) badge.style.display = 'none';
+  if (btnDel) btnDel.style.display = 'none';
+  document.getElementById('broadcast-title-input').value = '';
+  document.getElementById('broadcast-text-input').value = '';
+}
+
+async function submitBroadcastAnnouncement() {
+  const title = document.getElementById('broadcast-title-input').value.trim();
+  const text = document.getElementById('broadcast-text-input').value.trim();
+  let priority = 'normal';
+  const radios = document.getElementsByName('broadcast-priority');
+  for (let r of radios) {
+    if (r.checked) priority = r.value;
+  }
+
+  if (!text) {
+    toast('⚠️ يرجى كتابة نص التعميم', true);
+    return;
+  }
+
+  try {
+    toast('⏳ جاري نشر التعميم لجميع الوكلاء...', false, 'blue');
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/announcement', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, text, priority })
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast('📢 تم نشر التعميم بنجاح لجميع هواتف الوكلاء!', false);
+      renderBroadcastBanner(data.announcement);
+      closeMod('m-broadcast-modal');
+    } else {
+      toast('❌ خطأ: ' + (data.message || 'فشل النشر'), true);
+    }
+  } catch(err) {
+    toast('❌ تعذر الاتصال بالسيرفر لنشر التعميم', true);
+  }
+}
+
+async function deleteActiveBroadcast() {
+  if (!confirm('هل أنت متأكد من إيقاف وحذف هذا التعميم؟')) return;
+  try {
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/announcement', { method: 'DELETE' });
+    const data = await res.json();
+    if (data.success) {
+      toast('🗑️ تم إيقاف وحذف التعميم بنجاح', false);
+      renderBroadcastBanner({ active: false });
+      closeMod('m-broadcast-modal');
+    }
+  } catch(_) {
+    toast('❌ تعذر الاتصال بالسيرفر', true);
+  }
+}
+
+// ── 3. AGENT'S CONNECTED DEVICES (PASSWORD REQUIRED) ──
+let agentPendingRevokeTarget = null;
+let agentPendingRevokeAll = false;
+
+async function openMyDevicesModal() {
+  if (!currentAgent) {
+    toast('يجب أن تكون مسجلاً كوكيل لعرض أجهزتك', true);
+    return;
+  }
+  showMod('m-my-devices');
+  const container = document.getElementById('my-devices-list');
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">⏳ جاري جلب قائمة الأجهزة...</div>';
+
+  try {
+    const res = await fetch(`https://wakil-api.onrender.com/api/sessions/my?agencyNumber=${currentAgent.agencyNumber}&username=${currentAgent.username}`);
+    if (res.ok) {
+      const data = await res.json();
+      renderMyDevicesList(data.sessions || []);
+    } else {
+      container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--r);">تعذر تحميل قائمة الأجهزة</div>';
+    }
+  } catch(err) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--r);">تأكد من الاتصال بالإنترنت</div>';
+  }
+}
+
+function renderMyDevicesList(sessions) {
+  const container = document.getElementById('my-devices-list');
+  const myDeviceId = getDeviceInfo().deviceId;
+
+  if (!sessions.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">لا توجد جلسات أخرى مسجلة</div>';
+    return;
+  }
+
+  container.innerHTML = sessions.map(s => {
+    const isCurrent = (s.deviceId === myDeviceId);
+    return `
+      <div style="background:var(--card);border:1.5px solid ${isCurrent ? 'var(--gbd)' : 'var(--bd)'};border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 6px var(--sh);">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:6px;">
+            <span>${s.deviceName || 'هاتف غير معروف'}</span>
+            ${isCurrent ? '<span style="background:var(--gbg);color:var(--g);border:1px solid var(--gbd);font-size:10px;font-weight:800;padding:2px 6px;border-radius:8px;">هذا الجهاز</span>' : ''}
+          </div>
+          <div style="font-size:11px;color:var(--mt);margin-top:2px;">
+            النظام: ${s.platform || 'Android'} • آخر نشاط: ${formatTimeAgo(s.lastActive || s.loginAt)}
+          </div>
+        </div>
+        ${!isCurrent ? `
+          <button class="btn-close" onclick="promptRevokeSingleDevice('${s.id}')" style="margin:0;padding:6px 10px;font-size:11px;font-weight:800;background:var(--rbg);color:var(--r);border-color:#FFCDD2;">
+            طرد 🚪
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function promptRevokeSingleDevice(sessionId) {
+  agentPendingRevokeTarget = sessionId;
+  agentPendingRevokeAll = false;
+  document.getElementById('agent-dev-logout-pass').value = '';
+  showMod('m-confirm-device-logout');
+}
+
+function promptRevokeAllOtherDevices() {
+  agentPendingRevokeTarget = null;
+  agentPendingRevokeAll = true;
+  document.getElementById('agent-dev-logout-pass').value = '';
+  showMod('m-confirm-device-logout');
+}
+
+async function executeAgentDeviceRevoke() {
+  const pwd = document.getElementById('agent-dev-logout-pass').value.trim();
+  if (!pwd) {
+    toast('⚠️ يرجى كتابة كلمة المرور لتأكيد طرد الجهاز', true);
+    return;
+  }
+
+  const currentSessionId = localStorage.getItem('wakil_session_id');
+
+  try {
+    toast('⏳ جاري التحقق وطرد الجهاز...', false, 'blue');
+    const res = await fetch('https://wakil-api.onrender.com/api/sessions/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agencyNumber: currentAgent ? currentAgent.agencyNumber : null,
+        username: currentAgent ? currentAgent.username : null,
+        password: pwd,
+        targetSessionId: agentPendingRevokeTarget,
+        revokeAllOthers: agentPendingRevokeAll,
+        currentSessionId
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      toast('🚪 تم تسجيل خروج وطرد الجهاز بنجاح!', false);
+      closeMod('m-confirm-device-logout');
+      openMyDevicesModal();
+    } else {
+      toast('❌ ' + (data.message || 'فشل طرد الجهاز (تأكد من كلمة المرور)'), true);
+    }
+  } catch(err) {
+    toast('❌ تعذر الاتصال بالسيرفر', true);
+  }
+}
+
+// ── 4. OWNER'S INSPECTION OF AGENT DEVICES (NO PASSWORD NEEDED) ──
+let ownerInspectingAgentId = null;
+let ownerInspectingAgencyNumber = null;
+
+async function openAgentSessionsModal(agentId, agencyNumber, agentName) {
+  ownerInspectingAgentId = agentId;
+  ownerInspectingAgencyNumber = agencyNumber;
+
+  document.getElementById('owner-agent-dev-title').textContent = `أجهزة الوكيل (${agentName})`;
+  showMod('m-agent-devices');
+
+  const container = document.getElementById('owner-agent-devices-list');
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">⏳ جاري جلب الأجهزة المتصلة بحساب الوكيل...</div>';
+
+  try {
+    const res = await fetch(`https://wakil-api.onrender.com/api/owner/agents/${agentId}/sessions`);
+    if (res.ok) {
+      const data = await res.json();
+      renderOwnerAgentSessionsList(data.sessions || []);
+    } else {
+      container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--r);">تعذر جلب أجهزة الوكيل</div>';
+    }
+  } catch(err) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--r);">تأكد من الاتصال بالإنترنت</div>';
+  }
+}
+
+function renderOwnerAgentSessionsList(sessions) {
+  const container = document.getElementById('owner-agent-devices-list');
+  if (!sessions.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">لا توجد أجهزة متصلة بحساب هذا الوكيل حالياً</div>';
+    return;
+  }
+
+  container.innerHTML = sessions.map(s => `
+    <div style="background:var(--card);border:1.5px solid var(--bd);border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 6px var(--sh);">
+      <div>
+        <div style="font-size:13px;font-weight:800;color:var(--tx);">${s.deviceName || 'هاتف غير معروف'}</div>
+        <div style="font-size:11px;color:var(--mt);margin-top:2px;">
+          النظام: ${s.platform || 'Android'} • آخر نشاط: ${formatTimeAgo(s.lastActive || s.loginAt)}
+        </div>
+      </div>
+      <!-- NO PASSWORD REQUIRED FOR OWNER -->
+      <button class="btn-close" onclick="ownerRevokeSingleAgentDevice('${s.id}')" style="margin:0;padding:6px 12px;font-size:11.5px;font-weight:800;background:var(--rbg);color:var(--r);border-color:#FFCDD2;">
+        طرد الجهاز فوراً 🚪
+      </button>
+    </div>
+  `).join('');
+}
+
+async function ownerRevokeSingleAgentDevice(sessionId) {
+  try {
+    toast('⏳ جاري طرد الجهاز فوراً...', false, 'blue');
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/sessions/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        targetSessionId: sessionId,
+        agentId: ownerInspectingAgentId
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast('🚪 تم طرد جهاز الوكيل فوراً بنجاح!', false);
+      openAgentSessionsModal(ownerInspectingAgentId, ownerInspectingAgencyNumber, '');
+    }
+  } catch(_) {
+    toast('❌ تعذر الاتصال بالسيرفر', true);
+  }
+}
+
+async function ownerRevokeAllAgentDevices() {
+  if (!confirm('هل أنت متأكد من رغبتك بطرد كافة الأجهزة المتصلة بحساب هذا الوكيل؟')) return;
+  try {
+    toast('⏳ جاري طرد كافة أجهزة الوكيل...', false, 'blue');
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/sessions/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: ownerInspectingAgentId,
+        agencyNumber: ownerInspectingAgencyNumber,
+        revokeAll: true
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast('🚪 تم طرد كافة أجهزة الوكيل فوراً بنجاح!', false);
+      openAgentSessionsModal(ownerInspectingAgentId, ownerInspectingAgencyNumber, '');
+    }
+  } catch(_) {
+    toast('❌ تعذر الاتصال بالسيرفر', true);
+  }
+}
+
+// ── 5. OWNER'S OWN DEVICES (PASSWORD REQUIRED) ──
+let ownerPendingRevokeTarget = null;
+let ownerPendingRevokeAll = false;
+
+async function openOwnerDevicesModal() {
+  showMod('m-owner-devices');
+  const container = document.getElementById('owner-self-devices-list');
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">⏳ جاري جلب أجهزة المالك...</div>';
+
+  try {
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/sessions/my');
+    if (res.ok) {
+      const data = await res.json();
+      renderOwnerSelfDevicesList(data.sessions || []);
+    } else {
+      container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--r);">تعذر جلب أجهزة المالك</div>';
+    }
+  } catch(err) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--r);">تأكد من الاتصال بالإنترنت</div>';
+  }
+}
+
+function renderOwnerSelfDevicesList(sessions) {
+  const container = document.getElementById('owner-self-devices-list');
+  const myDeviceId = getDeviceInfo().deviceId;
+
+  if (!sessions.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">لا توجد أجهزة أخرى مسجلة بحساب المالك</div>';
+    return;
+  }
+
+  container.innerHTML = sessions.map(s => {
+    const isCurrent = (s.deviceId === myDeviceId);
+    return `
+      <div style="background:var(--card);border:1.5px solid ${isCurrent ? 'var(--gbd)' : 'var(--bd)'};border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 6px var(--sh);">
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:6px;">
+            <span>${s.deviceName || 'جهاز المالك'}</span>
+            ${isCurrent ? '<span style="background:var(--gbg);color:var(--g);border:1px solid var(--gbd);font-size:10px;font-weight:800;padding:2px 6px;border-radius:8px;">هذا الجهاز</span>' : ''}
+          </div>
+          <div style="font-size:11px;color:var(--mt);margin-top:2px;">
+            النظام: ${s.platform || 'Android'} • آخر نشاط: ${formatTimeAgo(s.lastActive || s.loginAt)}
+          </div>
+        </div>
+        ${!isCurrent ? `
+          <button class="btn-close" onclick="promptRevokeSingleOwnerDevice('${s.id}')" style="margin:0;padding:6px 10px;font-size:11px;font-weight:800;background:var(--rbg);color:var(--r);border-color:#FFCDD2;">
+            طرد 🚪
+          </button>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function promptRevokeSingleOwnerDevice(sessionId) {
+  ownerPendingRevokeTarget = sessionId;
+  ownerPendingRevokeAll = false;
+  document.getElementById('owner-dev-logout-pass').value = '';
+  showMod('m-confirm-owner-device-logout');
+}
+
+function promptRevokeAllOtherOwnerDevices() {
+  ownerPendingRevokeTarget = null;
+  ownerPendingRevokeAll = true;
+  document.getElementById('owner-dev-logout-pass').value = '';
+  showMod('m-confirm-owner-device-logout');
+}
+
+async function executeOwnerDeviceRevoke() {
+  const pwd = document.getElementById('owner-dev-logout-pass').value.trim();
+  if (!pwd) {
+    toast('⚠️ يرجى كتابة كلمة مرور الأونر لتأكيد طرد الجهاز', true);
+    return;
+  }
+
+  const currentSessionId = localStorage.getItem('wakil_session_id');
+
+  try {
+    toast('⏳ جاري التحقق وطرد جهاز المالك...', false, 'blue');
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/sessions/revoke-self', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        password: pwd,
+        targetSessionId: ownerPendingRevokeTarget,
+        revokeAllOthers: ownerPendingRevokeAll,
+        currentSessionId
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      toast('🚪 تم تسجيل خروج جهاز المالك بنجاح!', false);
+      closeMod('m-confirm-owner-device-logout');
+      openOwnerDevicesModal();
+    } else {
+      toast('❌ ' + (data.message || 'كلمة مرور المالك غير صحيحة'), true);
+    }
+  } catch(err) {
+    toast('❌ تعذر الاتصال بالسيرفر', true);
+  }
+}
+
+// ── 6. FREEZE / UNFREEZE AGENCY BY OWNER ──
+async function toggleAgentFreeze(agId, shouldFreeze, agName) {
+  const msg = shouldFreeze
+    ? `هل أنت متأكد من قفل وتجميد حساب الوكيل (${agName})؟\nلن يتمكن من فتح السجلات أو توزيع الحصص وسيتم طرد أجهزته فوراً.`
+    : `هل أنت متأكد من فك التجميد وتفعيل حساب الوكيل (${agName}) مجدداً؟`;
+
+  if (!confirm(msg)) return;
+
+  const endpoint = shouldFreeze ? 'freeze' : 'unfreeze';
+  try {
+    toast(`⏳ جاري ${shouldFreeze ? 'تجميد' : 'فك تجميد'} الوكيل سحابياً...`, false, 'blue');
+    const res = await fetch(`https://wakil-api.onrender.com/api/owner/agents/${agId}/${endpoint}`, {
+      method: 'POST'
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast(data.message, false);
+      const ag = allAgents.find(a => a.id === agId);
+      if (ag) {
+        ag.isFrozen = shouldFreeze;
+        localStorage.setItem('wakil_all_agents', JSON.stringify(allAgents));
+      }
+      renderAgents();
+    } else {
+      toast('❌ خطأ: ' + (data.message || 'فشلت العملية'), true);
+    }
+  } catch(_) {
+    toast('❌ تعذر الاتصال بالسيرفر لتغيير حالة الوكيل', true);
+  }
+}
+
+// ── 7. QUICK RESET AGENT PASSWORD BY OWNER ──
+function openQuickResetPassModal(agId, agName) {
+  document.getElementById('reset-pwd-agent-id').value = agId;
+  document.getElementById('reset-pwd-agent-name').textContent = `تغيير كلمة مرور الوكيل (${agName})`;
+  document.getElementById('reset-pwd-new-input').value = '';
+  showMod('m-reset-agent-pwd');
+}
+
+function generateRandomPassForReset() {
+  const randNum = Math.floor(100000 + Math.random() * 900000);
+  document.getElementById('reset-pwd-new-input').value = 'pass' + randNum;
+}
+
+async function submitQuickResetPassword() {
+  const agId = document.getElementById('reset-pwd-agent-id').value;
+  const newPass = document.getElementById('reset-pwd-new-input').value.trim();
+
+  if (!newPass) {
+    toast('⚠️ يرجى كتابة كلمة المرور الجديدة', true);
+    return;
+  }
+
+  try {
+    toast('⏳ جاري حفظ كلمة المرور سحابياً...', false, 'blue');
+    const res = await fetch(`https://wakil-api.onrender.com/api/owner/agents/${agId}/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ newPassword: newPass })
+    });
+    const data = await res.json();
+    if (data.success) {
+      toast('🔑 تم تغيير كلمة مرور الوكيل بنجاح وطرد جلساته القديمة!', false);
+      const ag = allAgents.find(a => a.id === agId);
+      if (ag) {
+        ag.password = newPass;
+        localStorage.setItem('wakil_all_agents', JSON.stringify(allAgents));
+      }
+      closeMod('m-reset-agent-pwd');
+      renderAgents();
+    } else {
+      toast('❌ خطأ: ' + (data.message || 'فشل التغيير'), true);
+    }
+  } catch(_) {
+    toast('❌ تعذر الاتصال بالسيرفر لتغيير كلمة المرور', true);
+  }
+}
+
+// ── 8. ONE-CLICK FULL SYSTEM BACKUP (.JSON) ──
+async function downloadFullSystemBackup() {
+  try {
+    toast('⏳ جاري إعداد وتجميع النسخة الاحتياطية الشاملة للمنظومة...', false, 'blue');
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/backup/full');
+    if (!res.ok) throw new Error('فشل التصدير من الخادم');
+
+    const backupData = await res.json();
+    const jsonStr = JSON.stringify(backupData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `wakil_full_system_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast('💾 تم تنزيل النسخة الاحتياطية الشاملة للمنظومة بنجاح!', false);
+  } catch(err) {
+    console.error('Backup download error:', err);
+    toast('❌ تعذر تنزيل النسخة الاحتياطية سحابياً', true);
+  }
+}
+
+function formatTimeAgo(isoString) {
+  if (!isoString) return 'نشط الآن';
+  try {
+    const diffMs = Date.now() - new Date(isoString).getTime();
+    const diffMin = Math.floor(diffMs / 60000);
+    if (diffMin < 2) return 'نشط الآن 🟢';
+    if (diffMin < 60) return `منذ ${diffMin} دقيقة`;
+    const diffHours = Math.floor(diffMin / 60);
+    if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `منذ ${diffDays} يوم`;
+  } catch(_) {
+    return 'مؤخراً';
   }
 }
 

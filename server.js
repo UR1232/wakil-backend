@@ -182,11 +182,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.21',
-    versionCode: 21,
+    version: '1.0.22',
+    versionCode: 22,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/pphq46.apk',
-    notes: 'ترقية كبرى v1.0.21: قفل وتجميد الوكالات، بث التعاميم الإدارية الفورية، إدارة وطرد الأجهزة المتصلة، إعادة تعيين كلمات المرور وتنزيل نسخة احتياطية شاملة للمنظومة.',
+    downloadUrl: 'https://files.catbox.moe/gq146k.apk',
+    notes: 'إصلاح كامل وفوري لزر تسجيل الدخول v1.0.22: تفعيل دوال الأجهزة والجلسات والربط السحابي التلقائي.',
     updatedAt: new Date().toISOString()
   });
 });
