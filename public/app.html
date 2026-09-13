@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="HR">
+<head>
+<script>
+try {
+  localStorage.removeItem('wakil_ota_bundle');
+  localStorage.removeItem('wakil_ota_version');
+  } catch(e) {}
+</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<meta name="theme-color" content="#2E7D32"/>
+
+<style>
+*{font-family:'Segoe UI',Tahoma,sans-serif;box-sizing:border-box;margin:0;padding:0;}
+:root{--g:#2E7D32;--gl:#4CAF50;--gbg:#E8F5E9;--gbd:#A5D6A7;--r:#EF5350;--rbg:#FFEBEE;--pur:#6A1B9A;--purbg:#F3E5F5;--purbd:#CE93D8;--bg:#F0F2F5;--card:#FFFFFF;--tx:#212121;--tx2:#424242;--mt:#9E9E9E;--bd:#E0E0E0;--ib:#F5F5F5;--bb:#FFFFFF;--nb:#FFFFFF;--sh:rgba(0,0,0,.08);}
+.dark{--bg:#121212;--card:#1E1E1E;--tx:#FFFFFF;--tx2:#CCCCCC;--mt:#666666;--bd:#2C2C2C;--ib:#252525;--bb:#1A1A1A;--nb:#1A1A1A;--sh:rgba(0,0,0,.4);--gbg:#1A3320;--gbd:#2E7D32;--rbg:#2D1414;--purbg:#1E0F2E;--purbd:#6A1B9A;}
+html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:var(--bg);direction:rtl;-webkit-tap-highlight-color:transparent;user-select:none;}
+.phone{position:absolute;inset:0;width:100%;height:100%;background:var(--bg);border-radius:0;box-shadow:none;overflow:hidden;display:flex;flex-direction:column;border:none;transition:all .3s;}
+.screen{display:none;flex:1;flex-direction:column;overflow:hidden;}.screen.active{display:flex;}
+.scroll{flex:1;overflow-y:auto;padding-bottom:12px;}.scroll::-webkit-scrollbar{width:3px;}.scroll::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px;}
+
+/* AppBar */
+.bar{background:var(--bb);padding:calc(8px + env(safe-area-inset-top, 0px)) 16px 10px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;transition:all .3s;}
+.bar-title{font-size:22px;font-weight:800;color:var(--g);}
+.bar-icon{background:var(--gbg);width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;color:var(--g);font-size:16px;transition:all .3s;}
+
+/* Online / Offline badge */
+.online-pill{display:inline-flex;align-items:center;gap:4px;background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;}
+.offline-pill{display:inline-flex;align-items:center;gap:4px;background:#FFF3E0;color:#E65100;border:1px solid #FFE082;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;}
+.dark .online-pill{background:#1B3A1C;color:#81C784;border-color:#2E7D32;}
+.online-dot{width:6px;height:6px;border-radius:3px;background:#4CAF50;box-shadow:0 0 6px #4CAF50;}
+.offline-dot{width:6px;height:6px;border-radius:3px;background:#FB8C00;}
+
+/* Sim bar */
+.sim-bar{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:8px 12px;width:375px;font-size:12px;color:var(--tx2);}
+
+/* Read-Only Banner in Offline */
+.readonly-banner{background:#FFF3E0;color:#E65100;border:1px solid #FFE082;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:700;margin:8px 12px 0;display:flex;align-items:center;gap:6px;}
+
+/* Login */
+.login-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:var(--bg);gap:16px;transition:background .3s;}
+.logo{font-size:52px;font-weight:900;color:var(--g);}
+.login-card{background:var(--card);border-radius:20px;border:1px solid var(--bd);padding:20px;width:100%;display:flex;flex-direction:column;gap:12px;transition:all .3s;}
+.saved-session-card{background:var(--gbg);border:1.5px solid var(--gbd);border-radius:16px;padding:16px;width:100%;display:flex;flex-direction:column;gap:10px;text-align:center;}
+.flbl{font-size:12px;color:var(--mt);margin-bottom:4px;}
+.field{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--bd);font-size:14px;direction:rtl;outline:none;color:var(--tx);background:var(--ib);transition:all .3s;}
+.field:focus{border-color:var(--g);background:var(--card);}
+.field::placeholder{color:var(--mt);}
+.btn-g{background:var(--g);color:#fff;border:none;border-radius:12px;padding:13px;width:100%;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-continue{background:var(--g);color:#fff;border:none;border-radius:12px;padding:13px;width:100%;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 3px 12px rgba(46,125,50,.3);}
+.btn-forgot{background:transparent;border:none;color:var(--mt);font-size:12px;cursor:pointer;text-decoration:underline;text-align:center;}
+.err{background:var(--rbg);color:var(--r);border-radius:8px;padding:8px 12px;font-size:12px;text-align:center;display:none;border:1px solid rgba(239,83,80,.2);}
+.remember-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx2);cursor:pointer;}
+.remember-row input{width:16px;height:16px;accent-color:var(--g);cursor:pointer;}
+
+/* Stats */
+.stats{background:var(--bb);padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;gap:8px;flex-shrink:0;transition:all .3s;}
+.sbox{flex:1;border-radius:10px;padding:6px 4px;text-align:center;}
+.sbox .num{font-size:18px;font-weight:800;}.sbox .lbl{font-size:10px;}
+.s-all{background:rgba(158,158,158,.12);border:1px solid rgba(158,158,158,.2);color:var(--mt);}
+.s-done{background:var(--gbg);border:1px solid var(--gbd);color:var(--g);}
+.s-pend{background:var(--rbg);border:1px solid rgba(239,83,80,.3);color:var(--r);}
+
+/* Finish Month Banner */
+.finish-month-banner{background:linear-gradient(135deg,var(--gbg),#C8E6C9);border:1px solid var(--gbd);border-radius:14px;margin:8px 12px 2px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all .2s;}
+.dark .finish-month-banner{background:linear-gradient(135deg,#1B3A1C,#2E7D32);}
+.finish-month-banner:hover{transform:translateY(-1px);box-shadow:0 3px 12px var(--sh);}
+.fmb-title{font-size:13px;font-weight:800;color:var(--g);}
+.dark .fmb-title{color:#81C784;}
+.fmb-sub{font-size:11px;color:var(--tx2);opacity:.85;}
+.fmb-btn{background:var(--g);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;white-space:nowrap;}
+
+/* Search */
+.srch{padding:8px 12px 6px;flex-shrink:0;}
+.srch-i{width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid var(--bd);background:var(--card);font-size:13px;color:var(--tx);direction:rtl;outline:none;transition:all .3s;}
+.srch-i:focus{border-color:var(--g);}
+.srch-i::placeholder{color:var(--mt);}
+
+/* Citizen Card */
+.ccard{background:var(--card);border-radius:16px;border:1px solid var(--bd);margin:6px 12px;padding:13px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .2s;}
+.ccard:hover{box-shadow:0 2px 14px var(--sh);}
+.ccard.wc{border-color:var(--purbd);border-width:1.5px;}
+.ava{width:44px;height:44px;background:var(--gbg);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.ava.wa{background:var(--purbg);}
+.cname{font-size:14px;font-weight:700;color:var(--tx);}
+.cnum{font-size:11px;color:var(--g);margin:2px 0;}
+.cfam{font-size:11px;color:var(--mt);}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.b-done{background:var(--gbg);color:var(--g);border:1px solid var(--gbd);}
+.b-pend{background:var(--ib);color:var(--mt);border:1px solid var(--bd);}
+.b-welf{background:var(--purbg);color:var(--pur);border:1px solid var(--purbd);}
+
+/* Bottom Nav */
+.bnav{background:var(--nb);border-top:1px solid var(--bd);display:flex;height:60px;min-height:60px;padding:4px 0 env(safe-area-inset-bottom, 6px);box-sizing:border-box;flex-shrink:0;z-index:100;transition:all .3s;}
+.nitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:transparent;padding:4px 2px;}
+.nitem svg{width:24px;height:24px;transition:all .2s;}
+.nitem .nlbl{font-size:10px;font-weight:600;transition:color .2s;}
+.nitem.on svg{stroke:var(--g);}
+.nitem.on .nlbl{color:var(--g);}
+.nitem:not(.on) svg{stroke:var(--mt);}
+.nitem:not(.on) .nlbl{color:var(--mt);}
+
+/* Detail */
+.icard{background:var(--card);border-radius:16px;border:1px solid var(--bd);margin:8px 12px;padding:16px;transition:all .3s;}
+.icard.wcard{border-color:var(--purbd);border-width:1.5px;}
+.ilbl{font-size:11px;color:var(--mt);margin-bottom:3px;}
+.ival{font-size:19px;font-weight:800;color:var(--tx);}
+.irow{background:var(--ib);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-top:10px;cursor:pointer;}
+.divl{border:none;border-top:1px solid var(--bd);margin:12px 0;}
+.sec-t{font-size:15px;font-weight:700;color:var(--tx);}
+.sec-s{font-size:11px;color:var(--mt);margin:3px 0 12px;}
+.wbanner{background:var(--purbg);border:1.5px solid var(--purbd);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:10px;}
+
+/* PDF Export action box */
+.pdf-export-btn{background:var(--gbg);color:var(--g);border:1.5px solid var(--gbd);border-radius:12px;padding:11px;width:100%;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;transition:all .2s;}
+.pdf-export-btn:hover{opacity:.9;}
+
+/* Rations */
+.ration{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:10px;margin-bottom:8px;border:1px solid var(--bd);cursor:pointer;transition:all .2s;background:var(--ib);}
+.ration:hover{border-color:var(--gbd);}
+.ration.on{background:var(--gbg);border-color:var(--gbd);}
+.ration.wi{border-style:dashed;border-color:var(--purbd);background:var(--purbg);}
+.ration.wi.on{border-style:solid;border-color:var(--pur);}
+.chk{width:22px;height:22px;border-radius:6px;border:2px solid var(--mt);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;transition:all .2s;}
+.chk.on{background:var(--g);border-color:var(--g);color:#fff;}
+.chk.pon{background:var(--pur);border-color:var(--pur);color:#fff;}
+.rlbl{font-size:14px;font-weight:600;color:var(--tx);}
+.ration.on .rlbl{color:var(--g);}
+.ration.wi.on .rlbl{color:var(--pur);}
+
+/* Sec divider */
+.sdiv{margin:4px 0 8px;display:flex;align-items:center;gap:8px;}
+.sdiv-line{flex:1;border-top:1px dashed var(--bd);}
+.sdiv-lbl{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;white-space:nowrap;}
+
+/* Add form */
+.add-form{background:var(--ib);border-radius:14px;border:1.5px dashed var(--bd);padding:14px;margin-top:4px;}
+.add-row{display:flex;gap:8px;align-items:center;}
+.add-field{flex:1;padding:9px 12px;border-radius:10px;border:1.5px solid var(--bd);background:var(--card);font-size:13px;color:var(--tx);direction:rtl;outline:none;transition:all .3s;}
+.add-field:focus{border-color:var(--g);}
+.add-field::placeholder{color:var(--mt);}
+.add-btn{background:var(--g);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+/* Buttons */
+.btn-cf{background:var(--g);color:#fff;border:none;border-radius:12px;padding:13px;width:100%;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-save{background:#2563EB;color:#fff;border:none;border-radius:12px;padding:13px;width:100%;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 3px 10px rgba(37,99,235,.25);}
+.btn-save:hover{opacity:.9;}
+.btn-cn{background:transparent;color:var(--r);border:2px solid var(--r);border-radius:12px;padding:12px;width:100%;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
+.ts-bar{background:var(--gbg);border-radius:8px;padding:8px 12px;margin-top:10px;display:flex;align-items:center;justify-content:flex-end;gap:6px;}
+.btn-disabled{opacity:.5;cursor:not-allowed !important;}
+
+/* Log */
+.tabs{display:flex;background:var(--bb);border-bottom:1px solid var(--bd);flex-shrink:0;}
+.tab{flex:1;padding:10px 4px;text-align:center;font-size:12px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;color:var(--mt);}
+.tab.on{color:var(--g);border-bottom-color:var(--g);}
+.prog-wrap{background:var(--bb);padding:10px 14px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.prog-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px;}
+.prog-track{height:8px;background:var(--bd);border-radius:8px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--g);border-radius:8px;transition:width .5s;}
+.rcard{background:var(--card);border-radius:16px;border:1px solid var(--bd);margin:6px 12px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:all .2s;}
+.rcard.wcard{border-color:var(--purbd);}
+.chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+.chip{background:var(--gbg);color:var(--g);border:1px solid var(--gbd);border-radius:12px;padding:2px 8px;font-size:10px;}
+.chip.wchip{background:var(--purbg);color:var(--pur);border-color:var(--purbd);}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--mt);padding:40px;text-align:center;}
+.eico{font-size:60px;opacity:.2;}
+
+/* Archive */
+.arch-body{flex:1;overflow-y:auto;padding:12px;}
+.arch-year-title{font-size:13px;font-weight:800;color:var(--mt);padding:4px 4px 10px;letter-spacing:.5px;}
+.month-card{background:var(--card);border-radius:16px;border:1px solid var(--bd);margin-bottom:10px;overflow:hidden;cursor:pointer;transition:all .2s;}
+.month-card:hover{box-shadow:0 4px 16px var(--sh);border-color:var(--gbd);}
+.month-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+.month-name{font-size:16px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:8px;}
+.month-meta{font-size:12px;color:var(--mt);margin-top:2px;}
+.month-bar{height:4px;background:var(--bd);}
+.month-fill{height:100%;background:var(--g);border-radius:4px;transition:width .5s;}
+.month-stats{display:flex;border-top:1px solid var(--bd);}
+.mstat{flex:1;padding:10px 8px;text-align:center;border-left:1px solid var(--bd);}
+.mstat:last-child{border-left:none;}
+.mstat .mv{font-size:16px;font-weight:800;}
+.mstat .ml{font-size:10px;color:var(--mt);}
+.edit-btn-icon{padding:4px;border-radius:6px;background:var(--ib);color:var(--mt);cursor:pointer;border:none;}
+.edit-btn-icon:hover{color:var(--g);background:var(--gbg);}
+
+/* Settings */
+.set-body{flex:1;overflow-y:auto;padding:12px;}
+.sgroup{background:var(--card);border-radius:16px;border:1px solid var(--bd);overflow:hidden;margin-bottom:12px;}
+.sgroup-title{font-size:11px;font-weight:700;color:var(--mt);padding:10px 16px 4px;letter-spacing:.5px;}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s;}
+.srow:last-child{border-bottom:none;}
+.srow:hover{background:var(--ib);}
+.srow-L{display:flex;align-items:center;gap:10px;}
+.srow-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.srow-t{font-size:14px;font-weight:600;color:var(--tx);}
+.srow-s{font-size:11px;color:var(--mt);}
+.toggle{width:44px;height:24px;background:var(--bd);border-radius:12px;position:relative;cursor:pointer;transition:background .3s;border:none;flex-shrink:0;}
+.toggle.on{background:var(--g);}
+.toggle::after{content:'';position:absolute;top:2px;right:2px;width:20px;height:20px;background:#fff;border-radius:10px;transition:transform .3s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{transform:translateX(-20px);}
+
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid transparent;transition:all .2s;}
+.pill-g{background:#FFF8E1;color:#E65100;border-color:#FFB74D;}
+.pill-t{background:#E3F2FD;color:#1565C0;border-color:#90CAF9;}
+.pill-off{background:var(--ib);color:var(--mt);border-color:var(--bd);}
+
+/* Modal */
+.overlay{position:fixed;inset:0;width:100%;height:100%;background:rgba(0,0,0,.65);display:none;align-items:flex-end;justify-content:center;z-index:99999;}
+.overlay.show{display:flex;}
+.modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px;width:100%;transition:all .3s;max-height:85vh;overflow-y:auto;}
+.modal-t{font-size:16px;font-weight:800;color:var(--tx);margin-bottom:10px;}
+.btn-close{background:var(--ib);color:var(--mt);border:1.5px solid var(--bd);border-radius:12px;padding:11px;width:100%;font-weight:700;cursor:pointer;margin-top:8px;font-size:14px;}
+.btn-r{background:var(--r);color:#fff;border:none;border-radius:12px;padding:12px;width:100%;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;}
+.btn-welf{background:linear-gradient(135deg,#9C27B0,#7B1FA2);color:#fff;border:none;border-radius:12px;padding:11px;width:100%;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;}
+
+/* Print and PDF Multi-Page Layout */
+@media screen {
+  #print-mount { display: none; }
+  .pdf-page-sheet-preview {
+    background: #fff;
+    color: #111;
+    padding: 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    margin-bottom: 12px;
+    direction: rtl;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+  }
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 5mm 7mm;
+  }
+  *, *:before, *:after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  html, body {
+    position: static !important;
+    inset: auto !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .phone, .overlay, .bnav, .bar, .toast, .fab, button, input, select {
+    display: none !important;
+  }
+  #print-mount {
+    display: block !important;
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .print-page-sheet {
+    display: block !important;
+    position: static !important;
+    overflow: visible !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 2mm 0 !important;
+    margin: 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    background: #fff !important;
+    color: #000 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+  .print-page-sheet:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+}
+
+/* PDF Receipt Sheet / Table Styling */
+.pdf-preview-box{background:#fff;color:#000;padding:16px;border-radius:12px;border:1px solid #ccc;font-size:11px;direction:rtl;margin-bottom:10px;}
+.pdf-header{text-align:center;border-bottom:2px double #2E7D32;padding-bottom:8px;margin-bottom:10px;}
+.pdf-title{font-size:15px;font-weight:900;color:#2E7D32;}
+.pdf-table{width:100%;border-collapse:collapse;margin-top:8px;}
+.pdf-table th,.pdf-table td{border:1px solid #bbb;padding:5px 4px;text-align:center;font-size:10px;}
+.pdf-table th{background:#E8F5E9;color:#2E7D32;font-weight:800;}
+
+/* Toast */
+.toast{position:absolute;bottom:76px;right:12px;left:12px;background:var(--g);color:#fff;border-radius:12px;padding:11px 16px;font-size:13px;font-weight:600;text-align:center;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.2);}
+.toast.show{opacity:1;}.toast.red{background:var(--r);}.toast.pur{background:var(--pur);}.toast.blue{background:#2563EB;}
+.arr{color:var(--mt);font-size:14px;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <!-- ═══ OWNER VIEWING AGENT BANNER ═══ -->
+    <div id="owner-agent-banner" style="display:none;background:linear-gradient(135deg,#1B5E20,#2E7D32);color:#fff;padding:8px 14px;font-size:12px;font-weight:700;align-items:center;justify-content:space-between;z-index:999;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.2);">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:14px;">👑</span>
+        <span>كشف الوكيل: <b id="owner-viewing-name">فاضل عباس كريم</b> (<span id="owner-viewing-code">868</span>)</span>
+      </div>
+      <button onclick="exitOwnerAgentView()" style="background:#fff;color:#1B5E20;border:none;border-radius:8px;padding:4px 10px;font-weight:800;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+        <span>العودة للوكلاء</span><span>↩️</span>
+      </button>
+    </div>
+
+
+    <!-- ═══ LOGIN ═══ -->
+    <div class="screen active" id="sc-login">
+      <div class="login-wrap">
+        <div style="text-align:center;">
+          <div class="logo">وكيل</div>
+          <div style="font-size:13px;color:var(--g);font-weight:600;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <span>نظام التوزيع التمويني</span>
+            <span class="online-pill" id="login-net-badge"><span class="online-dot"></span>أونلاين</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <div class="pill pill-g" id="pg" onclick="setType('ghiz')">🛒 وكيل غذائية</div>
+          <div class="pill pill-off" id="pt" onclick="setType('tahn')">🌾 وكيل طحين</div>
+        </div>
+
+        <!-- ONLINE REGULAR LOGIN FORM -->
+        <div class="login-card" id="login-card-online">
+          <div><div class="flbl">اسم المستخدم</div><input class="field" id="fu" type="text" value="" placeholder="أدخل اسم المستخدم..."/></div>
+          <div><div class="flbl">كلمة المرور</div><input class="field" id="fp" type="password" value="" placeholder="أدخل كلمة المرور..."/></div>
+          <div class="remember-row">
+            <input type="checkbox" id="chk-remember" onchange="toggleRememberLogin(this.checked)"/>
+            <label for="chk-remember"><b>حفظ تسجيل الدخول</b> (للتصفح والطباعة أوفلاين)</label>
+          </div>
+          <div id="err" class="err">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
+          <button class="btn-g" onclick="doLogin()">تسجيل الدخول سحابياً ‹</button>
+          <button class="btn-forgot" onclick="showMod('m-forgot')">هل نسيت اسم الوكالة أو كلمة المرور؟</button>
+        </div>
+
+        <!-- SAVED SESSION OFFLINE QUICK LOGIN CARD -->
+        <div class="saved-session-card" id="login-card-saved-offline" style="display:none;">
+          <div style="font-size:28px;">👤</div>
+          <div style="font-size:15px;font-weight:800;color:var(--g);">أهلاً بك فاضل عباس (وكيل غذائية)</div>
+          <div style="font-size:11px;color:var(--tx2);">يوجد حساب مسجّل ومحفوظ سابقاً على هذا الجهاز.</div>
+          <button class="btn-continue" onclick="continueSavedOfflineSession()">
+            <span>إكمال والدخول للتطبيق أوفلاين ‹</span>
+          </button>
+          <div style="font-size:10px;color:var(--mt);margin-top:2px;">🔒 مسموح فقط بالتصفح واستخراج تقارير PDF أوفلاين.</div>
+        </div>
+
+        <!-- NEW LOGIN BLOCKED OFFLINE CARD WITH EXACT USER REQUESTED TEXT -->
+        <div class="login-card" id="login-card-new-offline" style="display:none;background:var(--rbg);border-color:rgba(239,83,80,.4);">
+          <div style="font-size:28px;text-align:center;">🌐⚠️</div>
+          <div style="font-size:14px;font-weight:800;color:var(--r);text-align:center;line-height:1.5;">
+            أنت غير متصل بالإنترنت، يرجى الاتصال بالإنترنت لإكمال تسجيل الدخول.
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:var(--mt);" id="login-footer-text">يتطلب إنترنت لتسجيل الدخول لأول مرة 🌐</div>
+      </div>
+    </div>
+
+    <!-- ═══ HOME ═══ -->
+    <div class="screen" id="sc-home">
+      <div class="bar">
+        <button class="bar-icon" onclick="showMod('m-import')">📂</button>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div id="app-net-pill" class="online-pill"><span class="online-dot"></span>سحابي</div>
+          <div id="type-badge"></div>
+          <div class="bar-title">وكيل</div>
+        </div>
+      </div>
+
+      <div id="home-readonly-banner" class="readonly-banner" style="display:none;">
+        🔒 وضع التصفح أوفلاين (الاطلاع وطباعة PDF فقط — التعديل يتطلب إنترنت)
+      </div>
+      
+      <!-- BANNER TO FINISH MONTH -->
+      <div class="finish-month-banner" onclick="openFinishMonthModal()">
+        <div>
+          <div class="fmb-title">🏁 إنهاء الشهر التمويني الحالي</div>
+          <div class="fmb-sub">حفظ سجلات هذا الشهر بأسمائه وأرشفته</div>
+        </div>
+        <button class="fmb-btn">إنهاء وترحيل ‹</button>
+      </div>
+      
+      <div style="padding:4px 12px 0;">
+        <button class="pdf-export-btn" onclick="generateCurrentMonthPDFReport()" style="margin-top:2px;">
+          <span>📄 استخراج وطباعة تقرير PDF للشهر الحالي (متاح أوفلاين)</span>
+        </button>
+      </div>
+
+      <div class="stats">
+        <div class="sbox s-all"><div class="num" id="st">5</div><div class="lbl">الكل</div></div>
+        <div class="sbox s-done"><div class="num" id="sd">0</div><div class="lbl">تم التسليم</div></div>
+        <div class="sbox s-pend"><div class="num" id="sp">5</div><div class="lbl">لم يستلموا</div></div>
+      </div>
+      <div class="srch"><input class="srch-i" id="sbx" type="text" placeholder="ابحث بالاسم أو رقم البطاقة..." oninput="doSearch(this.value)"/></div>
+      <div class="scroll" id="clist"></div>
+    </div>
+
+    <!-- ═══ DETAIL ═══ -->
+    <div class="screen" id="sc-detail">
+      <div class="bar">
+        <button class="bar-icon" id="det-back-btn" style="background:var(--ib);color:var(--tx);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="online-pill" id="det-net-pill"><span class="online-dot"></span>مزامنة خادمة</span>
+          <div class="bar-title">وكيل</div>
+        </div>
+      </div>
+      <div class="scroll" id="dbody"></div>
+    </div>
+
+    <!-- ═══ LOG ═══ -->
+    <div class="screen" id="sc-log">
+      <div class="bar">
+        <div class="online-pill" id="log-net-pill"><span class="online-dot"></span>مزامنة فورية</div>
+        <div class="bar-title">وكيل</div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-row">
+          <span style="color:var(--g);font-weight:700;" id="ppct">0%</span>
+          <span style="color:var(--mt);" id="plbl">0 من أصل 5</span>
+        </div>
+        <div class="prog-track"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
+      </div>
+      <div class="tabs">
+        <div class="tab on" id="tabp" onclick="switchTab('p')">لم يستلموا (<span id="tp">5</span>)</div>
+        <div class="tab" id="tabd" onclick="switchTab('d')">تم التسليم (<span id="tdv">0</span>)</div>
+      </div>
+      <div class="scroll" id="llist"></div>
+    </div>
+
+    <!-- ═══ ARCHIVE ═══ -->
+    <div class="screen" id="sc-archive">
+      <div class="bar">
+        <div class="online-pill"><span class="online-dot"></span>أرشيف سحابي</div>
+        <div class="bar-title" style="font-size:18px;">أرشيف أشهر السنة</div>
+      </div>
+      <div class="arch-body" id="arch-list"></div>
+    </div>
+
+    <!-- ═══ ARCHIVE MONTH DETAIL ═══ -->
+    <div class="screen" id="sc-arch-detail">
+      <div class="bar">
+        <button class="bar-icon" onclick="goArchive()" style="background:var(--ib);color:var(--tx);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <div class="bar-title" id="arch-month-title" style="font-size:17px;">الشهر</div>
+      </div>
+      <div style="padding:8px 12px 0;">
+        <button class="pdf-export-btn" onclick="generateMonthPDFReport()">
+          <span>📄 استخراج وطباعة تقرير PDF للشهر (متاح أوفلاين)</span>
+        </button>
+      </div>
+      <div class="stats" style="margin-top:6px;">
+        <div class="sbox s-all"><div class="num" id="am-tot">-</div><div class="lbl">الكل</div></div>
+        <div class="sbox s-done"><div class="num" id="am-don">-</div><div class="lbl">تم التسليم</div></div>
+        <div class="sbox s-pend"><div class="num" id="am-pen">-</div><div class="lbl">لم يستلموا</div></div>
+      </div>
+      <div class="srch"><input class="srch-i" id="arch-sbx" type="text" placeholder="ابحث في أرشيف هذا الشهر..." oninput="searchArchiveDetail(this.value)"/></div>
+      <div class="scroll" id="arch-detail-list"></div>
+    </div>
+
+    <!-- ═══ SETTINGS ═══ -->
+    <div class="screen" id="sc-settings">
+      <div class="bar">
+        <div class="online-pill"><span class="online-dot"></span>أونلاين</div>
+        <div class="bar-title">وكيل</div>
+      </div>
+      <div class="set-body">
+        <div class="sgroup">
+          <div class="sgroup-title">حالة الاتصال والسحابة</div>
+          <div class="srow" style="cursor:default;">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:var(--gbg);color:var(--g);">🌐</div>
+              <div>
+                <div class="srow-t" style="color:var(--g);display:flex;align-items:center;gap:6px;">
+                  <span id="set-net-text">متصل بالخادم السحابي</span>
+                  <span class="online-dot" id="set-net-dot"></span>
+                </div>
+                <div class="srow-s" id="set-net-sub">خيار "حفظ الدخول" مفعل للتصفح وطباعة PDF أوفلاين</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sgroup">
+          <div class="sgroup-title">معلومات الوكالة</div>
+          <div class="srow" style="cursor:default;">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:var(--gbg);">👤</div>
+              <div><div class="srow-t" id="set-uname">user</div><div class="srow-s">اسم المستخدم</div></div>
+            </div>
+          </div>
+          <div class="srow" style="cursor:default;">
+            <div class="srow-L">
+              <div class="srow-ico" id="set-tipo" style="background:#FFF8E1;">🛒</div>
+              <div><div class="srow-t" id="set-tipn">وكيل غذائية</div><div class="srow-s">نوع الوكالة</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sgroup">
+          <div class="sgroup-title">المظهر</div>
+          <div class="srow" onclick="toggleDark()">
+            <div class="srow-L">
+              <div class="srow-ico" id="dm-ico" style="background:#1a1a2e;color:#fff;">🌙</div>
+              <div><div class="srow-t">الوضع الليلي</div><div class="srow-s" id="dm-sub">وضع فاتح</div></div>
+            </div>
+            <button class="toggle" id="dm-tgl" onclick="event.stopPropagation();toggleDark()"></button>
+          </div>
+        </div>
+
+        <div class="sgroup">
+          <div class="sgroup-title">البيانات والأرشيف والطباعة</div>
+          <div class="srow" onclick="openFinishMonthModal()">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:var(--gbg);">🏁</div>
+              <div><div class="srow-t">إنهاء الشهر الحالي</div><div class="srow-s">تسمية وأرشفة السجلات الحالية سحابياً</div></div>
+            </div>
+            <span class="arr">‹</span>
+          </div>
+          <div class="srow" onclick="showMod('m-import')">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:#E3F2FD;">📂</div>
+              <div><div class="srow-t">استيراد ملف PDF</div><div class="srow-s">رفع بيانات شهر جديد للخادم</div></div>
+            </div>
+            <span class="arr">‹</span>
+          </div>
+          <div class="srow" onclick="goArchive()">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:#E8EAF6;">📦</div>
+              <div><div class="srow-t">أرشيف الأشهر وتصدير PDF</div><div class="srow-s">طباعة الكشوفات والوصولات الرسمية</div></div>
+            </div>
+            <span class="arr">‹</span>
+          </div>
+        </div>
+
+        <div class="sgroup">
+          <div class="sgroup-title">تحديث التطبيق</div>
+          <div class="srow" onclick="downloadAppUpdateDirect()">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:var(--gbg);color:var(--g);font-size:18px;">🔄</div>
+              <div>
+                <div class="srow-t">تحديث التطبيق المباشر</div>
+                <div class="srow-s" id="app-ver-sub">الإصدار 1.0.9 • تنزيل وتثبيت أحدث نسخة مباشرة</div>
+              </div>
+            </div>
+            <button class="add-btn" style="background:var(--g);padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();downloadAppUpdateDirect();">تحديث ⬇️</button>
+          </div>
+        </div>
+
+        <div class="sgroup">
+          <div class="sgroup-title">الحساب</div>
+          <div class="srow" onclick="showMod('m-forgot')">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:#E3F2FD;">🔑</div>
+              <div><div class="srow-t">تغيير كلمة المرور</div><div class="srow-s">التواصل مع المدير</div></div>
+            </div>
+            <span class="arr">‹</span>
+          </div>
+          <div class="srow" onclick="showMod('m-logout')">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:var(--rbg);">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#EF5350" stroke-width="2" width="20" height="20"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+              </div>
+              <div><div class="srow-t" style="color:var(--r);">تسجيل الخروج</div><div class="srow-s">الخروج من حساب الوكيل</div></div>
+            </div>
+            <span class="arr" style="color:var(--r);">‹</span>
+          </div>
+        </div>
+        <div style="text-align:center;padding:16px 0;font-size:11px;color:var(--mt);">وكيل v1.0 — أونلاين 🌐</div>
+      </div>
+    </div>
+
+    
+    <!-- ═══ AGENTS (OWNER CONTROL PANEL) ═══ -->
+    <div class="screen" id="sc-agents">
+      <div class="bar">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="badge" style="background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7;font-weight:800;font-size:11px;">👑 لوحة المالك</span>
+        </div>
+        <div class="bar-title">إدارة الوكلاء</div>
+      </div>
+
+      <div class="scroll" id="agents-scroll-wrap" style="padding:12px 14px 80px;">
+        <!-- Top Metrics Grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div style="background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;box-shadow:0 2px 8px var(--sh);">
+            <div style="font-size:11px;color:var(--mt);font-weight:700;">إجمالي الوكلاء</div>
+            <div style="font-size:22px;font-weight:900;color:var(--g);margin-top:2px;" id="owner-stat-total-agents">1</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;box-shadow:0 2px 8px var(--sh);">
+            <div style="font-size:11px;color:var(--mt);font-weight:700;">المواطنون المسجلون</div>
+            <div style="font-size:22px;font-weight:900;color:var(--tx);margin-top:2px;" id="owner-stat-total-citizens">1,042</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;box-shadow:0 2px 8px var(--sh);">
+            <div style="font-size:11px;color:var(--mt);font-weight:700;">🛒 وكلاء الغذائية</div>
+            <div style="font-size:20px;font-weight:800;color:#E65100;margin-top:2px;" id="owner-stat-ghiz-agents">1</div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;box-shadow:0 2px 8px var(--sh);">
+            <div style="font-size:11px;color:var(--mt);font-weight:700;">🌾 وكلاء الطحين</div>
+            <div style="font-size:20px;font-weight:800;color:#1565C0;margin-top:2px;" id="owner-stat-tahn-agents">0</div>
+          </div>
+        </div>
+
+        <!-- Add Agent Button -->
+        <button class="btn-g" onclick="openAddAgentModal()" style="margin:0 0 12px;padding:12px;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(46,125,50,.35);">
+          <span style="font-size:18px;">➕</span>
+          <span>إضافة وكيل جديد وتوليد بيانات الدخول</span>
+        </button>
+
+        <!-- Search Agent Input -->
+        <div class="srch" style="margin:0 0 12px;">
+          <input class="srch-i" id="ag-sbx" type="text" placeholder="ابحث بالاسم أو اسم المستخدم أو رمز الوكالة..." oninput="filterAgentsList(this.value)"/>
+        </div>
+
+        <!-- Agents Cards Container -->
+        <div id="agents-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+      </div>
+    </div>
+
+    <!-- ══ BOTTOM NAV ══ -->
+    <div class="bnav" id="bnav" style="display:none;">
+      <button class="nitem" id="n-agents" onclick="goAgents()" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nlbl">الوكلاء</span>
+      </button>
+
+      <button class="nitem on" id="n-home" onclick="goHome()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+        <span class="nlbl">الرئيسية</span>
+      </button>
+      <button class="nitem" id="n-log" onclick="goLog()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/></svg>
+        <span class="nlbl">السجل</span>
+      </button>
+      <button class="nitem" id="n-arch" onclick="goArchive()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="5" rx="1"/><path d="M4 9v10a1 1 0 001 1h14a1 1 0 001-1V9"/><path d="M10 13h4"/></svg>
+        <span class="nlbl">الأرشيف</span>
+      </button>
+      <button class="nitem" id="n-set" onclick="goSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 01-2-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span class="nlbl">الإعدادات</span>
+      </button>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- MODALS -->
+    <div class="overlay" id="m-forgot" onclick="closeMod('m-forgot',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t">🔑 نسيت بيانات الدخول؟</div>
+        <p style="font-size:13px;color:var(--mt);margin-bottom:12px;">تواصل مع مدير النظام لاستعادة بياناتك:</p>
+        <div style="background:var(--gbg);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;border:1px solid var(--gbd);">
+          <span style="font-size:28px;">💬</span>
+          <div><div style="font-size:11px;color:var(--mt);">اسم المستخدم</div><div style="font-size:16px;font-weight:800;color:var(--g);">@wakil_admin</div></div>
+        </div>
+        <button class="btn-close" onclick="closeMod('m-forgot')">حسناً، شكراً</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="m-logout" onclick="closeMod('m-logout',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t">⏻ تسجيل الخروج</div>
+        <p style="font-size:14px;color:var(--tx2);margin-bottom:4px;">هل أنت متأكد من تسجيل الخروج من حساب الوكيل؟</p>
+        <p style="font-size:12px;color:var(--mt);">ستحتاج لإدخال اسم المستخدم وكلمة المرور مجدداً.</p>
+        <button class="btn-r" onclick="doLogout()">نعم، تسجيل الخروج</button>
+        <button class="btn-close" onclick="closeMod('m-logout')">إلغاء</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="m-cancel-rcv" onclick="closeMod('m-cancel-rcv',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t" style="color:var(--r);">⚠️ إلغاء استلام الحصة</div>
+        <p style="font-size:14px;color:var(--tx2);margin-bottom:6px;" id="cancel-rcv-text">هل أنت متأكد من إلغاء الاستلام لهذا المواطن؟</p>
+        <p style="font-size:12px;color:var(--mt);">سيعود المواطن إلى قائمة "لم يستلموا بعد".</p>
+        <button class="btn-r" onclick="confirmCancelRcvAction()">نعم، إلغاء الاستلام</button>
+        <button class="btn-close" onclick="closeMod('m-cancel-rcv')">تراجع</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="m-finish-month" onclick="closeMod('m-finish-month',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t">🏁 إنهاء وأرشفة الشهر الحالي</div>
+        <p style="font-size:13px;color:var(--mt);margin-bottom:12px;">سيتم حفظ جميع الحالات والسجلات الحالية سحابياً وتصفير السجل لشهر جديد.</p>
+        <div style="margin-bottom:12px;">
+          <div class="flbl">اسم الشهر في الأرشيف</div>
+          <input class="field" id="finish-month-name" type="text" placeholder="مثال: شهر أيلول 2025"/>
+        </div>
+        <button class="btn-g" onclick="executeFinishMonth()">حفظ سحابياً وتأكيد إنهاء الشهر ‹</button>
+        <button class="btn-close" onclick="closeMod('m-finish-month')">إلغاء</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="m-rename-month" onclick="closeMod('m-rename-month',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t">✏️ تعديل اسم الشهر في الأرشيف</div>
+        <div style="margin-bottom:12px;">
+          <div class="flbl">الاسم الجديد للشهر</div>
+          <input class="field" id="rename-month-name" type="text"/>
+        </div>
+        <button class="btn-g" onclick="executeRenameMonth()">تعديل الاسم</button>
+        <button class="btn-close" onclick="closeMod('m-rename-month')">إلغاء</button>
+      </div>
+    </div>
+
+    <!-- MONTH PDF PREVIEW MODAL -->
+    <div class="overlay" id="m-pdf-month" onclick="closeMod('m-pdf-month',event)">
+      <div class="modal" style="max-height:92vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+        <div class="modal-t" id="pdf-modal-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>📄 كشف الحصص التموينية</span>
+          <span style="font-size:11px;background:var(--gbg);color:var(--g);padding:3px 8px;border-radius:6px;border:1px solid var(--gbd);">A4 بالعرض</span>
+        </div>
+
+        <!-- Page Navigator Toolbar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;background:var(--ib);border:1px solid var(--bd);padding:6px 10px;border-radius:12px;margin-bottom:8px;">
+          <button class="btn-close" style="width:auto;margin:0;padding:5px 12px;font-size:12px;font-weight:700;" onclick="prevPdfPage()">◀ السابق</button>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span id="pdf-page-indicator" style="font-size:12px;font-weight:800;color:var(--g);">صفحة 1 من 1</span>
+            <select id="pdf-page-select" onchange="jumpToPdfPage(parseInt(this.value))" style="font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font-weight:700;">
+            </select>
+          </div>
+          <button class="btn-close" style="width:auto;margin:0;padding:5px 12px;font-size:12px;font-weight:700;" onclick="nextPdfPage()">التالي ▶</button>
+        </div>
+        
+        <div class="pdf-preview-box" id="pdf-month-content" style="flex:1;overflow:auto;max-height:55vh;padding:8px;background:var(--card);"></div>
+
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;">
+          <button class="btn-g" onclick="printCurrentPdfPage()" style="margin:0;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <span>🖨️ طباعة وحفظ هذه الصفحة فقط (A4)</span>
+          </button>
+
+          <button class="btn-g" onclick="printAllPdfPages()" style="margin:0;background:#1B5E20;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <span>📑 طباعة وحفظ الكشف كاملاً (مقسم صفحة بصفحة A4)</span>
+          </button>
+
+          <button class="btn-close" onclick="closeMod('m-pdf-month')" style="margin:0;">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CITIZEN AUDIT PDF PREVIEW MODAL -->
+    <div class="overlay" id="m-pdf-citizen" onclick="closeMod('m-pdf-citizen',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t">📊 كشف جرد استلام المواطن لجميع الأشهر</div>
+        <div class="pdf-preview-box" id="pdf-citizen-content"></div>
+        <button class="btn-g" onclick="printCitizenAuditPDF()">🖨️ طباعة / تصدير PDF</button>
+        <button class="btn-close" onclick="closeMod('m-pdf-citizen')">إغلاق</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="m-import" onclick="closeMod('m-import',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t">📂 استيراد ملف PDF من ذاكرة الهاتف</div>
+        <div style="background:var(--ib);border-radius:10px;padding:12px;margin-bottom:10px;font-size:12px;color:var(--tx2);border:1px solid var(--bd);">
+          💡 اختر ملف الـ PDF التمويني الخاص بك من الهاتف لاستخراج الأسماء والبطاقات فوراً.
+        </div>
+
+        <!-- أزرار اختيار الملفات من الهاتف الحقيقي -->
+        <input type="file" id="input-ration-pdf" accept=".pdf,application/pdf" style="display:none;" onchange="handleRationPDFUpload(event)">
+        <input type="file" id="input-welfare-pdf" accept=".pdf,application/pdf" style="display:none;" onchange="handleWelfarePDFUpload(event)">
+
+        <div style="background:var(--gbg);border-radius:14px;padding:14px;margin-bottom:10px;border:1.5px solid var(--gbd);">
+          <div style="font-size:14px;font-weight:800;color:var(--g);display:flex;align-items:center;gap:6px;">
+            <span>📄</span><span>ملف PDF التمويني الأساسي</span>
+          </div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px;line-height:1.5;">
+            يستخرج كافة المواطنين وأرقام البطاقات وأفراد الأسرة مباشرة.
+          </div>
+          <button onclick="document.getElementById('input-ration-pdf').click()" class="btn-g" style="margin-top:10px;padding:11px;font-size:13.5px;box-shadow:0 3px 10px rgba(46,125,50,.3);">
+            📱 اختيار ملف PDF من الهاتف
+          </button>
+        </div>
+
+        <div style="background:var(--purbg);border-radius:14px;padding:14px;margin-bottom:10px;border:1.5px solid var(--purbd);">
+          <div style="font-size:14px;font-weight:800;color:var(--pur);display:flex;align-items:center;gap:6px;">
+            <span>🏛️</span><span>ملف الرعاية الاجتماعية (اختياري)</span>
+          </div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:4px;line-height:1.5;">
+            تحديد المستفيدين من شبكة الرعاية الاجتماعية تلقائياً.
+          </div>
+          <button onclick="document.getElementById('input-welfare-pdf').click()" class="btn-welf" style="padding:11px;font-size:13.5px;margin-top:10px;">
+            📱 اختيار ملف الرعاية من الهاتف
+          </button>
+        </div>
+
+        <button class="btn-close" onclick="closeMod('m-import')">إلغاء</button>
+      </div>
+    </div>
+
+  
+    <!-- MODAL: ADD NEW AGENT -->
+    <div class="overlay" id="m-add-agent" onclick="closeMod('m-add-agent',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t" style="display:flex;align-items:center;gap:6px;">
+          <span>➕</span><span>إضافة وكيل جديد وتوليد حساب الدخول</span>
+        </div>
+        <div style="font-size:12px;color:var(--mt);margin-bottom:12px;">
+          قم بإدخال بيانات الوكيل وسيتم إنشاء حساب شغال فوراً ليدخل به من هاتفه.
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--tx2);">اسم الوكيل الكامل:</label>
+            <input id="add-ag-name" class="srch-i" style="width:100%;margin-top:2px;" placeholder="مثال: حيدر جاسم كاظم"/>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--tx2);">رمز الوكالة (رقم):</label>
+              <input id="add-ag-code" class="srch-i" style="width:100%;margin-top:2px;" placeholder="مثال: 955"/>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--tx2);">نوع الوكالة:</label>
+              <select id="add-ag-type" class="srch-i" style="width:100%;margin-top:2px;padding:8px;">
+                <option value="ghiz">🛒 غذائية</option>
+                <option value="tahn">🌾 طحين</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--tx2);">المحافظة:</label>
+              <input id="add-ag-gov" class="srch-i" style="width:100%;margin-top:2px;" value="ذي قار"/>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--tx2);">الفرع:</label>
+              <input id="add-ag-branch" class="srch-i" style="width:100%;margin-top:2px;" value="فرع التموين"/>
+            </div>
+          </div>
+
+          <div style="background:var(--ib);border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:4px;">
+            <div style="font-size:12px;font-weight:800;color:var(--g);margin-bottom:6px;">🔐 بيانات تسجيل الدخول للوكيل:</div>
+            
+            <div style="margin-bottom:6px;">
+              <label style="font-size:11px;font-weight:700;color:var(--tx2);">اسم المستخدم (Username):</label>
+              <input id="add-ag-user" class="srch-i" style="width:100%;margin-top:2px;font-family:monospace;" placeholder="مثال: haider955"/>
+            </div>
+
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <label style="font-size:11px;font-weight:700;color:var(--tx2);">كلمة المرور (Password):</label>
+                <button onclick="generateRandomPassForAdd()" style="background:transparent;border:none;color:var(--g);font-size:11px;font-weight:700;cursor:pointer;">🎲 توليد تلقائي</button>
+              </div>
+              <input id="add-ag-pass" class="srch-i" style="width:100%;margin-top:2px;font-family:monospace;" placeholder="مثال: pass955"/>
+            </div>
+          </div>
+
+          <button class="btn-g" onclick="submitNewAgent()" style="margin-top:10px;padding:12px;font-size:14px;font-weight:800;">
+            🚀 إنشاء وتفعيل الوكيل فوراً
+          </button>
+          <button class="btn-close" onclick="closeMod('m-add-agent')" style="margin:0;">إلغاء</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: EDIT AGENT -->
+    <div class="overlay" id="m-edit-agent" onclick="closeMod('m-edit-agent',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t">✏️ تعديل بيانات وكلمة مرور الوكيل</div>
+        <input type="hidden" id="edit-ag-id"/>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--tx2);">اسم الوكيل:</label>
+            <input id="edit-ag-name" class="srch-i" style="width:100%;margin-top:2px;"/>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--tx2);">رمز الوكالة:</label>
+              <input id="edit-ag-code" class="srch-i" style="width:100%;margin-top:2px;"/>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--tx2);">نوع الوكالة:</label>
+              <select id="edit-ag-type" class="srch-i" style="width:100%;margin-top:2px;padding:8px;">
+                <option value="ghiz">🛒 غذائية</option>
+                <option value="tahn">🌾 طحين</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="background:var(--ib);border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:4px;">
+            <div style="font-size:12px;font-weight:800;color:var(--g);margin-bottom:6px;">🔐 تعديل بيانات الدخول:</div>
+            
+            <div style="margin-bottom:6px;">
+              <label style="font-size:11px;font-weight:700;color:var(--tx2);">اسم المستخدم:</label>
+              <input id="edit-ag-user" class="srch-i" style="width:100%;margin-top:2px;font-family:monospace;"/>
+            </div>
+
+            <div>
+              <label style="font-size:11px;font-weight:700;color:var(--tx2);">كلمة المرور الجديدة:</label>
+              <input id="edit-ag-pass" class="srch-i" style="width:100%;margin-top:2px;font-family:monospace;"/>
+            </div>
+          </div>
+
+          <button class="btn-g" onclick="submitEditAgent()" style="margin-top:10px;padding:12px;font-size:14px;font-weight:800;">
+            💾 حفظ التعديلات
+          </button>
+          <button class="btn-close" onclick="closeMod('m-edit-agent')" style="margin:0;">إلغاء</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /phone -->
+  <div id="print-mount"></div>
+
+<script src="js/pdf_extractor.js"></script>
+<script src="js/seed_1042.js"></script>
+<script>
+// ══ STATE (OWNER & MULTI-AGENT ARCHITECTURE) ══
+const CREDS = { user: 'user', pass: '00000000' };
+const OWNER_CREDS = { user: 'admin', pass: 'admin2026' };
+
+let currentUserRole = localStorage.getItem('wakil_user_role') || 'agent'; // 'owner' or 'agent'
+let currentAgent = {
+  id: 'agent_868',
+  name: 'فاضل عباس كريم',
+  agencyNumber: '868',
+  licenseNumber: '000699',
+  type: 'ghiz',
+  governorate: 'ذي قار',
+  branch: 'فرع تموين ذي قار',
+  username: 'user',
+  password: '00000000'
+};
+let allAgents = [];
+let ownerViewingAgent = null;
+let showPasswordsMap = {};
+
+let agentType = 'ghiz';
+let darkMode = false;
+let isConnected = typeof navigator !== 'undefined' ? navigator.onLine : true;
+let rememberLogin = localStorage.getItem('wakil_remember_login') === 'true';
+let hasSavedSession = localStorage.getItem('wakil_has_logged_in') === 'true';
+let curTab = 'p';
+let cur = null, chk = {}, curCustom = [];
+let archiveMonth = null;
+
+let archive = [
+  {
+    id: 'm_arch_prev1',
+    label: 'شهر أيلول 2025',
+    date: '2025-09-01T00:00:00.000Z',
+    citizens: []
+  }
+];
+
+let editingArchMonthId = null;
+
+// ══ INTERNET & OFFLINE LOGIN LOGIC ══
+function toggleRememberLogin(val){
+  rememberLogin = val;
+  localStorage.setItem('wakil_remember_login', val ? 'true' : 'false');
+  toast(val ? '✅ تم تفعيل حفظ الدخول للجهاز' : '⚠️ تم إيقاف حفظ الدخول', false);
+}
+
+function updateRealNetworkStatus(online){
+  isConnected = online;
+  const statusLbl = document.getElementById('sim-net-status');
+  const iconLbl = document.getElementById('sim-net-icon');
+  const toggleBtn = document.getElementById('sim-toggle-btn');
+  const homeBanner = document.getElementById('home-readonly-banner');
+  const loginNetBadge = document.getElementById('login-net-badge');
+
+  const loginCardOnline = document.getElementById('login-card-online');
+  const loginCardSavedOffline = document.getElementById('login-card-saved-offline');
+  const loginCardNewOffline = document.getElementById('login-card-new-offline');
+
+  updateNetPills(online);
+
+  if(online){
+    if(statusLbl){ statusLbl.textContent = 'الانترنت متصل'; statusLbl.style.color = 'var(--g)'; }
+    if(iconLbl) iconLbl.textContent = '🟢';
+    if(toggleBtn){ toggleBtn.textContent = 'قطع الإنترنت 🔌'; toggleBtn.style.background = 'var(--rbg)'; toggleBtn.style.color = 'var(--r)'; }
+    if(homeBanner) homeBanner.style.display = 'none';
+
+    if(loginNetBadge){
+      loginNetBadge.className = 'online-pill';
+      loginNetBadge.innerHTML = '<span class="online-dot"></span>أونلاين';
+    }
+    if(loginCardOnline) loginCardOnline.style.display = 'flex';
+    if(loginCardSavedOffline) loginCardSavedOffline.style.display = 'none';
+    if(loginCardNewOffline) loginCardNewOffline.style.display = 'none';
+  } else {
+    if(statusLbl){ statusLbl.textContent = 'لا يوجد إنترنت'; statusLbl.style.color = 'var(--r)'; }
+    if(iconLbl) iconLbl.textContent = '🔴';
+    if(toggleBtn){ toggleBtn.textContent = 'تفعيل الإنترنت ⚡'; toggleBtn.style.background = 'var(--gbg)'; toggleBtn.style.color = 'var(--g)'; }
+    if(homeBanner) homeBanner.style.display = 'flex';
+
+    if(loginNetBadge){
+      loginNetBadge.className = 'offline-pill';
+      loginNetBadge.innerHTML = '<span class="offline-dot"></span>أوفلاين';
+    }
+
+    if(hasSavedSession && rememberLogin){
+      if(loginCardOnline) loginCardOnline.style.display = 'none';
+      if(loginCardSavedOffline) loginCardSavedOffline.style.display = 'flex';
+      if(loginCardNewOffline) loginCardNewOffline.style.display = 'none';
+    } else {
+      // الجهاز الجديد أو من لم يسجل سابقاً: يمنع منعاً باتاً من الدخول أوفلاين
+      if(loginCardOnline) loginCardOnline.style.display = 'none';
+      if(loginCardSavedOffline) loginCardSavedOffline.style.display = 'none';
+      if(loginCardNewOffline) loginCardNewOffline.style.display = 'flex';
+    }
+  }
+}
+
+function toggleInternetSim(){
+  updateRealNetworkStatus(!isConnected);
+  if(isConnected) toast('🌐 تم الاتصال بالإنترنت والمزامنة السحابية',false);
+}
+
+window.addEventListener('online', ()=>updateRealNetworkStatus(true));
+window.addEventListener('offline', ()=>updateRealNetworkStatus(false));
+window.addEventListener('DOMContentLoaded', ()=>{
+  loadLocalState();
+  initVirtualScrollListeners();
+  updateRealNetworkStatus(typeof navigator !== 'undefined' ? navigator.onLine : true);
+  if(navigator.onLine){ syncCitizensFromServer(); syncArchiveFromServer(); }
+});
+
+function initVirtualScrollListeners(){
+  const clist = document.getElementById('clist');
+  if (clist) {
+    clist.addEventListener('scroll', () => {
+      if (clist.scrollTop + clist.clientHeight >= clist.scrollHeight - 300) {
+        appendMoreHomeCards();
+      }
+    }, { passive: true });
+  }
+  const llist = document.getElementById('llist');
+  if (llist) {
+    llist.addEventListener('scroll', () => {
+      if (llist.scrollTop + llist.clientHeight >= llist.scrollHeight - 300) {
+        appendMoreLogCards();
+      }
+    }, { passive: true });
+  }
+}
+
+function continueSavedOfflineSession(){
+  if(!hasSavedSession || !rememberLogin){
+    toast('⚠️ يجب تسجيل الدخول عبر الإنترنت أولاً لهذا الجهاز', false, 'red');
+    return;
+  }
+  loadLocalState();
+  document.getElementById('bnav').style.display='flex';
+  document.getElementById('type-badge').innerHTML=agentType==='ghiz'
+    ?'<span style="background:#FFF8E1;color:#E65100;border:1px solid #FFB74D;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">🛒 غذائية</span>'
+    :'<span style="background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">🌾 طحين</span>';
+  updateStats();renderList('');
+  showScreen('home');
+  toast('🔒 أهلاً بك! تم دخول وضع التصفح أوفلاين (قراءة وتصدير PDF فقط)',false,'pur');
+}
+
+function updateNetPills(online){
+  const cls = online ? 'online-pill' : 'offline-pill';
+  ['app-net-pill','det-net-pill','log-net-pill'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){
+      el.className = cls;
+      el.innerHTML = online ? '<span class="online-dot"></span>سحابي' : '<span class="offline-dot"></span>أوفلاين (قراءة فقط)';
+    }
+  });
+}
+
+// ══ ITEMS ══
+const ITEMS_GHIZ=[
+  {key:'oil',icon:'🫙',label:'الزيت',welfare:false},
+  {key:'rice',icon:'🍚',label:'الرز',welfare:false},
+  {key:'sugar',icon:'🍬',label:'السكر',welfare:false},
+  {key:'paste',icon:'🍅',label:'معجون الطماطم',welfare:false},
+  {key:'milk',icon:'🥛',label:'الحليب',welfare:false},
+  {key:'w_oil2',icon:'🫙',label:'الزيت (رعاية)',welfare:true},
+  {key:'w_rice2',icon:'🍚',label:'الرز (رعاية)',welfare:true},
+];
+const ITEMS_TAHN=[
+  {key:'flour',icon:'🌾',label:'الطحين',welfare:false},
+  {key:'w_flour2',icon:'🌾',label:'الطحين (رعاية)',welfare:true},
+];
+
+// ══ CURRENT CITIZENS ══
+let citizens = [];
+
+
+// ══ THEME ══
+function toggleDark(){
+  darkMode=!darkMode;
+  document.getElementById('HR').classList.toggle('dark',darkMode);
+  document.getElementById('dm-tgl').classList.toggle('on',darkMode);
+  document.getElementById('dm-sub').textContent=darkMode?'وضع ليلي نشط':'وضع فاتح';
+  document.getElementById('dm-ico').textContent=darkMode?'☀️':'🌙';
+  document.getElementById('dm-ico').style.background=darkMode?'#2C2C2C':'#1a1a2e';
+}
+
+// ══ AGENT TYPE ══
+function setType(t){
+  agentType=t;
+  document.getElementById('pg').className='pill '+(t==='ghiz'?'pill-g':'pill-off');
+  document.getElementById('pt').className='pill '+(t==='tahn'?'pill-t':'pill-off');
+}
+function getItems(){return agentType==='ghiz'?ITEMS_GHIZ:ITEMS_TAHN;}
+
+// ══ LOGIN / LOGOUT ══
+async function doLogin(){
+  loadLocalState();
+  const u = document.getElementById('fu').value.trim();
+  const p = document.getElementById('fp').value.trim();
+
+  // 1. فحص دخول المالك (Owner)
+  const isOwner = (u.toLowerCase() === 'admin' || u.toLowerCase() === 'owner') && p === 'admin2026';
+  if (isOwner) {
+    loginAsOwner();
+    return;
+  }
+
+  // 2. فحص دخول الوكلاء محلياً (متاح أوفلاين 100%)
+  const matchedAgent = allAgents.find(ag => ag.username.toLowerCase() === u.toLowerCase() && ag.password === p);
+  if (matchedAgent) {
+    loginAsAgent(matchedAgent);
+    return;
+  }
+
+  // 3. فحص الدخول سحابياً إذا توفر الإنترنت
+  if (navigator.onLine) {
+    try {
+      toast('⏳ جاري التحقق من الحساب سحابياً...', false, 'blue');
+      const res = await fetch('https://wakil-api.onrender.com/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p, agentType: agentType })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.role === 'owner') {
+          loginAsOwner();
+          return;
+        } else if (data.role === 'agent' && data.agent) {
+          if (!allAgents.some(a => a.id === data.agent.id)) {
+            allAgents.push(data.agent);
+          }
+          loginAsAgent(data.agent);
+          return;
+        }
+      }
+    } catch(err) {
+      console.warn('Cloud login error:', err);
+    }
+  }
+
+  // في حال خطأ بيانات الدخول
+  document.getElementById('err').style.display = 'block';
+  document.getElementById('fp').value = '';
+}
+
+function loginAsOwner(){
+  currentUserRole = 'owner';
+  ownerViewingAgent = null;
+  localStorage.setItem('wakil_user_role', 'owner');
+  localStorage.setItem('wakil_has_logged_in', 'true');
+  if (rememberLogin) localStorage.setItem('wakil_remember_login', 'true');
+
+  document.getElementById('err').style.display = 'none';
+  document.getElementById('bnav').style.display = 'flex';
+  
+  const nag = document.getElementById('n-agents');
+  if (nag) nag.style.display = 'flex';
+
+  const banner = document.getElementById('owner-agent-banner');
+  if (banner) banner.style.display = 'none';
+
+  document.getElementById('set-uname').textContent = 'المالك العام للمنظومة 👑';
+  document.getElementById('set-tipn').textContent = 'لوحة التحكم الشاملة';
+
+  goAgents();
+  toast('👑 أهلاً بك يا مالك التطبيق! تم فتح لوحة تحكم الوكلاء', false);
+
+  if (navigator.onLine) {
+    syncOwnerAgentsFromServer();
+  }
+}
+
+function loginAsAgent(ag){
+  currentUserRole = 'agent';
+  currentAgent = ag;
+  ownerViewingAgent = null;
+  agentType = ag.type || 'ghiz';
+
+  localStorage.setItem('wakil_user_role', 'agent');
+  localStorage.setItem('wakil_current_agent', JSON.stringify(ag));
+  localStorage.setItem('wakil_has_logged_in', 'true');
+  if (rememberLogin) localStorage.setItem('wakil_remember_login', 'true');
+
+  document.getElementById('err').style.display = 'none';
+  document.getElementById('bnav').style.display = 'flex';
+  
+  const nag = document.getElementById('n-agents');
+  if (nag) nag.style.display = 'none';
+
+  const banner = document.getElementById('owner-agent-banner');
+  if (banner) banner.style.display = 'none';
+
+  loadLocalState();
+
+  document.getElementById('type-badge').innerHTML = agentType === 'ghiz'
+    ? '<span style="background:#FFF8E1;color:#E65100;border:1px solid #FFB74D;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">🛒 غذائية</span>'
+    : '<span style="background:#E3F2FD;color:#1565C0;border:1px solid #90CAF9;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;">🌾 طحين</span>';
+
+  document.getElementById('set-uname').textContent = `${ag.name} (${ag.agencyNumber})`;
+  document.getElementById('set-tipn').textContent = ag.type === 'ghiz' ? 'وكيل غذائية' : 'وكيل طحين';
+
+  goHome();
+  toast(`مرحباً بك يا وكيلنا (${ag.name})!`, false);
+
+  if (navigator.onLine) {
+    syncCitizensFromServer();
+    syncArchiveFromServer();
+  }
+}
+
+function doLogout(){
+  closeMod('m-logout');
+  document.getElementById('bnav').style.display = 'none';
+  const nag = document.getElementById('n-agents');
+  if (nag) nag.style.display = 'none';
+  const banner = document.getElementById('owner-agent-banner');
+  if (banner) banner.style.display = 'none';
+
+  currentUserRole = 'agent';
+  ownerViewingAgent = null;
+  localStorage.removeItem('wakil_has_logged_in');
+
+  document.getElementById('fu').value = '';
+  document.getElementById('fp').value = '';
+  showScreen('login');
+  toast('تم تسجيل الخروج بنجاح', false, 'red');
+}
+
+async function syncArchiveFromServer(){
+  if(!navigator.onLine) return;
+  try {
+    const res = await fetch('https://wakil-api.onrender.com/api/archive', { signal: AbortSignal.timeout(6000) });
+    if(res.ok){
+      const data = await res.json();
+      if(Array.isArray(data) && data.length > 0){
+        let changed = false;
+        data.forEach(cloudMonth => {
+          const cloudTitle = cloudMonth.monthTitle || cloudMonth.label;
+          const exists = archive.some(m => m.id === cloudMonth.id || m.label === cloudTitle);
+          if(!exists){
+            archive.push({
+              id: cloudMonth.id || ('m_arch_' + Date.now()),
+              label: cloudTitle,
+              monthTitle: cloudTitle,
+              date: cloudMonth.archivedAt || cloudMonth.date || new Date().toISOString(),
+              citizens: cloudMonth.citizens || []
+            });
+            changed = true;
+          }
+        });
+        if(changed){
+          saveLocalState();
+          if(document.getElementById('sc-archive') && document.getElementById('sc-archive').classList.contains('active')){
+            renderArchive();
+          }
+        }
+      }
+    }
+  } catch(_) {}
+}
+
+async function syncCitizensFromServer(){
+  if (!navigator.onLine) return;
+  const agCode = currentAgent ? currentAgent.agencyNumber : '868';
+  try {
+    const res = await fetch('https://wakil-api.onrender.com/api/citizens?agencyNumber=' + agCode, { signal: AbortSignal.timeout(6000) });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.citizens)) {
+        // حماية تامة للـ 1042 مواطن: لا نسمح أبداً للسيرفر القديم بمحو المواطنين إذا أعاد عدداً أقل!
+        if (data.citizens.length >= citizens.length && data.citizens.length > 0) {
+          citizens = data.citizens.map(c => ({
+            id: c.id,
+            seq: c.id,
+            name: c.name,
+            card: c.cardNumber || c.card,
+            oldCard: c.oldCardNumber || c.oldCard || '',
+            fam: c.familyCount !== undefined ? c.familyCount : (c.fam || 0),
+            elig: c.eligibleCount !== undefined ? c.eligibleCount : (c.elig || 0),
+            blk: c.blockedCount !== undefined ? c.blockedCount : (c.blk || 0),
+            welfare: !!(c.isWelfare || c.welfare),
+            done: !!(c.isReceived || c.done),
+            doneAt: c.receivedAt || c.doneAt,
+            items: c.items || {},
+            custom: c.customItems || c.custom || []
+          }));
+          saveLocalState();
+          updateStats();
+          renderList(document.getElementById('sbx') ? document.getElementById('sbx').value : '');
+        } else if (citizens.length > data.citizens.length && citizens.length >= 1000) {
+          // إذا كان التطبيق يحتوي على الـ 1042 مواطن بينما السيرفر لا يزال قديماً (500 فقط)،
+          // نقوم تلقائياً برفع الـ 1042 مواطن للسيرفر لتحديث السيرفر السحابي أيضاً!
+          fetch('https://wakil-api.onrender.com/api/citizens/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ agencyNumber: agCode, citizens: citizens })
+          }).catch(()=>{});
+        }
+      }
+    }
+  } catch(e) {}
+}
+
+// ══ NAVIGATION ══
+
+function copyToClipboard(text, label){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).catch(()=>{});
+  }
+  toast('📋 تم نسخ ' + label + ': ' + text, false);
+}
+
+function showScreen(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sc-'+n).classList.add('active');
+  document.querySelectorAll('.nitem').forEach(x=>x.classList.remove('on'));
+  const map={agents:'n-agents',home:'n-home',log:'n-log',archive:'n-arch','arch-detail':'n-arch',settings:'n-set'};
+  if(map[n])document.getElementById(map[n]).classList.add('on');
+}
+function goHome(){
+  showScreen('home');
+  const sbx = document.getElementById('sbx');
+  if (sbx) sbx.value = '';
+  updateStats();
+  renderList('');
+}
+function goLog(){
+  showScreen('log');
+  updateStats();
+  renderLog();
+}
+function goArchive(){
+  showScreen('archive');
+  renderArchive();
+}
+function goSettings(){
+  showScreen('settings');
+}
+
+
+// ══ OWNER CONTROL PANEL & MULTI-AGENT FUNCTIONS ══
+
+function goAgents(){
+  showScreen('agents');
+  renderAgents();
+}
+
+function renderAgents(filterText = ''){
+  const container = document.getElementById('agents-list');
+  if (!container) return;
+
+  q = (filterText || '').trim().toLowerCase();
+  const filtered = q
+    ? allAgents.filter(a => a.name.toLowerCase().includes(q) || a.username.toLowerCase().includes(q) || String(a.agencyNumber).includes(q))
+    : allAgents;
+
+  // Update Top Metrics
+  const totalAgents = allAgents.length;
+  const ghizCount = allAgents.filter(a => a.type === 'ghiz').length;
+  const tahnCount = allAgents.filter(a => a.type === 'tahn').length;
+  
+  let totalAllCitizens = 0;
+  allAgents.forEach(a => {
+    const raw = localStorage.getItem('wakil_citizens_' + a.agencyNumber) || (a.agencyNumber === '868' ? localStorage.getItem('wakil_citizens_data') : null);
+    if (raw) {
+      try { totalAllCitizens += JSON.parse(raw).length; } catch(_) {}
+    }
+  });
+
+  const elTot = document.getElementById('owner-stat-total-agents');
+  if (elTot) elTot.textContent = totalAgents;
+  const elGhiz = document.getElementById('owner-stat-ghiz-agents');
+  if (elGhiz) elGhiz.textContent = ghizCount;
+  const elTahn = document.getElementById('owner-stat-tahn-agents');
+  if (elTahn) elTahn.textContent = tahnCount;
+  const elCit = document.getElementById('owner-stat-total-citizens');
+  if (elCit) elCit.textContent = totalAllCitizens.toLocaleString('ar-IQ');
+
+  if (!filtered.length) {
+    container.innerHTML = `<div class="empty" style="padding:40px 16px;">
+      <div class="eico">🔍</div>
+      <div>لا يوجد وكلاء مطابقين للبحث</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(ag => agentCardHTML(ag)).join('');
+}
+
+function agentCardHTML(ag) {
+  const isPassVisible = !!showPasswordsMap[ag.id];
+  const passDisplay = isPassVisible ? ag.password : '••••••••';
+  const isGhiz = ag.type === 'ghiz';
+
+  // Calculate stats for this agent
+  let total = 0, received = 0;
+  if (ag.stats) {
+    total = ag.stats.totalCitizens || 0;
+    received = ag.stats.receivedCount || 0;
+  } else {
+    const raw = localStorage.getItem('wakil_citizens_' + ag.agencyNumber) || (ag.agencyNumber === '868' ? localStorage.getItem('wakil_citizens_data') : null);
+    if (raw) {
+      try {
+        const list = JSON.parse(raw);
+        total = list.length;
+        received = list.filter(c => c.done || c.isReceived).length;
+      } catch(_) {}
+    }
+  }
+  const pct = total ? Math.round((received / total) * 100) : 0;
+
+  return `
+  <div class="agent-card" style="background:var(--card);border:1.5px solid var(--bd);border-radius:16px;padding:14px;box-shadow:0 3px 12px var(--sh);position:relative;">
+    <!-- Header: Name & Type -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--tx);">${ag.name}</div>
+        <div style="font-size:11px;color:var(--mt);margin-top:2px;">
+          رمز الوكالة: <b style="color:var(--g);font-size:12px;">${ag.agencyNumber}</b> | ${ag.governorate || 'ذي قار'}
+        </div>
+      </div>
+      <span style="background:${isGhiz ? '#FFF3E0' : '#E3F2FD'};color:${isGhiz ? '#E65100' : '#1565C0'};border:1px solid ${isGhiz ? '#FFE082' : '#90CAF9'};padding:3px 10px;border-radius:12px;font-size:11px;font-weight:800;">
+        ${isGhiz ? '🛒 غذائية' : '🌾 طحين'}
+      </span>
+    </div>
+
+    <!-- Credentials Box (Username & Password with Eye and Copy) -->
+    <div style="background:var(--ib);border:1px dashed var(--bd);border-radius:10px;padding:8px 10px;margin-bottom:10px;font-size:11.5px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="color:var(--tx2);">👤 اسم المستخدم:</span>
+        <span style="font-family:monospace;font-weight:800;color:var(--tx);font-size:12px;">${ag.username}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="color:var(--tx2);">🔑 كلمة المرور:</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-family:monospace;font-weight:800;color:var(--g);font-size:13px;" id="pass-${ag.id}">${passDisplay}</span>
+          <button onclick="toggleAgentPassword('${ag.id}')" style="background:transparent;border:none;cursor:pointer;font-size:13px;padding:2px 4px;" title="إظهار / إخفاء">
+            ${isPassVisible ? '🙈' : '👁️'}
+          </button>
+          <button onclick="copyAgentCredentials('${ag.username}', '${ag.password}', '${ag.name}')" style="background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700;cursor:pointer;color:var(--tx);" title="نسخ بيانات الدخول">
+            📋 نسخ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Progress -->
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:3px;">
+        <span style="color:var(--tx2);">المواطنون: <b>${total}</b></span>
+        <span style="color:var(--g);">المستلمون: <b>${received} (${pct}%)</b></span>
+      </div>
+      <div class="prog-track" style="height:6px;border-radius:3px;margin:0;">
+        <div class="prog-fill" style="width:${pct}%;height:6px;border-radius:3px;"></div>
+      </div>
+    </div>
+
+    <!-- Action Buttons Grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">
+      <button class="btn-g" onclick="openAgentRosterView('${ag.id}')" style="margin:0;padding:8px 6px;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:4px;">
+        <span>👥 تصفح الكشف</span>
+      </button>
+      <button class="btn-g" onclick="generateAndPrintAgentPDF('${ag.id}')" style="margin:0;padding:8px 6px;font-size:11.5px;font-weight:800;background:#1B5E20;display:flex;align-items:center;justify-content:center;gap:4px;">
+        <span>📄 طباعة PDF</span>
+      </button>
+      <button class="btn-close" onclick="openEditAgentModal('${ag.id}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:700;background:var(--card);color:var(--tx);">
+        ✏️ تعديل / كلمة المرور
+      </button>
+      <button class="btn-close" onclick="deleteAgentConfirm('${ag.id}', '${ag.name}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:700;background:var(--rbg);color:var(--r);border-color:#FFCDD2;">
+        🗑️ حذف الوكيل
+      </button>
+    </div>
+  </div>`;
+}
+
+function filterAgentsList(q){
+  renderAgents(q);
+}
+
+function toggleAgentPassword(agId){
+  showPasswordsMap[agId] = !showPasswordsMap[agId];
+  const ag = allAgents.find(a => a.id === agId);
+  const el = document.getElementById('pass-' + agId);
+  if (el && ag) {
+    el.textContent = showPasswordsMap[agId] ? ag.password : '••••••••';
+  }
+}
+
+function copyAgentCredentials(u, p, name){
+  const text = `بيانات دخول وكيل (${name}):\nاسم المستخدم: ${u}\nكلمة المرور: ${p}`;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text);
+  }
+  toast(`📋 تم نسخ بيانات الدخول للوكيل (${name})`, false);
+}
+
+function openAddAgentModal(){
+  document.getElementById('add-ag-name').value = '';
+  document.getElementById('add-ag-code').value = '';
+  document.getElementById('add-ag-user').value = '';
+  document.getElementById('add-ag-pass').value = '';
+  showMod('m-add-agent');
+}
+
+function generateRandomPassForAdd(){
+  const randNum = Math.floor(100000 + Math.random() * 900000);
+  document.getElementById('add-ag-pass').value = 'pass' + randNum;
+}
+
+async function submitNewAgent(){
+  const name = document.getElementById('add-ag-name').value.trim();
+  const agencyNumber = document.getElementById('add-ag-code').value.trim();
+  const type = document.getElementById('add-ag-type').value;
+  const gov = document.getElementById('add-ag-gov').value.trim() || 'ذي قار';
+  const branch = document.getElementById('add-ag-branch').value.trim() || 'فرع التموين';
+  const username = document.getElementById('add-ag-user').value.trim();
+  const password = document.getElementById('add-ag-pass').value.trim();
+
+  if (!name || !agencyNumber || !username || !password) {
+    toast('⚠️ يرجى ملء كافة الحقول (الاسم، الرمز، اليوزر، الباسورد)', false, 'red');
+    return;
+  }
+
+  if (allAgents.some(a => a.username.toLowerCase() === username.toLowerCase())) {
+    toast('⚠️ اسم المستخدم هذا مسجل مسبقاً، اختر اسماً آخر', false, 'red');
+    return;
+  }
+
+  if (allAgents.some(a => String(a.agencyNumber) === String(agencyNumber))) {
+    toast('⚠️ رمز الوكالة هذا مسجل مسبقاً لوكيل آخر', false, 'red');
+    return;
+  }
+
+  const newAgent = {
+    id: 'agent_' + Date.now(),
+    name,
+    agencyNumber,
+    type,
+    governorate: gov,
+    branch,
+    username,
+    password,
+    createdAt: new Date().toISOString()
+  };
+
+  allAgents.push(newAgent);
+  saveLocalState();
+  closeMod('m-add-agent');
+  renderAgents();
+
+  // رفع وحفظ الوكيل سحابياً فوراً
+  if (navigator.onLine) {
+    try {
+      toast('⏳ جاري رفع الحساب للسحابة لتفعيله على جميع الهواتف...', false, 'blue');
+      const res = await fetch('https://wakil-api.onrender.com/api/owner/agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newAgent)
+      });
+      if (res.ok) {
+        toast(`✅ تم إنشاء وتفعيل الوكيل (${name}) سحابياً بنجاح! يمكنه الدخول من أي هاتف الآن 🌐`, false);
+      } else {
+        toast(`✅ تم إنشاء الوكيل (${name}) في هذا الهاتف، وجاري المزامنة مع السيرفر`, false);
+      }
+    } catch(e) {
+      toast(`✅ تم إنشاء الوكيل (${name}) في هذا الهاتف، وسيتم رفعه للسحابة فور استجابة السيرفر`, false);
+    }
+  } else {
+    toast(`✅ تم إنشاء الوكيل (${name}) محلياً في هذا الهاتف (أوفلاين)`, false);
+  }
+}
+
+function openEditAgentModal(agId){
+  const ag = allAgents.find(a => a.id === agId);
+  if (!ag) return;
+  document.getElementById('edit-ag-id').value = ag.id;
+  document.getElementById('edit-ag-name').value = ag.name;
+  document.getElementById('edit-ag-code').value = ag.agencyNumber;
+  document.getElementById('edit-ag-type').value = ag.type || 'ghiz';
+  document.getElementById('edit-ag-user').value = ag.username;
+  document.getElementById('edit-ag-pass').value = ag.password;
+  showMod('m-edit-agent');
+}
+
+async function submitEditAgent(){
+  const id = document.getElementById('edit-ag-id').value;
+  const ag = allAgents.find(a => a.id === id);
+  if (!ag) return;
+
+  const name = document.getElementById('edit-ag-name').value.trim();
+  const agencyNumber = document.getElementById('edit-ag-code').value.trim();
+  const type = document.getElementById('edit-ag-type').value;
+  const username = document.getElementById('edit-ag-user').value.trim();
+  const password = document.getElementById('edit-ag-pass').value.trim();
+
+  if (!name || !agencyNumber || !username || !password) {
+    toast('⚠️ يرجى ملء كافة الحقول', false, 'red');
+    return;
+  }
+
+  ag.name = name;
+  ag.agencyNumber = agencyNumber;
+  ag.type = type;
+  ag.username = username;
+  ag.password = password;
+
+  saveLocalState();
+  closeMod('m-edit-agent');
+  renderAgents();
+  toast(`💾 تم تحديث بيانات الوكيل (${name}) وكلمة المرور بنجاح!`, false);
+
+  if (navigator.onLine) {
+    try {
+      fetch('https://wakil-api.onrender.com/api/owner/agents/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ag)
+      }).catch(()=>{});
+    } catch(_) {}
+  }
+}
+
+async function deleteAgentConfirm(agId, name){
+  if (confirm(`هل أنت متأكد من حذف الوكيل (${name}) وكافة بياناته؟ لا يمكن التراجع عن هذا الإجراء.`)) {
+    allAgents = allAgents.filter(a => a.id !== agId);
+    saveLocalState();
+    renderAgents();
+    toast(`🗑️ تم حذف الوكيل (${name}) بنجاح`, false, 'red');
+
+    if (navigator.onLine) {
+      try {
+        fetch('https://wakil-api.onrender.com/api/owner/agents/' + agId, {
+          method: 'DELETE'
+        }).catch(()=>{});
+      } catch(_) {}
+    }
+  }
+}
+
+function openAgentRosterView(agentId){
+  const ag = allAgents.find(a => a.id === agentId);
+  if (!ag) return;
+  ownerViewingAgent = ag;
+  currentAgent = ag;
+  agentType = ag.type || 'ghiz';
+
+  // Load this agent's citizens
+  const agentKey = 'wakil_citizens_' + ag.agencyNumber;
+  const raw = localStorage.getItem(agentKey) || (ag.agencyNumber === '868' ? localStorage.getItem('wakil_citizens_data') : null);
+  citizens = raw ? JSON.parse(raw) : [];
+
+  // Show banner
+  const banner = document.getElementById('owner-agent-banner');
+  if (banner) {
+    banner.style.display = 'flex';
+    document.getElementById('owner-viewing-name').textContent = ag.name;
+    document.getElementById('owner-viewing-code').textContent = ag.agencyNumber;
+  }
+
+  goHome();
+  toast(`👑 تم فتح كشف الوكيل: ${ag.name}`, false, 'blue');
+}
+
+function exitOwnerAgentView(){
+  ownerViewingAgent = null;
+  const banner = document.getElementById('owner-agent-banner');
+  if (banner) banner.style.display = 'none';
+  goAgents();
+  toast('↩️ عدت إلى لوحة إدارة الوكلاء', false);
+}
+
+function generateAndPrintAgentPDF(agentId){
+  const ag = allAgents.find(a => a.id === agentId);
+  if (!ag) return;
+
+  const agentKey = 'wakil_citizens_' + ag.agencyNumber;
+  const raw = localStorage.getItem(agentKey) || (ag.agencyNumber === '868' ? localStorage.getItem('wakil_citizens_data') : null);
+  const list = raw ? JSON.parse(raw) : [];
+
+  if (!list.length) {
+    toast(`⚠️ الوكيل (${ag.name}) ليس لديه أي مواطنين مسجلين بعد لتوليد التقرير`, false, 'red');
+    return;
+  }
+
+  archiveMonth = {
+    id: 'current_month_' + Date.now(),
+    label: `كشف الوكيل ${ag.name} (رمز ${ag.agencyNumber})`,
+    monthTitle: `كشف الوكيل ${ag.name}`,
+    citizens: list,
+    agentInfo: ag
+  };
+
+  const savedAgent = currentAgent;
+  currentAgent = ag;
+  agentType = ag.type || 'ghiz';
+
+  generateMonthPDFReport();
+
+  if (currentUserRole === 'owner' && !ownerViewingAgent) {
+    currentAgent = savedAgent;
+  }
+}
+
+async function syncOwnerAgentsFromServer(){
+  if (!navigator.onLine) return;
+  try {
+    // 1. إرسال الوكلاء المحفوظين في هذا الهاتف إلى السحابة لضمان توفرهم في كل هواتف العالم (Push)
+    if (allAgents && allAgents.length > 0) {
+      fetch('https://wakil-api.onrender.com/api/owner/agents/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agents: allAgents })
+      }).catch(()=>{});
+    }
+
+    // 2. جلب أحدث قائمة وكلاء من السحابة (Pull)
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/agents', { signal: AbortSignal.timeout(6000) });
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.agents) && data.agents.length > 0) {
+        data.agents.forEach(cloudAg => {
+          const idx = allAgents.findIndex(a => a.username.toLowerCase() === cloudAg.username.toLowerCase() || a.agencyNumber === cloudAg.agencyNumber);
+          if (idx === -1) {
+            allAgents.push(cloudAg);
+          } else {
+            allAgents[idx] = { ...allAgents[idx], ...cloudAg };
+          }
+        });
+        saveLocalState();
+        renderAgents();
+      }
+    }
+  } catch(e) {
+    console.warn('Agent sync error:', e);
+  }
+}
+
+// ══ HOME (OPTIMIZED WITH CHUNKED RENDERING) ══
+let homeRenderedCount = 0;
+let homeCurrentList = [];
+
+function renderList(q){
+  const el = document.getElementById('clist');
+  if (!el) return;
+  q = (q || '').trim();
+  homeCurrentList = q ? citizens.filter(c => c.name.includes(q) || c.card.includes(q)) : citizens;
+  
+  if (!homeCurrentList.length) {
+    if (!citizens.length) {
+      el.innerHTML = `<div class="empty" style="padding:50px 16px;text-align:center;">
+        <div style="font-size:52px;margin-bottom:12px;">📂</div>
+        <div style="font-size:16px;font-weight:800;color:var(--tx);margin-bottom:6px;">التطبيق جاهز للبدء (0 مواطن)</div>
+        <div style="font-size:12px;color:var(--mt);line-height:1.6;max-width:280px;margin:0 auto 16px;">
+          لم يتم رفع أي ملف بعد. اضغط على الزر أدناه لاختيار ملف PDF التمويني من هاتفك.
+        </div>
+        <button onclick="showMod('m-import')" class="btn-g" style="width:auto;display:inline-flex;padding:11px 22px;font-size:14px;margin:0 auto;">
+          📱 اختيار ملف PDF من الهاتف
+        </button>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div class="empty"><div class="eico">🔍</div><div>لا توجد نتائج مطابقة للبحث</div></div>`;
+    return;
+  }
+
+  el.scrollTop = 0;
+  if (homeCurrentList.length <= 50) {
+    el.innerHTML = homeCurrentList.map(c => citizenCardHTML(c)).join('');
+    homeRenderedCount = homeCurrentList.length;
+    return;
+  }
+
+  homeRenderedCount = 40;
+  el.innerHTML = homeCurrentList.slice(0, homeRenderedCount).map(c => citizenCardHTML(c)).join('');
+}
+
+function appendMoreHomeCards() {
+  if (homeRenderedCount >= homeCurrentList.length) return;
+  const el = document.getElementById('clist');
+  if (!el) return;
+  const nextChunk = homeCurrentList.slice(homeRenderedCount, homeRenderedCount + 40);
+  if (!nextChunk.length) return;
+  
+  const div = document.createElement('div');
+  div.innerHTML = nextChunk.map(c => citizenCardHTML(c)).join('');
+  while (div.firstChild) {
+    el.appendChild(div.firstChild);
+  }
+  homeRenderedCount += nextChunk.length;
+}
+
+function doSearch(q){ renderList(q); }
+
+function citizenCardHTML(c,onclick='openDetail'){
+  return `<div class="ccard ${c.welfare?'wc':''}" onclick="${onclick}(${c.id})">
+    <div class="ava ${c.welfare?'wa':''}">👤</div>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+        <span class="cname">${c.name}</span>
+        ${c.welfare?'<span class="badge b-welf" style="font-size:10px;">🏛️ رعاية</span>':''}
+      </div>
+      <div class="cnum">🪪 ${c.card}</div>
+      <div class="cfam">كلي: ${c.fam} | مستحق: ${c.elig} | محجوب: ${c.blk}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
+      <div class="badge ${c.done?'b-done':'b-pend'}">${c.done?'✓ تم':'⏳ لم يستلم'}</div>
+      <span class="arr">‹</span>
+    </div>
+  </div>`;
+}
+
+function updateStats(){
+  const don=citizens.filter(c=>c.done).length,tot=citizens.length;
+  document.getElementById('st').textContent=tot;
+  document.getElementById('sd').textContent=don;
+  document.getElementById('sp').textContent=tot-don;
+  const pct=tot?Math.round(don/tot*100):0;
+  document.getElementById('ppct').textContent=pct+'%';
+  document.getElementById('plbl').textContent=`${don} من أصل ${tot} تم التسليم`;
+  document.getElementById('pfill').style.width=pct+'%';
+  document.getElementById('tdv').textContent=don;
+  document.getElementById('tp').textContent=tot-don;
+}
+
+// ══ FINISH MONTH FEATURE ══
+function openFinishMonthModal(){
+  if(!isConnected){
+    toast('⚠️ إنهاء الشهر وأرشفته يتطلب إنترنت لرفع البيانات سحابياً',false,'red');
+    return;
+  }
+  const now = new Date();
+  const monthsArr = ['كانون الثاني','شباط','آذار','نيسان','أيار','حزيران','تموز','آب','أيلول','تشرين الأول','تشرين الثاني','كانون الأول'];
+  const defaultName = `شهر ${monthsArr[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('finish-month-name').value = defaultName;
+  showMod('m-finish-month');
+}
+
+async function executeFinishMonth(){
+  const nameInput = document.getElementById('finish-month-name').value.trim();
+  const monthName = nameInput || 'شهر جديد ' + new Date().toLocaleDateString('ar-IQ');
+  
+  const snap={
+    id: 'm_arch_' + Date.now(),
+    label: monthName,
+    monthTitle: monthName,
+    date: new Date().toISOString(),
+    archivedAt: new Date().toISOString(),
+    totalCitizens: citizens.length,
+    receivedCount: citizens.filter(c => c.done).length,
+    citizens: citizens.map(c => ({ ...c, items: { ...c.items }, custom: [ ...(c.custom || []) ] }))
+  };
+  
+  // 1. إضافة الشهر للأرشيف وتصفير المستلمين محلياً
+  archive.unshift(snap);
+  citizens.forEach(c => {
+    c.done = false;
+    c.doneAt = null;
+    c.items = {};
+    c.custom = [];
+  });
+  
+  // 2. الحفظ الفوري الدائم في ذاكرة الهاتف (مضمون 100% حتى لو خرج المستخدم فوراً)
+  saveLocalState();
+  
+  closeMod('m-finish-month');
+  updateStats();
+  renderList('');
+  toast(`🏁 تم إنهاء وأرشفة "${monthName}" بنجاح وحفظه في الهاتف والسحابة!`, false);
+
+  // 3. رفع الأرشيف إلى السحابة فوراً
+  if(navigator.onLine){
+    try {
+      fetch('https://wakil-api.onrender.com/api/archive/finish-month', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          monthTitle: monthName,
+          citizens: snap.citizens
+        })
+      }).then(r => r.json()).then(d => {
+        console.log('Month archived to cloud database successfully:', d);
+      }).catch(err => console.warn('Cloud finish-month error:', err));
+    } catch(_) {}
+  }
+}
+
+// ══ RENAME ARCHIVED MONTH ══
+function openRenameMonthModal(id, currentName, e){
+  if(e) e.stopPropagation();
+  if(!isConnected){
+    toast('⚠️ تعديل أسماء الأرشيف يتطلب إنترنت',false,'red');
+    return;
+  }
+  editingArchMonthId = id;
+  document.getElementById('rename-month-name').value = currentName;
+  showMod('m-rename-month');
+}
+
+function executeRenameMonth(){
+  const newName = document.getElementById('rename-month-name').value.trim();
+  if(!newName){ toast('يرجى كتابة الاسم الجديد',false,'red'); return; }
+  
+  const m = archive.find(x => x.id === editingArchMonthId);
+  if(m){
+    m.label = newName;
+    m.monthTitle = newName;
+    saveLocalState();
+    closeMod('m-rename-month');
+    renderArchive();
+    toast('✅ تم تعديل اسم الشهر في الأرشيف وحفظه', false);
+
+    if(navigator.onLine){
+      fetch('https://wakil-api.onrender.com/api/archive/' + editingArchMonthId, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newTitle: newName })
+      }).catch(err => console.warn('Cloud rename error:', err));
+    }
+  }
+}
+
+
+// ══ PERSISTENCE & LOCAL STORAGE (MULTI-AGENT) ══
+function saveLocalState() {
+  try {
+    const agency = (ownerViewingAgent && ownerViewingAgent.agencyNumber) ? ownerViewingAgent.agencyNumber : (currentAgent ? currentAgent.agencyNumber : '868');
+    localStorage.setItem('wakil_citizens_' + agency, JSON.stringify(citizens));
+    if (agency === '868') {
+      localStorage.setItem('wakil_citizens', JSON.stringify(citizens));
+      localStorage.setItem('wakil_citizens_data', JSON.stringify(citizens));
+    }
+    localStorage.setItem('wakil_archive_' + agency, JSON.stringify(archive));
+    localStorage.setItem('wakil_agents_cache', JSON.stringify(allAgents));
+    localStorage.setItem('wakil_current_agent', JSON.stringify(currentAgent));
+    localStorage.setItem('wakil_user_role', currentUserRole);
+  } catch(e) {
+    console.warn('Storage error:', e);
+  }
+}
+
+function loadLocalState() {
+  try {
+    const rawAgents = localStorage.getItem('wakil_agents_cache');
+    if (rawAgents) allAgents = JSON.parse(rawAgents);
+  } catch(_) {}
+
+  if (!allAgents || !allAgents.length) {
+    allAgents = [{
+      id: 'agent_868',
+      username: 'user',
+      password: '00000000',
+      name: 'فاضل عباس كريم',
+      agencyNumber: '868',
+      licenseNumber: '000699',
+      type: 'ghiz',
+      governorate: 'ذي قار',
+      branch: 'فرع تموين ذي قار'
+    }];
+  }
+
+  try {
+    const rawCurAgent = localStorage.getItem('wakil_current_agent');
+    if (rawCurAgent) currentAgent = JSON.parse(rawCurAgent);
+  } catch(_) {}
+
+  currentUserRole = localStorage.getItem('wakil_user_role') || 'agent';
+  agentType = (currentAgent && currentAgent.type) ? currentAgent.type : 'ghiz';
+
+  const agency = currentAgent ? currentAgent.agencyNumber : '868';
+  const saved = localStorage.getItem('wakil_citizens_' + agency) || (agency === '868' ? (localStorage.getItem('wakil_citizens') || localStorage.getItem('wakil_citizens_data')) : null);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        citizens = parsed;
+      }
+    } catch(e) {}
+  }
+
+  // 💡 حماية وتأمين الـ 1042 مواطن: إذا كانت الذاكرة فارغة، يتم تحميل الـ 1042 مواطن المدمجين فوراً
+  if ((!citizens || citizens.length === 0) && agency === '868' && window.WAKIL_SEED_1042) {
+    citizens = JSON.parse(JSON.stringify(window.WAKIL_SEED_1042));
+    saveLocalState();
+    console.log('Loaded bundled 1,042 citizens into agency 868');
+  }
+
+  const savedArch = localStorage.getItem('wakil_archive_' + agency) || (agency === '868' ? (localStorage.getItem('wakil_archive') || localStorage.getItem('wakil_archive_data')) : null);
+  if (savedArch) {
+    try {
+      const parsedArch = JSON.parse(savedArch);
+      if (Array.isArray(parsedArch) && parsedArch.length > 0) {
+        archive = parsedArch;
+      }
+    } catch(e) {}
+  }
+}
+
+// ══ IMPORT ══
+
+// ══ NATIVE PHONE PDF UPLOAD & PARSER ══
+async function handleRationPDFUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  closeMod('m-import');
+  toast('⏳ جاري قراءة ملف PDF واستخراج المواطنين من هاتفك...', false, 'blue');
+  
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    if (!window.parseRationPDF) {
+      throw new Error('محرك قراءة PDF لم يكتمل تحميله بعد، يرجى المحاولة ثانية');
+    }
+    const extracted = await window.parseRationPDF(new Uint8Array(arrayBuffer));
+
+    if (!extracted || extracted.length === 0) {
+      toast('⚠️ لم يتم العثور على أسطر مواطنين في ملف PDF المختار', false, 'red');
+      return;
+    }
+
+    citizens = extracted;
+    saveLocalState();
+    updateStats();
+    renderList('');
+    toast('✅ تم استيراد ' + citizens.length + ' مواطناً بنجاح من ملف الهاتف!', false);
+
+    // مزامنة الكشف سحابياً لضمان بقائه عند فتح الحساب من هاتف آخر أو بعد مسح التطبيق
+    if(navigator.onLine){
+      fetch('https://wakil-api.onrender.com/api/citizens/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ citizens: extracted })
+      }).then(r => r.json()).then(d => {
+        console.log('Synced citizens to cloud database:', d);
+      }).catch(err => console.warn('Cloud sync warning:', err));
+    }
+  } catch (err) {
+    console.error('PDF parse error:', err);
+    toast('❌ ' + (err.message || 'حدث خطأ أثناء معالجة ملف PDF'), false, 'red');
+  } finally {
+    event.target.value = '';
+  }
+}
+
+async function handleWelfarePDFUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  closeMod('m-import');
+  toast('⏳ جاري قراءة ملف الرعاية الاجتماعية من هاتفك...', false, 'pur');
+  
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    if (!window.parseWelfarePDF) {
+      throw new Error('محرك قراءة PDF لم يكتمل تحميله بعد');
+    }
+    const welfareCards = await window.parseWelfarePDF(new Uint8Array(arrayBuffer));
+    const cardSet = new Set(welfareCards);
+
+    let count = 0;
+    citizens.forEach(c => {
+      if (cardSet.has(c.card) || cardSet.has(c.oldCard)) {
+        c.welfare = true;
+        count++;
+      }
+    });
+
+    saveLocalState();
+    renderList(document.getElementById('sbx') ? document.getElementById('sbx').value : '');
+    toast('🏛️ تم مطابقة ' + count + ' مستفيداً من الرعاية الاجتماعية بنجاح!', false, 'pur');
+  } catch (err) {
+    console.error('Welfare parse error:', err);
+    toast('❌ ' + (err.message || 'حدث خطأ أثناء قراءة ملف الرعاية'), false, 'red');
+  } finally {
+    event.target.value = '';
+  }
+}
+
+function simImport(){
+  if(!isConnected){ toast('⚠️ استيراد الملفات يتطلب اتصالاً بالإنترنت',false,'red'); return; }
+  toast('✅ تم استيراد ونشر البيانات سحابياً من الملف التمويني',false);
+}
+function simWelfare(){
+  if(!isConnected){ toast('⚠️ مطابقة ملف الرعاية تتطلب اتصالاً بالإنترنت',false,'red'); return; }
+  let n=0;citizens.forEach(c=>{if(welfareCards.includes(c.card)){c.welfare=true;n++;}});
+  renderList('');updateStats();
+  toast(`🏛️ تم تطابق ${n} مواطنين مع ملف الرعاية سحابياً`,false,'pur');
+}
+
+// ══ DETAIL VIEW & EDIT LOGIC ══
+function openDetail(id){
+  cur=citizens.find(c=>c.id===id);
+  chk={...cur.items};
+  curCustom=[...cur.custom];
+  document.getElementById('det-back-btn').onclick=goHome;
+  renderDetail();
+  showScreen('detail');
+}
+
+function hasEdits(){
+  if(!cur.done) return false;
+  if(curCustom.length !== cur.custom.length) return true;
+  for(let i=0; i<curCustom.length; i++){
+    if(curCustom[i] !== cur.custom[i]) return true;
+  }
+  const allKeys = new Set([...Object.keys(chk), ...Object.keys(cur.items)]);
+  for(let k of allKeys){
+    if(!!chk[k] !== !!cur.items[k]) return true;
+  }
+  return false;
+}
+
+function renderDetail(){
+  const c=cur;
+  const allItems=getItems();
+  const base=allItems.filter(i=>!i.welfare),welf=allItems.filter(i=>i.welfare);
+  const now=c.doneAt?new Date(c.doneAt).toLocaleString('ar-IQ'):'';
+  const isEdited = hasEdits();
+  
+  document.getElementById('dbody').innerHTML=`
+    ${!isConnected ? `<div class="readonly-banner">🔒 التعديل ممنوع في وضع الأوفلاين. يرجى الاتصال بالإنترنت للتعديل والمزامنة.</div>` : ''}
+
+    <div class="icard ${c.welfare?'wcard':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div class="badge ${c.done?'b-done':'b-pend'}">${c.done?'✓ تم الاستلام':'⏳ لم يستلم'}</div>
+          ${c.welfare?'<div class="badge b-welf">🏛️ رعاية اجتماعية</div>':''}
+        </div>
+        <div style="font-size:11px;color:var(--mt);">بيانات المواطن</div>
+      </div>
+      <hr class="divl"/>
+      <div class="ilbl">اسم رب الأسرة</div>
+      <div class="ival">${c.name}</div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <div style="flex:1;background:var(--gbg);border:1.5px solid var(--gbd);border-radius:12px;padding:8px 10px;text-align:right;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:10px;color:var(--g);font-weight:700;">💳 رقم البطاقة الإلكترونية</div>
+            <div style="font-size:13px;color:var(--g);font-weight:900;margin-top:2px;">${c.card}</div>
+          </div>
+          <button onclick="event.stopPropagation();copyToClipboard('${c.card}','رقم البطاقة الإلكترونية')" style="background:var(--card);border:1px solid var(--gbd);color:var(--g);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;" title="نسخ الرقم الإلكتروني">
+            نسخ 📋
+          </button>
+        </div>
+        <div style="flex:1;background:var(--ib);border:1.5px solid var(--bd);border-radius:12px;padding:8px 10px;text-align:right;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:10px;color:var(--mt);font-weight:700;">📜 رقم البطاقة القديمة</div>
+            <div style="font-size:13px;color:var(--tx);font-weight:900;margin-top:2px;">${c.oldCard || '-'}</div>
+          </div>
+          ${c.oldCard ? `<button onclick="event.stopPropagation();copyToClipboard('${c.oldCard}','رقم البطاقة القديمة')" style="background:var(--card);border:1px solid var(--bd);color:var(--tx2);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;" title="نسخ الرقم القديم">نسخ 📋</button>` : ''}
+        </div>
+      </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <div style="flex:1;background:var(--ib);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:10px;color:var(--mt);">الكلي</div><div style="font-weight:800;font-size:15px;color:var(--tx);">${c.fam}</div></div>
+        <div style="flex:1;background:var(--gbg);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:10px;color:var(--g);">المستحقون</div><div style="font-weight:800;font-size:15px;color:var(--g);">${c.elig}</div></div>
+        <div style="flex:1;background:var(--rbg);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:10px;color:var(--r);">المحجوبون</div><div style="font-weight:800;font-size:15px;color:var(--r);">${c.blk}</div></div>
+      </div>
+      ${c.welfare?`<div class="wbanner"><span style="font-size:22px;">🏛️</span><div><div style="font-size:13px;font-weight:700;color:var(--pur);">مستفيد من الرعاية الاجتماعية</div><div style="font-size:11px;color:var(--pur);opacity:.7;">يستحق حصة إضافية</div></div></div>`:''}
+      ${c.done?`<div class="ts-bar"><span style="font-size:12px;color:var(--g);">📅 ${now}</span><span style="font-size:11px;color:var(--mt);">تاريخ الاستلام:</span></div>`:''}
+      
+      <!-- BUTTON TO GENERATE INDIVIDUAL CITIZEN AUDIT PDF (WORKS OFFLINE) -->
+      <button class="pdf-export-btn" onclick="generateCitizenAuditPDF(${c.id})">
+        <span>📊 استخراج كشف جرد PDF للمواطن (متاح أوفلاين)</span>
+      </button>
+    </div>
+
+    <!-- RATIONS & CUSTOM ITEMS -->
+    <div class="icard">
+      <div class="sec-t">المواد التموينية</div>
+      <div class="sec-s">الحصة الأساسية — ${c.elig} أفراد مستحقون</div>
+      ${base.map(it=>rationRow(it,false)).join('')}
+      ${c.welfare&&welf.length?`<div class="sdiv"><div class="sdiv-line"></div><div class="sdiv-lbl" style="background:var(--purbg);color:var(--pur);border:1px solid var(--purbd);">🏛️ حصة الرعاية</div><div class="sdiv-line"></div></div>${welf.map(it=>rationRow(it,true)).join('')}`:''}
+      
+      ${curCustom.length?`<div class="sdiv"><div class="sdiv-line"></div><div class="sdiv-lbl" style="background:var(--ib);color:var(--tx2);border:1px solid var(--bd);">✏️ مواد مضافة يدوياً</div><div class="sdiv-line"></div></div>${curCustom.map((item,i)=>customRow(item,i)).join('')}`:''}
+      
+      <!-- ADD CUSTOM ITEM FORM -->
+      <div class="add-form" style="margin-top:10px;">
+        <div style="font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span>➕</span> إضافة مادة جديدة للمواطن</div>
+        <div class="add-row">
+          <input class="add-field" id="nif" type="text" placeholder="مثال: شاي، عدس، معجون، زبدة..." ${!isConnected?'disabled':''}/>
+          <button class="add-btn ${!isConnected?'btn-disabled':''}" onclick="addCustom()">إضافة</button>
+        </div>
+        <div style="font-size:11px;color:var(--mt);margin-top:6px;">${isConnected ? 'يمكنك تعديل أو إضافة أي مواد هنا وتأكيد حفظها سحابياً.' : '🔒 إضافة التعديلات يتطلب إنترنت.'}</div>
+      </div>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div style="padding:4px 12px 16px;">
+      ${!c.done
+        ? `<button class="btn-cf ${!isConnected?'btn-disabled':''}" onclick="confirmRcv()">✓ تأكيد الاستلام وتسجيل الوقت</button>`
+        : (isEdited
+            ? `<button class="btn-save ${!isConnected?'btn-disabled':''}" onclick="saveEditedChanges()">💾 حفظ التغييرات المعدلة</button>
+               <button class="btn-cn ${!isConnected?'btn-disabled':''}" onclick="openCancelRcvModal()">↩ إلغاء الاستلام</button>`
+            : `<button class="btn-cn ${!isConnected?'btn-disabled':''}" onclick="openCancelRcvModal()">↩ إلغاء الاستلام</button>`
+          )
+      }
+    </div>`;
+
+  setTimeout(()=>{const f=document.getElementById('nif');if(f)f.addEventListener('keydown',e=>{if(e.key==='Enter')addCustom();});},100);
+}
+
+function rationRow(it,isW){
+  const on=!!chk[it.key];
+  return `<div class="ration ${on?'on':''} ${isW?'wi':''}" onclick="tog('${it.key}')">
+    <div class="chk ${on?(isW?'pon':'on'):''}">${on?'✓':''}</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="rlbl" ${isW&&on?'style="color:var(--pur);"':''}>${it.label}</span>
+      <span style="font-size:18px;">${it.icon}</span>
+    </div>
+  </div>`;
+}
+
+function customRow(item,idx){
+  const key='cx_'+idx,on=!!chk[key];
+  return `<div class="ration ${on?'on':''}" style="border-color:rgba(46,125,50,.25);" onclick="tog('${key}')">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <div class="chk ${on?'on':''}">${on?'✓':''}</div>
+      <button onclick="event.stopPropagation();removeCustom(${idx})" style="background:var(--rbg);color:var(--r);border:none;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;" title="حذف المادة">✕</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;"><span class="rlbl">${item}</span><span style="font-size:16px;">📦</span></div>
+  </div>`;
+}
+
+function tog(key){
+  if(!isConnected){
+    toast('⚠️ التعديل والتحديد ممنوع في وضع الأوفلاين (قراءة وتصدير PDF فقط)', false, 'red');
+    return;
+  }
+  chk[key]=!chk[key];
+  renderDetail();
+}
+
+function addCustom(){
+  if(!isConnected){
+    toast('⚠️ إضافة المواد يتطلب إنترنت للمزامنة السحابية', false, 'red');
+    return;
+  }
+  const f=document.getElementById('nif');if(!f)return;
+  const v=f.value.trim();if(!v){toast('اكتب اسم المادة أولاً',false,'red');return;}
+  curCustom.push(v);
+  chk['cx_' + (curCustom.length - 1)] = true;
+  f.value='';
+  renderDetail();
+  toast(`✅ تمت إضافة "${v}"`,false);
+}
+
+function removeCustom(idx){
+  if(!isConnected){
+    toast('⚠️ حذف المواد يتطلب إنترنت للمزامنة السحابية', false, 'red');
+    return;
+  }
+  curCustom.splice(idx,1);
+  const newChk={};
+  Object.keys(chk).forEach(k=>{
+    if(!k.startsWith('cx_')) newChk[k]=chk[k];
+  });
+  chk=newChk;
+  renderDetail();
+  toast('تم حذف المادة المخصصة',false);
+}
+
+function confirmRcv(){
+  if(!isConnected){
+    toast('⚠️ تأكيد الاستلام يتطلب إنترنت لرفع الوقت والتأكيد سحابياً', false, 'red');
+    return;
+  }
+  const c=citizens.find(x=>x.id===cur.id);
+  c.items={...chk};c.custom=[...curCustom];c.done=true;c.doneAt=new Date().toISOString();
+  cur=c;
+  saveLocalState();
+  renderDetail();
+  toast('✅ تم تأكيد الاستلام بنجاح ونشره سحابياً',false);
+  updateStats();
+  if(navigator.onLine){ fetch('https://wakil-api.onrender.com/api/citizens/' + c.id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ isReceived: true, items: c.items, customItems: c.custom }) }).catch(()=>{}); }
+}
+
+function saveEditedChanges(){
+  if(!isConnected){
+    toast('⚠️ حفظ التغييرات المعدلة يتطلب إنترنت للمزامنة', false, 'red');
+    return;
+  }
+  const c=citizens.find(x=>x.id===cur.id);
+  c.items={...chk};
+  c.custom=[...curCustom];
+  c.doneAt=new Date().toISOString();
+  cur=c;
+  saveLocalState();
+  renderDetail();
+  toast('💾 تم حفظ التغييرات المعدلة سحابياً بنجاح',false,'blue');
+  updateStats();
+  if(navigator.onLine){ fetch('https://wakil-api.onrender.com/api/citizens/' + c.id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ isReceived: c.done, items: c.items, customItems: c.custom }) }).catch(()=>{}); }
+}
+
+function openCancelRcvModal(){
+  if(!isConnected){
+    toast('⚠️ إلغاء الاستلام يتطلب إنترنت للتعديل السحابي', false, 'red');
+    return;
+  }
+  document.getElementById('cancel-rcv-text').textContent = `هل أنت متأكد من إلغاء حالة الاستلام للمواطن (${cur.name})؟`;
+  showMod('m-cancel-rcv');
+}
+
+function confirmCancelRcvAction(){
+  closeMod('m-cancel-rcv');
+  const c=citizens.find(x=>x.id===cur.id);
+  c.items={};c.custom=[];c.done=false;c.doneAt=null;
+  chk={};curCustom=[];cur=c;
+  saveLocalState();
+  renderDetail();
+  toast('تم إلغاء الاستلام بنجاح',false,'red');
+  updateStats();
+  if(navigator.onLine){ fetch('https://wakil-api.onrender.com/api/citizens/' + c.id + '/cancel', { method: 'POST' }).catch(()=>{}); }
+}
+
+// ══ MULTI-PAGE A4 PDF GENERATION (PAGE BY PAGE) ══
+let pdfReportPages = [];
+let currentPdfPageIndex = 0;
+const PDF_ROWS_PER_PAGE = 25;
+
+function buildSinglePageHTML(pageCitizens, pageIndex, totalPages, monthLabel, allItems, totalCitizensCount, totalReceivedCount) {
+  const items = allItems || getItems();
+  const pageReceived = pageCitizens.filter(c => c.done).length;
+  const printDate = new Date().toLocaleDateString('ar-IQ');
+
+  let rowsHTML = '';
+  pageCitizens.forEach((c, idx) => {
+    const seqNum = (pageIndex * PDF_ROWS_PER_PAGE) + idx + 1;
+    const statusText = c.done 
+      ? '<span style="color:#1B5E20;font-weight:800;">✓ مستلم</span>' 
+      : '<span style="color:#C62828;font-weight:700;">لم يستلم</span>';
+
+    const got = items.filter(i => c.items && c.items[i.key]).map(i => i.label.replace(' (رعاية)','')).join('، ');
+    const cCustom = Array.isArray(c.custom) ? c.custom : (Array.isArray(c.customItems) ? c.customItems : []);
+    const cGot = cCustom.filter((_, i) => c.items && c.items['cx_' + i]).join('، ');
+    const allGotText = [got, cGot].filter(Boolean).join(' + ') || (c.done ? 'كافة المواد' : '—');
+
+    rowsHTML += `
+      <tr style="background:${idx % 2 === 1 ? '#F9FBF9' : '#FFFFFF'};height:22px;">
+        <td style="border:1px solid #555;padding:3px 2px;font-weight:800;font-size:10px;">${seqNum}</td>
+        <td style="border:1px solid #555;padding:3px 6px;text-align:right;font-weight:700;font-size:11px;color:#111;">${c.name}</td>
+        <td style="border:1px solid #555;padding:3px 4px;font-family:monospace;font-size:10.5px;font-weight:700;">${c.card}</td>
+        <td style="border:1px solid #555;padding:3px 4px;font-family:monospace;font-size:10px;color:#444;">${c.oldCard || '—'}</td>
+        <td style="border:1px solid #555;padding:3px 2px;font-weight:700;font-size:10px;">${c.elig || c.eligibleCount || 0}/${c.fam || c.familyCount || 0}</td>
+        <td style="border:1px solid #555;padding:3px 2px;font-size:10px;">${c.welfare ? '🏛️ رعاية' : '—'}</td>
+        <td style="border:1px solid #555;padding:3px 4px;font-size:10px;">${statusText}</td>
+        <td style="border:1px solid #555;padding:3px 6px;text-align:right;font-size:9.5px;color:#222;">${allGotText}</td>
+        <td style="border:1px solid #555;padding:3px 4px;color:#888;font-size:9px;"></td>
+      </tr>
+    `;
+  });
+
+  return `
+    <div class="print-page-sheet pdf-page-sheet-preview">
+      <!-- HEADER -->
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1B5E20;padding-bottom:5px;margin-bottom:6px;direction:rtl;">
+        <div style="text-align:right;font-size:10.5px;font-weight:700;line-height:1.35;color:#111;">
+          <div>جمهورية العراق — وزارة التجارة</div>
+          <div>${agentType==='ghiz'?'الشركة العامة لتجارة المواد الغذائية':'الشركة العامة لتصنيع الحبوب'}</div>
+          <div>فرع تموين ذي قار</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:16px;font-weight:900;color:#1B5E20;">كشف توزيع الحصص التموينية — ${monthLabel}</div>
+          <div style="font-size:11px;color:#222;margin-top:2px;">
+            الوكيل: <b>${currentAgent ? currentAgent.name : 'فاضل عباس كريم'}</b> &nbsp;|&nbsp; رمز الوكالة: <b>${currentAgent ? currentAgent.agencyNumber : '868'}</b> &nbsp;|&nbsp; النوع: <b>${agentType==='ghiz'?'غذائية':'طحين'}</b>
+          </div>
+        </div>
+        <div style="text-align:left;font-size:10.5px;line-height:1.35;">
+          <div style="background:#E8F5E9;color:#1B5E20;border:1.5px solid #2E7D32;padding:3px 10px;border-radius:6px;display:inline-block;font-weight:800;font-size:12px;">
+            صفحة ${pageIndex + 1} من ${totalPages}
+          </div>
+          <div style="color:#555;font-size:10px;margin-top:3px;">التاريخ: ${printDate}</div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <table style="width:100%;border-collapse:collapse;text-align:center;direction:rtl;border:1.5px solid #333;">
+        <thead>
+          <tr style="background:#1B5E20;color:#FFFFFF;font-weight:800;font-size:10.5px;">
+            <th style="border:1px solid #444;padding:5px 2px;width:32px;">ت</th>
+            <th style="border:1px solid #444;padding:5px 6px;text-align:right;">اسم رب الأسرة</th>
+            <th style="border:1px solid #444;padding:5px 4px;width:82px;">رقم البطاقة</th>
+            <th style="border:1px solid #444;padding:5px 4px;width:72px;">القديم</th>
+            <th style="border:1px solid #444;padding:5px 2px;width:45px;">الأفراد</th>
+            <th style="border:1px solid #444;padding:5px 2px;width:48px;">رعاية</th>
+            <th style="border:1px solid #444;padding:5px 4px;width:68px;">الحالة</th>
+            <th style="border:1px solid #444;padding:5px 6px;text-align:right;">المواد المسلمة</th>
+            <th style="border:1px solid #444;padding:5px 4px;width:95px;">التوقيع / البصمة</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHTML}
+        </tbody>
+      </table>
+
+      <!-- FOOTER -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:4px;border-top:1px dashed #666;font-size:10.5px;color:#222;direction:rtl;">
+        <div>مستلمو الصفحة: <b>${pageReceived} من ${pageCitizens.length}</b> &nbsp;|&nbsp; إجمالي الكشف: <b>${totalReceivedCount} من ${totalCitizensCount}</b></div>
+        <div>توقيع وختم الوكيل: <b>${currentAgent ? currentAgent.name : 'فاضل عباس كريم'}</b> ___________________</div>
+        <div style="font-weight:700;">صفحة ${pageIndex + 1} من ${totalPages}</div>
+      </div>
+    </div>
+  `;
+}
+
+function generateCurrentMonthPDFReport(){
+  archiveMonth = {
+    id: 'current_month_' + Date.now(),
+    label: 'الشهر الحالي (' + new Date().toLocaleDateString('ar-IQ') + ')',
+    monthTitle: 'الشهر الحالي',
+    citizens: citizens
+  };
+  generateMonthPDFReport();
+}
+
+function generateMonthPDFReport(){
+  try {
+    let m = archiveMonth;
+    if(!m){
+      if(archive && archive.length > 0){
+        m = archive[0];
+        archiveMonth = m;
+      } else {
+        m = {
+          id: 'current_month_' + Date.now(),
+          label: 'الشهر الحالي (' + new Date().toLocaleDateString('ar-IQ') + ')',
+          monthTitle: 'الشهر الحالي',
+          citizens: citizens
+        };
+        archiveMonth = m;
+      }
+    }
+
+    let list = [];
+    if(Array.isArray(m.citizens)){
+      list = m.citizens;
+    } else if(m.citizens && typeof m.citizens === 'object'){
+      list = Object.values(m.citizens);
+    } else if(citizens && citizens.length > 0){
+      list = citizens;
+    }
+
+    if(!list.length){
+      toast('⚠️ لا يوجد مواطنون في كشف هذا الشهر لاستخراج التقرير', false, 'red');
+      return;
+    }
+
+    const items = getItems();
+    const totalPages = Math.ceil(list.length / PDF_ROWS_PER_PAGE);
+    const totalReceived = list.filter(c => c && (c.done || c.isReceived)).length;
+    pdfReportPages = [];
+
+    const label = m.label || m.monthTitle || 'الشهر الحالي';
+
+    for (let i = 0; i < totalPages; i++) {
+      const chunk = list.slice(i * PDF_ROWS_PER_PAGE, (i + 1) * PDF_ROWS_PER_PAGE);
+      const sheetHTML = buildSinglePageHTML(chunk, i, totalPages, label, items, list.length, totalReceived);
+      pdfReportPages.push(sheetHTML);
+    }
+
+    currentPdfPageIndex = 0;
+
+    // Build page dropdown options
+    const sel = document.getElementById('pdf-page-select');
+    if(sel){
+      sel.innerHTML = pdfReportPages.map((_, idx) => 
+        `<option value="${idx}">صفحة ${idx + 1} من ${totalPages}</option>`
+      ).join('');
+    }
+
+    renderPdfPreviewPage();
+    showMod('m-pdf-month');
+  } catch(err) {
+    console.error('Error generating PDF report:', err);
+    toast('❌ حدث خطأ أثناء تجهيز التقرير: ' + (err.message || ''), false, 'red');
+  }
+}
+
+function renderPdfPreviewPage(){
+  if (!pdfReportPages.length) return;
+  const totalPages = pdfReportPages.length;
+  document.getElementById('pdf-page-indicator').textContent = `صفحة ${currentPdfPageIndex + 1} من ${totalPages}`;
+  const sel = document.getElementById('pdf-page-select');
+  if (sel) sel.value = currentPdfPageIndex;
+  
+  document.getElementById('pdf-month-content').innerHTML = pdfReportPages[currentPdfPageIndex];
+}
+
+function prevPdfPage(){
+  if (currentPdfPageIndex > 0) {
+    currentPdfPageIndex--;
+    renderPdfPreviewPage();
+  }
+}
+
+function nextPdfPage(){
+  if (currentPdfPageIndex < pdfReportPages.length - 1) {
+    currentPdfPageIndex++;
+    renderPdfPreviewPage();
+  }
+}
+
+function jumpToPdfPage(pageIdx){
+  if (pageIdx >= 0 && pageIdx < pdfReportPages.length) {
+    currentPdfPageIndex = pageIdx;
+    renderPdfPreviewPage();
+  }
+}
+
+function executeNativePrint(jobName){
+  if (window.AndroidNativePrinter && window.AndroidNativePrinter.printDocument) {
+    try {
+      window.AndroidNativePrinter.printDocument(jobName || 'كشف_التموين');
+      toast('🖨️ جاري فتح نافذة الطباعة والحفظ بتنسيق PDF على الهاتف...', false);
+      return;
+    } catch(err) {
+      console.warn('Native printer error, fallback to window.print():', err);
+    }
+  }
+  window.print();
+}
+
+function printCurrentPdfPage(){
+  if (!pdfReportPages || pdfReportPages.length === 0) return;
+  const sheet = pdfReportPages[currentPdfPageIndex];
+  document.getElementById('print-mount').innerHTML = sheet;
+  toast('⏳ جاري تجهيز الصفحة للطباعة...', false, 'blue');
+  setTimeout(() => {
+    executeNativePrint('كشف_' + (archiveMonth ? archiveMonth.label : 'الشهر') + '_صفحة_' + (currentPdfPageIndex + 1));
+  }, 250);
+}
+
+function printAllPdfPages(){
+  if (!pdfReportPages || pdfReportPages.length === 0) return;
+  document.getElementById('print-mount').innerHTML = pdfReportPages.join('');
+  toast('⏳ جاري تجهيز كافة الصفحات (' + pdfReportPages.length + ' صفحة) للطباعة والحفظ...', false, 'blue');
+  setTimeout(() => {
+    executeNativePrint('كشف_' + (archiveMonth ? archiveMonth.label : 'الشهر') + '_كامل');
+  }, 400);
+}
+
+function printCitizenAuditPDF(){
+  const content = document.getElementById('pdf-citizen-content').innerHTML;
+  document.getElementById('print-mount').innerHTML = `
+    <div class="print-page-sheet pdf-page-sheet-preview" style="padding:15px;direction:rtl;font-family:'Segoe UI',Tahoma,sans-serif;">
+      ${content}
+    </div>
+  `;
+  executeNativePrint('جرد_المواطن');
+}
+
+// ══ PDF GENERATION: INDIVIDUAL CITIZEN AUDIT (WORKS OFFLINE & ONLINE) ══
+function generateCitizenAuditPDF(citizenId){
+  const c = citizens.find(x=>x.id===citizenId) || (cur.id===citizenId ? cur : null);
+  if(!c) return;
+  
+  const items = getItems();
+  let html = `
+    <div class="pdf-header">
+      <div style="font-size:10px;color:#666;">جمهورية العراق — وزارة التجارة</div>
+      <div class="pdf-title">كشف جرد استلامات المواطن</div>
+      <div style="font-size:12px;font-weight:800;color:#2E7D32;margin-top:4px;">${c.name}</div>
+      <div style="font-size:10px;color:#444;">رقم البطاقة التموينية: <b>${c.card}</b> | عدد الأفراد: <b>${c.elig || c.eligibleCount || 0}</b></div>
+    </div>
+    <table class="pdf-table">
+      <thead>
+        <tr>
+          <th>الشهر / الدورة</th>
+          <th>حالة الاستلام</th>
+          <th>تاريخ/وقت الاستلام</th>
+          <th>المواد المسلمة</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  
+  // Current month row
+  const curStatus = c.done ? '<b style="color:#2E7D32;">تم الاستلام</b>' : '<span style="color:#EF5350;">لم يستلم بعد</span>';
+  const curDt = c.doneAt ? new Date(c.doneAt).toLocaleString('ar-IQ') : '—';
+  const curGot = items.filter(i=>c.items && c.items[i.key]).map(i=>i.label.replace(' (رعاية)','')).join('، ');
+  const curCGot = c.custom ? c.custom.filter((_,i)=>c.items && c.items['cx_'+i]).join('، ') : '';
+  const curAll = [curGot, curCGot].filter(Boolean).join(' + ') || '—';
+
+  html += `
+    <tr style="background:#F9F9F9;">
+      <td><b>الشهر الحالي</b></td>
+      <td>${curStatus}</td>
+      <td style="font-size:9px;">${curDt}</td>
+      <td style="font-size:9px;text-align:right;">${curAll}</td>
+    </tr>
+  `;
+
+  // Archived months rows
+  archive.forEach(m=>{
+    const ac = m.citizens.find(x=>x.card===c.card || x.name===c.name);
+    if(ac){
+      const st = ac.done ? '<b style="color:#2E7D32;">تم الاستلام</b>' : '<span style="color:#EF5350;">لم يستلم</span>';
+      const dt = ac.doneAt ? new Date(ac.doneAt).toLocaleString('ar-IQ') : '—';
+      const got = items.filter(i=>ac.items && ac.items[i.key]).map(i=>ac.items[i.key]).join('، ');
+      const cGot = ac.custom ? ac.custom.filter((_,i)=>ac.items && ac.items['cx_'+i]).join('، ') : '';
+      const allText = [got, cGot].filter(Boolean).join(' + ') || '—';
+
+      html += `
+        <tr>
+          <td>${m.label}</td>
+          <td>${st}</td>
+          <td style="font-size:9px;">${dt}</td>
+          <td style="font-size:9px;text-align:right;">${allText}</td>
+        </tr>
+      `;
+    }
+  });
+
+  html += `
+      </tbody>
+    </table>
+    <div style="margin-top:12px;font-size:9px;color:#555;text-align:center;">
+      تم تصدير التقرير بنجاح ${!isConnected?'(في وضع الأوفلاين)':''} 📄
+    </div>
+  `;
+
+  document.getElementById('pdf-citizen-content').innerHTML = html;
+  showMod('m-pdf-citizen');
+}
+
+// ══ LOG (OPTIMIZED WITH CHUNKED RENDERING) ══
+let logRenderedCount = 0;
+let logCurrentList = [];
+
+function switchTab(t){
+  curTab = t;
+  document.getElementById('tabp').classList.toggle('on', t === 'p');
+  document.getElementById('tabd').classList.toggle('on', t === 'd');
+  renderLog();
+}
+
+function logReceivedCardHTML(c, items){
+  const dt = c.doneAt ? new Date(c.doneAt).toLocaleString('ar-IQ') : '';
+  const got = items.filter(i => c.items && c.items[i.key]);
+  const cGot = (c.custom || []).filter((_, i) => c.items && c.items['cx_' + i]);
+  return `<div class="rcard ${c.welfare ? 'wcard' : ''}" onclick="openDetail(${c.id})">
+    <div style="width:40px;height:40px;background:${c.welfare ? 'var(--purbg)' : 'var(--gbg)'};border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${c.welfare ? '🏛️' : '✅'}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;"><span style="font-size:14px;font-weight:700;color:var(--tx);">${c.name}</span>${c.welfare ? '<span class="badge b-welf" style="font-size:10px;">رعاية</span>' : ''}</div>
+      <div style="font-size:11px;color:var(--g);">📅 ${dt}</div>
+      <div class="chips">${got.map(i => `<span class="chip ${i.welfare ? 'wchip' : ''}">${i.label.replace(' (رعاية)', '')}</span>`).join('')}${cGot.map(n => `<span class="chip" style="background:var(--ib);color:var(--tx2);border-color:var(--bd);">📦 ${n}</span>`).join('')}</div>
+    </div>
+    <span class="arr">‹</span>
+  </div>`;
+}
+
+function renderLog(){
+  const el = document.getElementById('llist');
+  if (!el) return;
+  const items = getItems();
+  el.scrollTop = 0;
+
+  if (curTab === 'p') {
+    logCurrentList = citizens.filter(c => !c.done);
+    if (!logCurrentList.length) {
+      el.innerHTML = `<div class="empty"><div class="eico">🎉</div><div style="color:var(--g);font-size:14px;">جميع المواطنين استلموا حصصهم!</div></div>`;
+      return;
+    }
+    if (logCurrentList.length <= 50) {
+      el.innerHTML = logCurrentList.map(c => citizenCardHTML(c)).join('');
+      logRenderedCount = logCurrentList.length;
+      return;
+    }
+    logRenderedCount = 40;
+    el.innerHTML = logCurrentList.slice(0, logRenderedCount).map(c => citizenCardHTML(c)).join('');
+  } else {
+    logCurrentList = citizens.filter(c => c.done);
+    if (!logCurrentList.length) {
+      el.innerHTML = `<div class="empty"><div class="eico">📥</div><div>لا يوجد مستلمون بعد</div></div>`;
+      return;
+    }
+    if (logCurrentList.length <= 50) {
+      el.innerHTML = logCurrentList.map(c => logReceivedCardHTML(c, items)).join('');
+      logRenderedCount = logCurrentList.length;
+      return;
+    }
+    logRenderedCount = 40;
+    el.innerHTML = logCurrentList.slice(0, logRenderedCount).map(c => logReceivedCardHTML(c, items)).join('');
+  }
+}
+
+function appendMoreLogCards(){
+  if (logRenderedCount >= logCurrentList.length) return;
+  const el = document.getElementById('llist');
+  if (!el) return;
+  const items = getItems();
+  const nextChunk = logCurrentList.slice(logRenderedCount, logRenderedCount + 40);
+  if (!nextChunk.length) return;
+
+  const div = document.createElement('div');
+  if (curTab === 'p') {
+    div.innerHTML = nextChunk.map(c => citizenCardHTML(c)).join('');
+  } else {
+    div.innerHTML = nextChunk.map(c => logReceivedCardHTML(c, items)).join('');
+  }
+  while (div.firstChild) {
+    el.appendChild(div.firstChild);
+  }
+  logRenderedCount += nextChunk.length;
+}
+
+// ══ ARCHIVE VIEW & RENAME ══
+function renderArchive(){
+  const el=document.getElementById('arch-list');
+  if(!archive.length){
+    el.innerHTML=`<div class="empty"><div class="eico">📦</div><div>لا يوجد أرشيف بعد.<br>اضغط "إنهاء الشهر التمويني الحالي" لحفظ الشهر في الأرشيف.</div></div>`;
+    return;
+  }
+  const years={};
+  archive.forEach(m=>{
+    const yr=m.date?new Date(m.date).getFullYear():'2025';
+    if(!years[yr])years[yr]=[];
+    years[yr].push(m);
+  });
+  el.innerHTML=Object.keys(years).sort((a,b)=>b-a).map(yr=>{
+    const months=years[yr];
+    return `<div class="arch-year-title">سنة ${yr}</div>`+
+      months.map(m=>{
+        const tot=m.citizens.length;
+        const don=m.citizens.filter(c=>c.done).length;
+        const pct=tot?Math.round(don/tot*100):0;
+        return `<div class="month-card" onclick="openArchiveMonth('${m.id}')">
+          <div class="month-header">
+            <div>
+              <div class="month-name">
+                <span>${m.label}</span>
+                <button class="edit-btn-icon" onclick="openRenameMonthModal('${m.id}','${m.label}',event)" title="تعديل اسم الشهر">✏️</button>
+              </div>
+              <div class="month-meta">${tot} مواطن — ${don} استلموا (${pct}%)</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <div class="badge b-done" style="font-size:11px;">✓ ${don}</div>
+              <span class="arr">‹</span>
+            </div>
+          </div>
+          <div class="month-bar"><div class="month-fill" style="width:${pct}%"></div></div>
+          <div class="month-stats">
+            <div class="mstat"><div class="mv" style="color:var(--tx);">${tot}</div><div class="ml">الكل</div></div>
+            <div class="mstat"><div class="mv" style="color:var(--g);">${don}</div><div class="ml">استلموا</div></div>
+            <div class="mstat"><div class="mv" style="color:var(--r);">${tot-don}</div><div class="ml">لم يستلموا</div></div>
+            <div class="mstat"><div class="mv" style="color:var(--pur);">${m.citizens.filter(c=>c.welfare).length}</div><div class="ml">رعاية</div></div>
+          </div>
+        </div>`;
+      }).join('');
+  }).join('');
+}
+
+function openArchiveMonth(id){
+  archiveMonth=archive.find(m=>m.id===id);
+  document.getElementById('arch-month-title').textContent=archiveMonth.label;
+  const tot=archiveMonth.citizens.length,don=archiveMonth.citizens.filter(c=>c.done).length;
+  document.getElementById('am-tot').textContent=tot;
+  document.getElementById('am-don').textContent=don;
+  document.getElementById('am-pen').textContent=tot-don;
+  document.getElementById('arch-sbx').value='';
+  renderArchiveDetail('');
+  showScreen('arch-detail');
+}
+
+function renderArchiveDetail(q){
+  const el=document.getElementById('arch-detail-list');
+  const list=archiveMonth.citizens.filter(c=>c.name.includes(q)||c.card.includes(q));
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="eico">🔍</div><div>لا توجد نتائج</div></div>`;return;}
+  el.innerHTML=list.map(c=>`
+    <div class="ccard ${c.welfare?'wc':''}" onclick="openArchiveCitizen(${c.id})">
+      <div class="ava ${c.welfare?'wa':''}">👤</div>
+      <div style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+          <span class="cname">${c.name}</span>
+          ${c.welfare?'<span class="badge b-welf" style="font-size:10px;">🏛️</span>':''}
+        </div>
+        <div class="cnum">🪪 ${c.card}</div>
+        <div class="cfam">كلي: ${c.fam} | مستحق: ${c.elig}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
+        <div class="badge ${c.done?'b-done':'b-pend'}">${c.done?'✓ تم':'⏳ لم يستلم'}</div>
+        <span class="arr">‹</span>
+      </div>
+    </div>`).join('');
+}
+
+function searchArchiveDetail(q){renderArchiveDetail(q);}
+
+function openArchiveCitizen(id){
+  const c=archiveMonth.citizens.find(x=>x.id===id);
+  cur={...c,items:{...c.items},custom:[...c.custom]};
+  chk={...c.items};curCustom=[...c.custom];
+  document.getElementById('det-back-btn').onclick=()=>{
+    const ac=archiveMonth.citizens.find(x=>x.id===id);
+    ac.items={...chk};ac.custom=[...curCustom];
+    renderArchiveDetail('');
+    showScreen('arch-detail');
+  };
+  renderDetail();showScreen('detail');
+}
+
+// ══ MODALS & UTILS ══
+function showMod(id){const el=document.getElementById(id);if(el){el.classList.add('show');el.style.setProperty('display','flex','important');}}
+function closeMod(id,e){
+  const el=document.getElementById(id);
+  if(!el)return;
+  if(!e||e.target===el){
+    el.classList.remove('show');
+    el.style.setProperty('display','none','important');
+    if(id==='m-pdf-month'){
+      const pm = document.getElementById('print-mount');
+      if(pm) pm.innerHTML = '';
+    }
+  }
+}
+
+function toast(msg,r,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+(type==='pur'?'pur':type==='red'?'red':type==='blue'?'blue':'');
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ══ APP DIRECT UPDATE ══
+const CURRENT_APP_VERSION = '1.0.9';
+const LATEST_APK_URL = 'https://files.catbox.moe/q4336e.apk';
+
+async function downloadAppUpdateDirect() {
+  toast('⏳ جاري بدء تنزيل التحديث المباشر...', false, 'blue');
+  
+  let targetUrl = LATEST_APK_URL;
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const res = await fetch('https://wakil-api.onrender.com/api/app-version', { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.downloadUrl) targetUrl = data.downloadUrl;
+    }
+  } catch(_) {}
+
+  try {
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.open(targetUrl, '_system');
+    } else {
+      window.open(targetUrl, '_blank') || (window.location.href = targetUrl);
+    }
+  } catch(e) {
+    window.location.href = targetUrl;
+  }
+}
+window.addEventListener('afterprint', () => {
+  const pm = document.getElementById('print-mount');
+  if (pm) pm.innerHTML = '';
+});
+</script>
+</body>
+</html>
