@@ -8,6 +8,23 @@
     window.COMPILED_APP_VERSION = compiledVersion;
     var otaBundle = localStorage.getItem('wakil_ota_bundle');
     var otaVer = localStorage.getItem('wakil_ota_version');
+    var alreadyBooted = sessionStorage.getItem('wakil_ota_booted');
+
+    // إذا وُجدت حزمة هوائية أحدث ولم يتم تشغيلها بعد في هذه الجلسة
+    if (otaBundle && otaVer && otaVer !== compiledVersion && alreadyBooted !== otaVer) {
+      sessionStorage.setItem('wakil_ota_booted', otaVer);
+      window.ACTIVE_APP_VERSION = otaVer;
+
+      // ضبط base href لضمان تحميل سكريبتات js/seed_1042.js والملفات النسبية
+      var baseDir = window.location.href.split('?')[0].replace(/[^\/]*$/, '');
+      if (baseDir && otaBundle.indexOf('<base ') === -1) {
+        otaBundle = otaBundle.replace(/<head[^>]*>/i, '<script id="wakil-ota-boot">
+(function(){
+  try {
+    var compiledVersion = "1.0.16";
+    window.COMPILED_APP_VERSION = compiledVersion;
+    var otaBundle = localStorage.getItem('wakil_ota_bundle');
+    var otaVer = localStorage.getItem('wakil_ota_version');
     if (otaBundle && otaVer && otaVer !== compiledVersion && !window.__OTA_ACTIVE__) {
       window.__OTA_ACTIVE__ = true;
       window.ACTIVE_APP_VERSION = otaVer;
@@ -17,6 +34,20 @@
       return;
     }
     window.ACTIVE_APP_VERSION = window.ACTIVE_APP_VERSION || compiledVersion;
+  } catch(e) {
+    console.warn("OTA boot error:", e);
+    window.ACTIVE_APP_VERSION = "1.0.16";
+  }
+})();
+</script><base href="' + baseDir + '">');
+      }
+
+      document.open();
+      document.write(otaBundle);
+      document.close();
+      return;
+    }
+    window.ACTIVE_APP_VERSION = (otaVer && otaBundle) ? otaVer : compiledVersion;
   } catch(e) {
     console.warn("OTA boot error:", e);
     window.ACTIVE_APP_VERSION = "1.0.16";
@@ -729,6 +760,38 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
     <div class="toast" id="toast"></div>
 
     <!-- MODALS -->
+    <!-- ═══ MODAL: MANDATORY / FORCED APP UPDATE (تحديث إلزامي بمنتصف الشاشة) ═══ -->
+    <div class="overlay" id="m-forced-update" style="z-index:999999;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;display:none;">
+      <div class="modal" style="width:90%;max-width:380px;border-radius:24px;padding:26px 20px;text-align:center;box-shadow:0 20px 45px rgba(0,0,0,0.6);border:1.5px solid var(--gbd);background:var(--card);">
+        
+        <div style="width:72px;height:72px;background:var(--gbg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:36px;box-shadow:0 0 24px rgba(46,125,50,0.3);">
+          🚀
+        </div>
+
+        <div style="font-size:20px;font-weight:900;color:var(--tx);margin-bottom:6px;">
+          يتوفر تحديث جديد للتطبيق!
+        </div>
+
+        <div style="display:inline-flex;align-items:center;gap:6px;background:var(--gbg);color:var(--g);border:1px solid var(--gbd);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:14px;" id="forced-ver-badge">
+          الإصدار الجديد: v1.0.17
+        </div>
+
+        <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px;text-align:right;background:var(--ib);padding:12px;border-radius:14px;border:1px solid var(--bd);">
+          <div style="font-weight:800;color:var(--g);margin-bottom:4px;">✨ ما الجديد في هذا التحديث:</div>
+          <div id="forced-update-notes" style="font-size:12px;color:var(--tx2);">تحديث الواجهة وإلغاء زر تحميل الـ APK وجعل التحديث هوائياً وسلساً بضغطة زر.</div>
+        </div>
+
+        <div style="font-size:11px;color:var(--mt);margin-bottom:16px;font-weight:600;">
+          🔒 هذا التحديث مطلوب ولا يمكن متابعة استخدام التطبيق بدونه.
+        </div>
+
+        <button id="btn-apply-forced-update" onclick="applyForcedOtaUpdate()" style="width:100%;background:linear-gradient(135deg, #2E7D32, #1B5E20);color:#fff;border:none;border-radius:16px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(46,125,50,0.35);display:flex;align-items:center;justify-content:center;gap:8px;">
+          <span>تحديث التطبيق الآن ⚡</span>
+        </button>
+
+      </div>
+    </div>
+
     <div class="overlay" id="m-forgot" onclick="closeMod('m-forgot',event)">
       <div class="modal" onclick="event.stopPropagation()">
         <div class="modal-t">🔑 نسيت بيانات الدخول؟</div>
@@ -1169,6 +1232,13 @@ function toggleRememberLogin(val){
 // ══ ANDROID NATIVE BACK BUTTON HANDLER ══
 let lastBackPressTime = 0;
 window.handleAndroidBackButton = function() {
+  // 0. منع الرجوع إذا كانت نافذة التحديث الإجباري مفتوحة
+  const mForced = document.getElementById('m-forced-update');
+  if (mForced && mForced.style.display !== 'none' && mForced.classList.contains('show')) {
+    toast('⚠️ يرجى تحديث التطبيق للمتابعة', false, 'red');
+    return true;
+  }
+
   // 1. إغلاق أي نافذة منبثقة مفتوحة (Modals / Overlays)
   const openOverlays = Array.from(document.querySelectorAll('.overlay.show'));
   if (openOverlays.length > 0) {
@@ -1400,6 +1470,8 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function initializeApp(){
+  try { checkForcedUpdateOnStartup(); } catch(_){}
+
   try { syncOtaUiState(); } catch(_){}
 
   loadLocalState();
@@ -3811,10 +3883,10 @@ function toast(msg,r,type=''){
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-// ══ APP LIVE OTA & DIRECT UPDATE ENGINE ══
+// ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
 const BASE_APK_VERSION = '1.0.16';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
-let LATEST_APK_URL = 'https://files.catbox.moe/59s68e.apk';
+let pendingOtaUpdate = null;
 
 function syncOtaUiState() {
   const otaVer = localStorage.getItem('wakil_ota_version');
@@ -3822,11 +3894,77 @@ function syncOtaUiState() {
   const elSub = document.getElementById('ota-ver-sub');
   const elRestore = document.getElementById('restore-apk-row');
   if (otaVer && otaBundle) {
+    CURRENT_LIVE_VERSION = otaVer;
     if (elSub) elSub.innerHTML = '<span style="color:#2E7D32;font-weight:bold;">⚡ تحديث هوائي مفعل (v' + otaVer + ')</span> — الأساس (v' + BASE_APK_VERSION + ')';
     if (elRestore) elRestore.style.display = 'flex';
   } else {
+    CURRENT_LIVE_VERSION = BASE_APK_VERSION;
     if (elSub) elSub.textContent = 'الإصدار الأصلي: v' + BASE_APK_VERSION + ' — اضغط للفحص والتحديث فوراً';
     if (elRestore) elRestore.style.display = 'none';
+  }
+}
+
+async function checkForcedUpdateOnStartup() {
+  if (!navigator.onLine) return;
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const res = await fetch('https://wakil-api.onrender.com/api/app-version?t=' + Date.now(), { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) return;
+    const data = await res.json();
+    const serverVer = data.version;
+
+    if (serverVer && serverVer !== CURRENT_LIVE_VERSION) {
+      pendingOtaUpdate = data;
+      showForcedUpdateModal(data);
+    }
+  } catch(e) {
+    console.warn('Silent update check skipped:', e);
+  }
+}
+
+function showForcedUpdateModal(data) {
+  const m = document.getElementById('m-forced-update');
+  if (!m) return;
+  const b = document.getElementById('forced-ver-badge');
+  if (b) b.textContent = 'الإصدار الجديد: v' + data.version;
+  const n = document.getElementById('forced-update-notes');
+  if (n && data.notes) n.textContent = data.notes;
+  m.classList.add('show');
+  m.style.setProperty('display', 'flex', 'important');
+}
+
+async function applyForcedOtaUpdate() {
+  const btn = document.getElementById('btn-apply-forced-update');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>جاري تحميل وتثبيت التحديث... ⏳</span>';
+    btn.style.opacity = '0.8';
+  }
+  try {
+    const bRes = await fetch('https://wakil-api.onrender.com/api/ota-bundle?t=' + Date.now());
+    if (!bRes.ok) throw new Error('تعذر تنزيل حزمة التحديث من السيرفر');
+    const htmlText = await bRes.text();
+    if (!htmlText || !htmlText.includes('تطبيق وكيل') || htmlText.length < 50000) {
+      throw new Error('حزمة التحديث غير صالحة');
+    }
+    const ver = (pendingOtaUpdate && pendingOtaUpdate.version) ? pendingOtaUpdate.version : '1.0.17';
+    localStorage.setItem('wakil_ota_bundle', htmlText);
+    localStorage.setItem('wakil_ota_version', ver);
+    sessionStorage.removeItem('wakil_ota_booted');
+    
+    if (btn) btn.innerHTML = '<span>✅ تم التثبيت! جاري إعادة التشغيل...</span>';
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  } catch(e) {
+    alert('⚠️ حدث خطأ أثناء تنزيل التحديث: ' + (e.message || e) + '\nيرجى التأكد من اتصال الإنترنت والمحاولة مجدداً.');
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>إعادة المحاولة 🔄</span>';
+      btn.style.opacity = '1';
+    }
   }
 }
 
@@ -3846,29 +3984,12 @@ async function checkOtaUpdate(manual = false) {
       return;
     }
     const data = await res.json();
-    if (data.downloadUrl) LATEST_APK_URL = data.downloadUrl;
-
     const serverVer = data.version;
     const isNewer = serverVer && serverVer !== CURRENT_LIVE_VERSION;
 
     if (isNewer) {
-      const notes = data.notes ? ('\n\nالمميزات: ' + data.notes) : '';
-      const doUpdate = confirm('🚀 يتوفر تحديث هوائي جديد (v' + serverVer + ')!' + notes + '\n\nهل تريد تثبيت التحديث الآن بضغطة زر دون الحاجة لتحميل APK؟');
-      if (!doUpdate) return;
-
-      toast('⚡ جاري تنزيل التحديث الهوائي الفوري...', false, 'blue');
-      const bRes = await fetch('https://wakil-api.onrender.com/api/ota-bundle?t=' + Date.now());
-      if (!bRes.ok) throw new Error('فشل تحميل حزمة التحديث');
-      const htmlText = await bRes.text();
-      if (!htmlText || !htmlText.includes('تطبيق وكيل') || htmlText.length < 50000) {
-        throw new Error('حزمة التحديث غير صالحة');
-      }
-      localStorage.setItem('wakil_ota_bundle', htmlText);
-      localStorage.setItem('wakil_ota_version', serverVer);
-      toast('✅ تم تثبيت التحديث الهوائي بنجاح! جاري إعادة التشغيل...', false, 'green');
-      setTimeout(() => {
-        window.location.reload();
-      }, 1200);
+      pendingOtaUpdate = data;
+      showForcedUpdateModal(data);
     } else {
       if (manual) {
         toast('✅ تطبيقك محدث لأحدث إصدار (v' + CURRENT_LIVE_VERSION + ')!', false, 'green');
@@ -3884,35 +4005,11 @@ function restoreFactoryApkVersion() {
   if (confirm('هل أنت متأكد من استعادة النسخة الأصلية للـ APK وإلغاء أي تحديثات هوائية؟')) {
     localStorage.removeItem('wakil_ota_bundle');
     localStorage.removeItem('wakil_ota_version');
+    sessionStorage.removeItem('wakil_ota_booted');
     toast('تمت استعادة النسخة الأصلية، جاري إعادة التشغيل...', false, 'blue');
     setTimeout(() => {
       window.location.reload();
     }, 1000);
-  }
-}
-
-async function downloadAppUpdateDirect() {
-  toast('⏳ جاري بدء تنزيل حزمة APK المباشرة...', false, 'blue');
-  let targetUrl = LATEST_APK_URL;
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
-    const res = await fetch('https://wakil-api.onrender.com/api/app-version?t=' + Date.now(), { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (res.ok) {
-      const data = await res.json();
-      if (data.downloadUrl) targetUrl = data.downloadUrl;
-    }
-  } catch(_) {}
-
-  try {
-    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
-      window.open(targetUrl, '_system');
-    } else {
-      window.open(targetUrl, '_blank') || (window.location.href = targetUrl);
-    }
-  } catch(e) {
-    window.location.href = targetUrl;
   }
 }
 window.addEventListener('afterprint', () => {
