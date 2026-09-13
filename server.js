@@ -157,14 +157,31 @@ app.get('/', (req, res) => {
   });
 });
 
-// فحص إصدار التطبيق والتحديث المباشر
+// فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.12',
-    downloadUrl: 'https://files.catbox.moe/htzjg1.apk',
-    notes: 'لوحة تحكم المالك الشاملة (Owner Dashboard) وإدارة الوكلاء المتعددين',
+    version: '1.0.16',
+    versionCode: 16,
+    bundleUrl: 'https://wakil-api.onrender.com/index.html',
+    downloadUrl: 'https://files.catbox.moe/59s68e.apk',
+    notes: 'إصدار التحديث الهوائي الفوري (Live Updates) مع دعم كامل لتأكيد وإلغاء استلام الأرشيف',
     updatedAt: new Date().toISOString()
   });
+});
+
+// خدمة حزمة التحديث الهوائي (OTA Bundle)
+app.get('/api/ota-bundle', (req, res) => {
+  const p1 = path.join(__dirname, 'public', 'index.html');
+  const p2 = path.join(__dirname, 'index.html');
+  const targetFile = fs.existsSync(p1) ? p1 : (fs.existsSync(p2) ? p2 : null);
+  if (targetFile) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    return res.sendFile(targetFile);
+  }
+  res.status(404).send('OTA bundle file not found');
 });
 
 // خدمة ملف التطبيق

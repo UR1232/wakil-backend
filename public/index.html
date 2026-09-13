@@ -1,11 +1,27 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" id="HR">
 <head>
-<script>
-try {
-  localStorage.removeItem('wakil_ota_bundle');
-  localStorage.removeItem('wakil_ota_version');
-  } catch(e) {}
+<script id="wakil-ota-boot">
+(function(){
+  try {
+    var compiledVersion = "1.0.16";
+    window.COMPILED_APP_VERSION = compiledVersion;
+    var otaBundle = localStorage.getItem('wakil_ota_bundle');
+    var otaVer = localStorage.getItem('wakil_ota_version');
+    if (otaBundle && otaVer && otaVer !== compiledVersion && !window.__OTA_ACTIVE__) {
+      window.__OTA_ACTIVE__ = true;
+      window.ACTIVE_APP_VERSION = otaVer;
+      document.open();
+      document.write(otaBundle);
+      document.close();
+      return;
+    }
+    window.ACTIVE_APP_VERSION = window.ACTIVE_APP_VERSION || compiledVersion;
+  } catch(e) {
+    console.warn("OTA boot error:", e);
+    window.ACTIVE_APP_VERSION = "1.0.16";
+  }
+})();
 </script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
@@ -588,16 +604,42 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <div class="sgroup">
-          <div class="sgroup-title">تحديث التطبيق</div>
-          <div class="srow" onclick="downloadAppUpdateDirect()">
+          <div class="sgroup-title">تحديثات التطبيق الذكية</div>
+          
+          <!-- Live OTA Update Row -->
+          <div class="srow" onclick="checkOtaUpdate(true)">
             <div class="srow-L">
-              <div class="srow-ico" style="background:var(--gbg);color:var(--g);font-size:18px;">🔄</div>
+              <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
-                <div class="srow-t">تحديث التطبيق المباشر</div>
-                <div class="srow-s" id="app-ver-sub">الإصدار 1.0.16 — تأكيد وإلغاء استلام التموينية في الأرشيف والتحكم الكامل</div>
+                <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.16 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
-            <button class="add-btn" style="background:var(--g);padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();downloadAppUpdateDirect();">تحديث ⬇️</button>
+            <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
+          </div>
+
+          <!-- Direct APK Download Row -->
+          <div class="srow" onclick="downloadAppUpdateDirect()">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:#E3F2FD;color:#1565C0;font-size:18px;">📦</div>
+              <div>
+                <div class="srow-t">تنزيل حزمة التطبيق (APK) كاملة</div>
+                <div class="srow-s">تنزيل ملف APK المباشر على الهاتف وتثبيته يدوياً</div>
+              </div>
+            </div>
+            <button class="add-btn" style="background:#1565C0;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();downloadAppUpdateDirect();">تحميل ⬇️</button>
+          </div>
+
+          <!-- Restore Factory Version Button (shown if OTA is active) -->
+          <div class="srow" id="restore-apk-row" style="display:none;" onclick="restoreFactoryApkVersion()">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:#FFF3E0;color:#E65100;font-size:18px;">⏪</div>
+              <div>
+                <div class="srow-t">استعادة النسخة الأصلية للـ APK</div>
+                <div class="srow-s">إلغاء التحديثات الهوائية والرجوع لنسخة المصنع</div>
+              </div>
+            </div>
+            <button class="add-btn" style="background:#E65100;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();restoreFactoryApkVersion();">استعادة</button>
           </div>
         </div>
 
@@ -1370,6 +1412,8 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function initializeApp(){
+  try { syncOtaUiState(); } catch(_){}
+
   loadLocalState();
   initVirtualScrollListeners();
 
@@ -3779,18 +3823,93 @@ function toast(msg,r,type=''){
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-// ══ APP DIRECT UPDATE ══
-const CURRENT_APP_VERSION = '1.0.12';
-const LATEST_APK_URL = 'https://files.catbox.moe/q4336e.apk';
+// ══ APP LIVE OTA & DIRECT UPDATE ENGINE ══
+const BASE_APK_VERSION = '1.0.16';
+let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
+let LATEST_APK_URL = 'https://files.catbox.moe/59s68e.apk';
+
+function syncOtaUiState() {
+  const otaVer = localStorage.getItem('wakil_ota_version');
+  const otaBundle = localStorage.getItem('wakil_ota_bundle');
+  const elSub = document.getElementById('ota-ver-sub');
+  const elRestore = document.getElementById('restore-apk-row');
+  if (otaVer && otaBundle) {
+    if (elSub) elSub.innerHTML = '<span style="color:#2E7D32;font-weight:bold;">⚡ تحديث هوائي مفعل (v' + otaVer + ')</span> — الأساس (v' + BASE_APK_VERSION + ')';
+    if (elRestore) elRestore.style.display = 'flex';
+  } else {
+    if (elSub) elSub.textContent = 'الإصدار الأصلي: v' + BASE_APK_VERSION + ' — اضغط للفحص والتحديث فوراً';
+    if (elRestore) elRestore.style.display = 'none';
+  }
+}
+
+async function checkOtaUpdate(manual = false) {
+  if (!navigator.onLine) {
+    if (manual) toast('⚠️ التحديث يتطلب اتصالاً بالإنترنت', false, 'red');
+    return;
+  }
+  if (manual) toast('🔍 جاري التحقق من التحديثات السحابية...', false, 'blue');
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000);
+    const res = await fetch('https://wakil-api.onrender.com/api/app-version?t=' + Date.now(), { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      if (manual) toast('تعذر الاتصال بسيرفر التحديثات حالياً', false, 'red');
+      return;
+    }
+    const data = await res.json();
+    if (data.downloadUrl) LATEST_APK_URL = data.downloadUrl;
+
+    const serverVer = data.version;
+    const isNewer = serverVer && serverVer !== CURRENT_LIVE_VERSION;
+
+    if (isNewer) {
+      const notes = data.notes ? ('\n\nالمميزات: ' + data.notes) : '';
+      const doUpdate = confirm('🚀 يتوفر تحديث هوائي جديد (v' + serverVer + ')!' + notes + '\n\nهل تريد تثبيت التحديث الآن بضغطة زر دون الحاجة لتحميل APK؟');
+      if (!doUpdate) return;
+
+      toast('⚡ جاري تنزيل التحديث الهوائي الفوري...', false, 'blue');
+      const bRes = await fetch('https://wakil-api.onrender.com/api/ota-bundle?t=' + Date.now());
+      if (!bRes.ok) throw new Error('فشل تحميل حزمة التحديث');
+      const htmlText = await bRes.text();
+      if (!htmlText || !htmlText.includes('تطبيق وكيل') || htmlText.length < 50000) {
+        throw new Error('حزمة التحديث غير صالحة');
+      }
+      localStorage.setItem('wakil_ota_bundle', htmlText);
+      localStorage.setItem('wakil_ota_version', serverVer);
+      toast('✅ تم تثبيت التحديث الهوائي بنجاح! جاري إعادة التشغيل...', false, 'green');
+      setTimeout(() => {
+        window.location.reload();
+      }, 1200);
+    } else {
+      if (manual) {
+        toast('✅ تطبيقك محدث لأحدث إصدار (v' + CURRENT_LIVE_VERSION + ')!', false, 'green');
+      }
+    }
+  } catch(e) {
+    console.error('OTA Update check error:', e);
+    if (manual) toast('⚠️ حدث خطأ أثناء فحص التحديثات: ' + (e.message || e), false, 'red');
+  }
+}
+
+function restoreFactoryApkVersion() {
+  if (confirm('هل أنت متأكد من استعادة النسخة الأصلية للـ APK وإلغاء أي تحديثات هوائية؟')) {
+    localStorage.removeItem('wakil_ota_bundle');
+    localStorage.removeItem('wakil_ota_version');
+    toast('تمت استعادة النسخة الأصلية، جاري إعادة التشغيل...', false, 'blue');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
+}
 
 async function downloadAppUpdateDirect() {
-  toast('⏳ جاري بدء تنزيل التحديث المباشر...', false, 'blue');
-  
+  toast('⏳ جاري بدء تنزيل حزمة APK المباشرة...', false, 'blue');
   let targetUrl = LATEST_APK_URL;
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3500);
-    const res = await fetch('https://wakil-api.onrender.com/api/app-version', { signal: controller.signal });
+    const res = await fetch('https://wakil-api.onrender.com/api/app-version?t=' + Date.now(), { signal: controller.signal });
     clearTimeout(timeoutId);
     if (res.ok) {
       const data = await res.json();
