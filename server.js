@@ -336,11 +336,11 @@ app.post('/api/login', (req, res) => {
 
 // نبض الجلسة وفحص الحالة والتعاميم (Heartbeat & Ping)
 app.post('/api/sessions/ping', (req, res) => {
-  const { sessionId, sessionToken, deviceId, userRole, agencyNumber } = req.body;
+  const { sessionId, sessionToken, deviceId, userRole, agencyNumber, deviceInfo } = req.body;
   const sessions = getSessions();
   const ann = getAnnouncement();
 
-  // فحص تجميد حساب الوكيل
+  // 1. فحص هل حساب الوكيل مجمّد؟
   if (userRole === 'agent' && agencyNumber) {
     const agents = getAgents();
     const ag = agents.find(a => String(a.agencyNumber) === String(agencyNumber));
@@ -354,26 +354,52 @@ app.post('/api/sessions/ping', (req, res) => {
     }
   }
 
-  if (!sessionId && !sessionToken && !deviceId) {
-    return res.json({ success: true, announcement: ann });
-  }
-
-  const session = sessions.find(s => 
-    (s.id === sessionId || s.token === sessionToken || (deviceId && s.deviceId === deviceId)) && 
-    s.status === 'active'
+  // 2. فحص هل الجلسة ملغاة / مطرودة صراحة فقط؟
+  // لا يتم طرد المستخدم إلا إذا تم استهدافه صراحة ووضع status = 'revoked'
+  const explicitRevoked = sessions.find(s => 
+    ((sessionId && s.id === sessionId) || (sessionToken && s.token === sessionToken)) && 
+    s.status === 'revoked'
   );
 
-  if (!session) {
+  if (explicitRevoked) {
     return res.json({
       success: false,
       revoked: true,
-      message: 'تم إنهاء وتسجيل خروج هذا الجهاز من قبل الإدارة أو من جهاز آخر',
+      message: 'تم إنهاء جلستك على هذا الجهاز من قبل الإدارة أو من جهاز آخر',
       announcement: ann
     });
   }
 
-  session.lastActive = new Date().toISOString();
-  saveSessions(sessions);
+  // 3. تحديث الجلسة النشطة أو تسجيلها تلقائياً إذا لم تكن موجودة
+  let activeSession = sessions.find(s => 
+    ((sessionId && s.id === sessionId) || (sessionToken && s.token === sessionToken) || (deviceId && s.deviceId === deviceId && s.userRole === userRole)) && 
+    s.status === 'active'
+  );
+
+  if (activeSession) {
+    activeSession.lastActive = new Date().toISOString();
+    saveSessions(sessions);
+  } else if (deviceId || sessionId) {
+    const devName = (deviceInfo && deviceInfo.deviceName) || 'هاتف متصل';
+    const devPlat = (deviceInfo && deviceInfo.platform) || 'Android';
+    const newSession = {
+      id: sessionId || ('sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6)),
+      token: sessionToken || ('tok_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8)),
+      userId: userRole === 'owner' ? 'owner' : (agencyNumber ? 'agent_' + agencyNumber : 'agent'),
+      userRole: userRole || 'agent',
+      agencyNumber: agencyNumber ? String(agencyNumber) : null,
+      username: userRole === 'owner' ? 'admin' : (agencyNumber || 'user'),
+      name: userRole === 'owner' ? 'المالك العام للمنظومة' : 'وكيل',
+      deviceId: deviceId || ('dev_' + Math.random().toString(36).substr(2, 8)),
+      deviceName: devName,
+      platform: devPlat,
+      loginAt: new Date().toISOString(),
+      lastActive: new Date().toISOString(),
+      status: 'active'
+    };
+    sessions.push(newSession);
+    saveSessions(sessions);
+  }
 
   res.json({
     success: true,
