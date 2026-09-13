@@ -1,0 +1,62 @@
+[
+  {
+    "id": "sess_1789272326706_gq307z",
+    "token": "owner_session_1789272326706_piig9bnr",
+    "userId": "owner",
+    "userRole": "owner",
+    "agencyNumber": null,
+    "username": "admin",
+    "name": "المالك العام للمنظومة",
+    "deviceId": "test_owner_phone",
+    "deviceName": "Samsung S24 Ultra",
+    "platform": "Android",
+    "loginAt": "2026-09-13T04:05:26.707Z",
+    "lastActive": "2026-09-13T04:05:26.712Z",
+    "status": "active"
+  },
+  {
+    "id": "sess_1789272326724_zdr7bt",
+    "token": "agent_session_1789272326724_tgdgawm5",
+    "userId": "agent_868",
+    "userRole": "agent",
+    "agencyNumber": "868",
+    "username": "user",
+    "name": "فاضل عباس كريم",
+    "deviceId": "test_agent_phone_1",
+    "deviceName": "Xiaomi Redmi Note 11",
+    "platform": "Android",
+    "loginAt": "2026-09-13T04:05:26.725Z",
+    "lastActive": "2026-09-13T04:05:26.729Z",
+    "status": "revoked"
+  },
+  {
+    "id": "sess_1789272326773_25xhwb",
+    "token": "agent_session_1789272326773_o8jv5giw",
+    "userId": "agent_868",
+    "userRole": "agent",
+    "agencyNumber": "868",
+    "username": "user",
+    "name": "فاضل عباس كريم",
+    "deviceId": "test_agent_phone_2",
+    "deviceName": "Realme 9 Pro",
+    "platform": "Android",
+    "loginAt": "2026-09-13T04:05:26.774Z",
+    "lastActive": "2026-09-13T04:05:26.774Z",
+    "status": "revoked"
+  },
+  {
+    "id": "sess_1789272326786_jtzwb0",
+    "token": "agent_session_1789272326786_irle2a7d",
+    "userId": "agent_868",
+    "userRole": "agent",
+    "agencyNumber": "868",
+    "username": "user",
+    "name": "فاضل عباس كريم",
+    "deviceId": "test_agent_phone_3",
+    "deviceName": "Infinix Note 30",
+    "platform": "Android",
+    "loginAt": "2026-09-13T04:05:26.786Z",
+    "lastActive": "2026-09-13T04:05:26.786Z",
+    "status": "revoked"
+  }
+]

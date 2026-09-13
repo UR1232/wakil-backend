@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.20";
+    var compiledVersion = "1.0.21";
     window.COMPILED_APP_VERSION = compiledVersion;
     var otaBundle = localStorage.getItem('wakil_ota_bundle');
     var otaVer = localStorage.getItem('wakil_ota_version');
@@ -18,28 +18,7 @@
       // ضبط base href لضمان تحميل سكريبتات js/seed_1042.js والملفات النسبية
       var baseDir = window.location.href.split('?')[0].replace(/[^\/]*$/, '');
       if (baseDir && otaBundle.indexOf('<base ') === -1) {
-        otaBundle = otaBundle.replace(/<head[^>]*>/i, '<script id="wakil-ota-boot">
-(function(){
-  try {
-    var compiledVersion = "1.0.16";
-    window.COMPILED_APP_VERSION = compiledVersion;
-    var otaBundle = localStorage.getItem('wakil_ota_bundle');
-    var otaVer = localStorage.getItem('wakil_ota_version');
-    if (otaBundle && otaVer && otaVer !== compiledVersion && !window.__OTA_ACTIVE__) {
-      window.__OTA_ACTIVE__ = true;
-      window.ACTIVE_APP_VERSION = otaVer;
-      document.open();
-      document.write(otaBundle);
-      document.close();
-      return;
-    }
-    window.ACTIVE_APP_VERSION = window.ACTIVE_APP_VERSION || compiledVersion;
-  } catch(e) {
-    console.warn("OTA boot error:", e);
-    window.ACTIVE_APP_VERSION = "1.0.16";
-  }
-})();
-</script><base href="' + baseDir + '">');
+        otaBundle = otaBundle.replace(/<head[^>]*>/i, function(m){ return m + '<base href="' + baseDir + '">'; });
       }
 
       document.open();
@@ -50,7 +29,7 @@
     window.ACTIVE_APP_VERSION = (otaVer && otaBundle) ? otaVer : compiledVersion;
   } catch(e) {
     console.warn("OTA boot error:", e);
-    window.ACTIVE_APP_VERSION = "1.0.16";
+    window.ACTIVE_APP_VERSION = "1.0.21";
   }
 })();
 </script>
@@ -457,6 +436,9 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
       </div>
 
+      <!-- BROADCAST ANNOUNCEMENT BANNER -->
+      <div id="home-broadcast-banner" style="display:none;margin:8px 12px 2px;padding:12px 14px;border-radius:14px;box-shadow:0 3px 12px rgba(0,0,0,0.06);transition:all .3s;"></div>
+
       <div id="home-readonly-banner" class="readonly-banner" style="display:none;">
         🔒 وضع التصفح أوفلاين (الاطلاع وطباعة PDF فقط — التعديل يتطلب إنترنت)
       </div>
@@ -644,13 +626,28 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.20 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.21 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
           </div>
         </div>
 
+        
+        <div class="sgroup">
+          <div class="sgroup-title">الأمان والجلسات</div>
+          <div class="srow" onclick="openMyDevicesModal()">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:#E0F2F1;color:#00796B;font-size:18px;">📱</div>
+              <div>
+                <div class="srow-t">الأجهزة المتصلة بحسابي</div>
+                <div class="srow-s" id="my-devices-summary">عرض وإدارة الهواتف المفتوح بها حسابك</div>
+              </div>
+            </div>
+            <span class="arr">‹</span>
+          </div>
+        </div>
+  
         <div class="sgroup">
           <div class="sgroup-title">الحساب</div>
           <div class="srow" onclick="showMod('m-forgot')">
@@ -705,6 +702,23 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
           </div>
         </div>
 
+        
+        <!-- Owner Super Powers Action Row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <button class="btn-g" onclick="openBroadcastModal()" style="margin:0;padding:11px 8px;font-size:12px;font-weight:800;background:linear-gradient(135deg,#1565C0,#0D47A1);display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px rgba(21,101,192,0.3);">
+            <span style="font-size:16px;">📢</span>
+            <span>بث تعميم إداري</span>
+          </button>
+          <button class="btn-g" onclick="downloadFullSystemBackup()" style="margin:0;padding:11px 8px;font-size:12px;font-weight:800;background:linear-gradient(135deg,#4A148C,#6A1B9A);display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px rgba(106,27,154,0.3);">
+            <span style="font-size:16px;">💾</span>
+            <span>نسخة المنظومة كاملة</span>
+          </button>
+        </div>
+
+        <button class="btn-close" onclick="openOwnerDevicesModal()" style="margin:0 0 10px;padding:9px 12px;font-size:12px;font-weight:800;background:var(--card);color:var(--tx);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 6px var(--sh);">
+          <span>📱 إدارة الأجهزة المتصلة بحساب المالك (الأونر)</span>
+        </button>
+  
         <!-- Add Agent Button -->
         <button class="btn-g" onclick="openAddAgentModal()" style="margin:0 0 12px;padding:12px;font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(46,125,50,.35);">
           <span style="font-size:18px;">➕</span>
@@ -1649,6 +1663,10 @@ async function doLogin(){
   // 2. فحص دخول الوكلاء محلياً (متاح أوفلاين 100%)
   const matchedAgent = allAgents.find(ag => ag.username.toLowerCase() === u.toLowerCase() && ag.password === p);
   if (matchedAgent) {
+    if (matchedAgent.isFrozen) {
+      showFrozenScreen();
+      return;
+    }
     loginAsAgent(matchedAgent);
     return;
   }
@@ -1660,10 +1678,16 @@ async function doLogin(){
       const res = await fetch('https://wakil-api.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: u, password: p, agentType: agentType })
+        body: JSON.stringify({ username: u, password: p, agentType: agentType, deviceInfo: getDeviceInfo() })
       });
       if (res.ok) {
         const data = await res.json();
+        if (data.isFrozen || res.status === 403) {
+          showFrozenScreen();
+          return;
+        }
+        if (data.sessionId) localStorage.setItem('wakil_session_id', data.sessionId);
+        if (data.token) localStorage.setItem('wakil_session_token', data.token);
         if (data.role === 'owner') {
           loginAsOwner();
           return;
@@ -1686,6 +1710,7 @@ async function doLogin(){
 }
 
 function loginAsOwner(){
+  startSessionHeartbeat();
   currentUserRole = 'owner';
   ownerViewingAgent = null;
   localStorage.setItem('wakil_user_role', 'owner');
@@ -1713,6 +1738,7 @@ function loginAsOwner(){
 }
 
 function loginAsAgent(ag){
+  startSessionHeartbeat();
   currentUserRole = 'agent';
   currentAgent = ag;
   ownerViewingAgent = null;
@@ -1954,6 +1980,7 @@ function agentCardHTML(ag) {
   const isPassVisible = !!showPasswordsMap[ag.id];
   const passDisplay = isPassVisible ? ag.password : '••••••••';
   const isGhiz = ag.type === 'ghiz';
+  const isFrozen = !!ag.isFrozen;
 
   // Calculate stats for this agent
   let total = 0, received = 0;
@@ -1971,13 +1998,20 @@ function agentCardHTML(ag) {
     }
   }
   const pct = total ? Math.round((received / total) * 100) : 0;
+  const safeName = (ag.name || '').replace(/'/g, "\\'");
 
   return `
-  <div class="agent-card" style="background:var(--card);border:1.5px solid var(--bd);border-radius:16px;padding:14px;box-shadow:0 3px 12px var(--sh);position:relative;">
-    <!-- Header: Name & Type -->
+  <div class="agent-card" style="background:var(--card);border:${isFrozen ? '2px solid #EF5350' : '1.5px solid var(--bd)'};border-radius:16px;padding:14px;box-shadow:0 3px 12px var(--sh);position:relative;">
+    <!-- Header: Name & Type & Status -->
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
       <div>
-        <div style="font-size:16px;font-weight:800;color:var(--tx);">${ag.name}</div>
+        <div style="font-size:16px;font-weight:800;color:var(--tx);display:flex;align-items:center;gap:6px;">
+          <span>${ag.name}</span>
+          ${isFrozen 
+            ? '<span style="background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">🔒 مجمّد</span>'
+            : '<span style="background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;">🟢 نشط</span>'
+          }
+        </div>
         <div style="font-size:11px;color:var(--mt);margin-top:2px;">
           رمز الوكالة: <b style="color:var(--g);font-size:12px;">${ag.agencyNumber}</b> | ${ag.governorate || 'ذي قار'}
         </div>
@@ -1987,7 +2021,7 @@ function agentCardHTML(ag) {
       </span>
     </div>
 
-    <!-- Credentials Box (Username & Password with Eye and Copy) -->
+    <!-- Credentials Box -->
     <div style="background:var(--ib);border:1px dashed var(--bd);border-radius:10px;padding:8px 10px;margin-bottom:10px;font-size:11.5px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
         <span style="color:var(--tx2);">👤 اسم المستخدم:</span>
@@ -2000,7 +2034,7 @@ function agentCardHTML(ag) {
           <button onclick="toggleAgentPassword('${ag.id}')" style="background:transparent;border:none;cursor:pointer;font-size:13px;padding:2px 4px;" title="إظهار / إخفاء">
             ${isPassVisible ? '🙈' : '👁️'}
           </button>
-          <button onclick="copyAgentCredentials('${ag.username}', '${ag.password}', '${ag.name}')" style="background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700;cursor:pointer;color:var(--tx);" title="نسخ بيانات الدخول">
+          <button onclick="copyAgentCredentials('${ag.username}', '${ag.password}', '${safeName}')" style="background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700;cursor:pointer;color:var(--tx);" title="نسخ بيانات الدخول">
             📋 نسخ
           </button>
         </div>
@@ -2026,11 +2060,30 @@ function agentCardHTML(ag) {
       <button class="btn-g" onclick="generateAndPrintAgentPDF('${ag.id}')" style="margin:0;padding:8px 6px;font-size:11.5px;font-weight:800;background:#1B5E20;display:flex;align-items:center;justify-content:center;gap:4px;">
         <span>📄 طباعة PDF</span>
       </button>
-      <button class="btn-close" onclick="openEditAgentModal('${ag.id}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:700;background:var(--card);color:var(--tx);">
-        ✏️ تعديل / كلمة المرور
+
+      <!-- Connected Devices Button -->
+      <button class="btn-close" onclick="openAgentSessionsModal('${ag.id}', '${ag.agencyNumber}', '${safeName}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:800;background:#E0F2F1;color:#00796B;border-color:#80CBC4;display:flex;align-items:center;justify-content:center;gap:4px;">
+        <span>📱 الأجهزة المتصلة</span>
       </button>
-      <button class="btn-close" onclick="deleteAgentConfirm('${ag.id}', '${ag.name}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:700;background:var(--rbg);color:var(--r);border-color:#FFCDD2;">
-        🗑️ حذف الوكيل
+
+      <!-- Freeze / Unfreeze Button -->
+      <button class="btn-close" onclick="toggleAgentFreeze('${ag.id}', ${!isFrozen}, '${safeName}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:800;background:${isFrozen ? '#E8F5E9' : '#FFEBEE'};color:${isFrozen ? '#2E7D32' : '#C62828'};border-color:${isFrozen ? '#A5D6A7' : '#FFCDD2'};display:flex;align-items:center;justify-content:center;gap:4px;">
+        <span>${isFrozen ? '🔓 فك التجميد' : '🔒 قفل وتجميد'}</span>
+      </button>
+
+      <!-- Quick Reset Password Button -->
+      <button class="btn-close" onclick="openQuickResetPassModal('${ag.id}', '${safeName}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:700;background:var(--card);color:var(--tx);">
+        🔑 كلمة المرور
+      </button>
+
+      <!-- Edit Agent Button -->
+      <button class="btn-close" onclick="openEditAgentModal('${ag.id}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:700;background:var(--card);color:var(--tx);">
+        ✏️ تعديل البيانات
+      </button>
+
+      <!-- Delete Agent Button -->
+      <button class="btn-close" onclick="deleteAgentConfirm('${ag.id}', '${safeName}')" style="grid-column:span 2;margin:0;padding:7px 6px;font-size:11px;font-weight:700;background:var(--rbg);color:var(--r);border-color:#FFCDD2;">
+        🗑️ حذف الوكيل وبياناته
       </button>
     </div>
   </div>`;
@@ -3997,5 +4050,232 @@ window.addEventListener('afterprint', () => {
   if (pm) pm.innerHTML = '';
 });
 </script>
+
+    <!-- ═══ MODAL: OWNER BROADCAST ANNOUNCEMENT ═══ -->
+    <div class="overlay" id="m-broadcast-modal" onclick="closeMod('m-broadcast-modal',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t" style="display:flex;align-items:center;gap:6px;color:#1565C0;">
+          <span>📢</span><span>بث تعميم إداري لجميع الوكلاء</span>
+        </div>
+        <div style="font-size:12px;color:var(--mt);margin-bottom:12px;">
+          سيظهر هذا التعميم فوراً وبشكل بارز على الشاشة الرئيسية في هواتف كافة الوكلاء في المنظومة.
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <label style="font-size:11.5px;font-weight:700;color:var(--tx2);">عنوان التعميم:</label>
+            <input id="broadcast-title-input" class="srch-i" style="width:100%;margin-top:2px;" placeholder="مثال: تعميم رسمي هام — مواعيد القطع والتجهيز"/>
+          </div>
+
+          <div>
+            <label style="font-size:11.5px;font-weight:700;color:var(--tx2);">درجة الأهمية واللون:</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+              <label style="display:flex;align-items:center;gap:6px;background:var(--gbg);border:1.5px solid var(--gbd);padding:8px 10px;border-radius:10px;font-size:12px;font-weight:800;color:var(--g);cursor:pointer;">
+                <input type="radio" name="broadcast-priority" value="normal" checked/>
+                <span>📢 عادي (أخضر)</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;background:var(--rbg);border:1.5px solid rgba(239,83,80,.4);padding:8px 10px;border-radius:10px;font-size:12px;font-weight:800;color:var(--r);cursor:pointer;">
+                <input type="radio" name="broadcast-priority" value="urgent"/>
+                <span>🚨 عاجل وهام (أحمر)</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label style="font-size:11.5px;font-weight:700;color:var(--tx2);">نص التعميم الإداري:</label>
+            <textarea id="broadcast-text-input" class="srch-i" style="width:100%;height:100px;margin-top:2px;resize:none;line-height:1.5;" placeholder="اكتب هنا التوجيه أو التعليمات الإدارية الموجهة للوكلاء..."></textarea>
+          </div>
+
+          <div id="broadcast-status-badge" style="display:none;background:var(--ib);border:1px solid var(--bd);padding:8px 10px;border-radius:10px;font-size:11.5px;color:var(--tx2);">
+          </div>
+
+          <button class="btn-g" onclick="submitBroadcastAnnouncement()" style="padding:12px;font-size:14px;font-weight:800;background:#1565C0;box-shadow:0 3px 12px rgba(21,101,192,0.35);">
+            📢 نشر التعميم للجميع الآن
+          </button>
+
+          <button id="btn-delete-broadcast" class="btn-close" onclick="deleteActiveBroadcast()" style="display:none;background:var(--rbg);color:var(--r);border-color:#FFCDD2;margin:0;">
+            🗑️ إيقاف وحذف التعميم الحالي
+          </button>
+
+          <button class="btn-close" onclick="closeMod('m-broadcast-modal')" style="margin:0;">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODAL: MY CONNECTED DEVICES (FOR AGENT) ═══ -->
+    <div class="overlay" id="m-my-devices" onclick="closeMod('m-my-devices',event)">
+      <div class="modal" style="max-height:85vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+        <div class="modal-t" style="display:flex;align-items:center;gap:6px;">
+          <span>📱</span><span>الأجهزة المتصلة بحسابك</span>
+        </div>
+        <div style="font-size:12px;color:var(--mt);margin-bottom:10px;">
+          قائمة بالهواتف والأجهزة التي سجلت دخولاً بحساب هذه الوكالة.
+        </div>
+
+        <div id="my-devices-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;max-height:50vh;padding:4px 0;">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;">
+          <button class="btn-close" onclick="promptRevokeAllOtherDevices()" style="background:var(--rbg);color:var(--r);border-color:#FFCDD2;font-weight:800;padding:10px;">
+            🚫 تسجيل الخروج من كافة الأجهزة الأخرى
+          </button>
+          <button class="btn-close" onclick="closeMod('m-my-devices')">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODAL: CONFIRM AGENT DEVICE REVOKE (PASSWORD REQUIRED) ═══ -->
+    <div class="overlay" id="m-confirm-device-logout" onclick="closeMod('m-confirm-device-logout',event)" style="z-index:9999999;">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t" style="color:var(--r);display:flex;align-items:center;gap:6px;">
+          <span>🔒</span><span>تأكيد تسجيل خروج الجهاز</span>
+        </div>
+        <div style="font-size:13px;color:var(--tx2);margin-bottom:12px;line-height:1.5;">
+          لحماية بيانات وكالتك، يتطلب النظام إدخال <b>كلمة مرور حسابك</b> لتأكيد طرد هذا الجهاز:
+        </div>
+
+        <div class="pwd-field-wrap" style="margin-bottom:14px;">
+          <input type="password" class="field" id="agent-dev-logout-pass" placeholder="أدخل كلمة مرور الوكيل الحالية" style="padding-left:46px;"/>
+          <button type="button" class="magic-eye-btn" onclick="togglePasswordVisibilityField('agent-dev-logout-pass', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button class="btn-g" style="background:var(--r);box-shadow:0 3px 12px rgba(239,83,80,0.35);" onclick="executeAgentDeviceRevoke()">
+            تأكيد طرد الجهاز 🚪
+          </button>
+          <button class="btn-close" onclick="closeMod('m-confirm-device-logout')">إلغاء</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODAL: OWNER INSPECTING AGENT DEVICES (NO PASSWORD NEEDED) ═══ -->
+    <div class="overlay" id="m-agent-devices" onclick="closeMod('m-agent-devices',event)">
+      <div class="modal" style="max-height:85vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+        <div class="modal-t" style="display:flex;align-items:center;gap:6px;color:#00796B;">
+          <span>📱</span><span id="owner-agent-dev-title">الأجهزة المتصلة بحساب الوكيل</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--mt);margin-bottom:10px;">
+          بصفتك المالك العام، يمكنك طرد أي جهاز لهذا الوكيل فوراً <b>دون الحاجة لكتابة كلمة سر</b>.
+        </div>
+
+        <div id="owner-agent-devices-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;max-height:50vh;padding:4px 0;">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;">
+          <button class="btn-close" onclick="ownerRevokeAllAgentDevices()" style="background:var(--rbg);color:var(--r);border-color:#FFCDD2;font-weight:800;padding:10px;">
+            🚫 طرد كافة أجهزة هذا الوكيل فوراً
+          </button>
+          <button class="btn-close" onclick="closeMod('m-agent-devices')">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODAL: OWNER'S OWN DEVICES ═══ -->
+    <div class="overlay" id="m-owner-devices" onclick="closeMod('m-owner-devices',event)">
+      <div class="modal" style="max-height:85vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
+        <div class="modal-t" style="display:flex;align-items:center;gap:6px;color:var(--g);">
+          <span>👑</span><span>الأجهزة المتصلة بحساب المالك (الأونر)</span>
+        </div>
+        <div style="font-size:12px;color:var(--mt);margin-bottom:10px;">
+          الهواتف والأجهزة المفتوح بها حساب الإدارة العامة.
+        </div>
+
+        <div id="owner-self-devices-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;max-height:50vh;padding:4px 0;">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;">
+          <button class="btn-close" onclick="promptRevokeAllOtherOwnerDevices()" style="background:var(--rbg);color:var(--r);border-color:#FFCDD2;font-weight:800;padding:10px;">
+            🚫 طرد كافة أجهزة المالك الأخرى
+          </button>
+          <button class="btn-close" onclick="closeMod('m-owner-devices')">إغلاق</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODAL: CONFIRM OWNER DEVICE REVOKE (OWNER PASSWORD REQUIRED) ═══ -->
+    <div class="overlay" id="m-confirm-owner-device-logout" onclick="closeMod('m-confirm-owner-device-logout',event)" style="z-index:9999999;">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t" style="color:var(--r);display:flex;align-items:center;gap:6px;">
+          <span>🔒</span><span>تأكيد طرد جهاز المالك</span>
+        </div>
+        <div style="font-size:13px;color:var(--tx2);margin-bottom:12px;line-height:1.5;">
+          لتأكيد تسجيل خروج هذا الجهاز من حساب المالك، يرجى كتابة <b>كلمة مرور الأونر</b>:
+        </div>
+
+        <div class="pwd-field-wrap" style="margin-bottom:14px;">
+          <input type="password" class="field" id="owner-dev-logout-pass" placeholder="أدخل كلمة مرور المالك (admin2026)" style="padding-left:46px;"/>
+          <button type="button" class="magic-eye-btn" onclick="togglePasswordVisibilityField('owner-dev-logout-pass', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+
+        <div style="display:flex;gap:8px;">
+          <button class="btn-g" style="background:var(--r);box-shadow:0 3px 12px rgba(239,83,80,0.35);" onclick="executeOwnerDeviceRevoke()">
+            تأكيد طرد الجهاز 🚪
+          </button>
+          <button class="btn-close" onclick="closeMod('m-confirm-owner-device-logout')">إلغاء</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODAL: QUICK RESET AGENT PASSWORD (BY OWNER) ═══ -->
+    <div class="overlay" id="m-reset-agent-pwd" onclick="closeMod('m-reset-agent-pwd',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t" style="display:flex;align-items:center;gap:6px;">
+          <span>🔑</span><span id="reset-pwd-agent-name">تغيير كلمة مرور الوكيل</span>
+        </div>
+        <div style="font-size:12px;color:var(--mt);margin-bottom:12px;">
+          أدخل كلمة المرور الجديدة وسيتم تحديثها سحابياً ومحلياً فوراً وطرد أي جلسات قديمة.
+        </div>
+
+        <input type="hidden" id="reset-pwd-agent-id"/>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <label style="font-size:11.5px;font-weight:700;color:var(--tx2);">كلمة المرور الجديدة:</label>
+              <button onclick="generateRandomPassForReset()" style="background:transparent;border:none;color:var(--g);font-size:11.5px;font-weight:700;cursor:pointer;">🎲 توليد تلقائي</button>
+            </div>
+            <div class="pwd-field-wrap">
+              <input type="password" class="field" id="reset-pwd-new-input" placeholder="كلمة المرور الجديدة" style="padding-left:46px;font-family:monospace;"/>
+              <button type="button" class="magic-eye-btn" onclick="togglePasswordVisibilityField('reset-pwd-new-input', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <button class="btn-g" onclick="submitQuickResetPassword()" style="padding:12px;font-size:14px;font-weight:800;">
+            💾 حفظ وتعيين كلمة المرور فوراً
+          </button>
+          <button class="btn-close" onclick="closeMod('m-reset-agent-pwd')" style="margin:0;">إلغاء</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODAL: FROZEN ACCOUNT BLOCKER ═══ -->
+    <div class="overlay" id="m-frozen-screen" style="z-index:99999999;background:rgba(0,0,0,0.92);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;">
+      <div class="modal" style="width:90%;max-width:380px;border-radius:24px;padding:26px 20px;text-align:center;border:2px solid #EF5350;background:var(--card);box-shadow:0 20px 45px rgba(0,0,0,0.6);">
+        <div style="width:72px;height:72px;background:var(--rbg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:36px;box-shadow:0 0 24px rgba(239,83,80,0.35);">
+          🔒
+        </div>
+        <div style="font-size:20px;font-weight:900;color:#C62828;margin-bottom:6px;">
+          تم قفل وتجميد حساب الوكالة
+        </div>
+        <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:18px;background:var(--ib);padding:14px;border-radius:14px;border:1px solid var(--bd);text-align:right;">
+          ⚠️ تم تجميد وقفل هذا الحساب من قبل الإدارة العامة للمنظومة (المالك).
+          <br/><br/>
+          لا يمكن توزيع الحصص أو الوصول لكشوفات المواطنين أو تعديل البيانات أثناء فترة التجميد. يرجى التواصل مع إدارة المنظومة لفك التجميد.
+        </div>
+        <button onclick="doLogout()" style="width:100%;background:#EF5350;color:#fff;border:none;border-radius:14px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(239,83,80,0.3);">
+          تسجيل الخروج 🚪
+        </button>
+      </div>
+    </div>
+  
 </body>
 </html>

@@ -22,6 +22,28 @@ const DATA_FILE = path.join(__dirname, 'citizens.json');
 const ARCHIVE_FILE = path.join(__dirname, 'archive.json');
 const AGENTS_FILE = path.join(__dirname, 'agents.json');
 const OWNER_FILE = path.join(__dirname, 'owner.json');
+const SESSIONS_FILE = path.join(__dirname, 'sessions.json');
+const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
+
+function getSessions() {
+  if (!fs.existsSync(SESSIONS_FILE)) return [];
+  try { return JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8')); } catch (_) { return []; }
+}
+function saveSessions(data) {
+  fs.writeFileSync(SESSIONS_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
+
+function getAnnouncement() {
+  if (!fs.existsSync(ANNOUNCEMENT_FILE)) {
+    return { active: false, title: '', text: '', priority: 'normal', updatedAt: null };
+  }
+  try { return JSON.parse(fs.readFileSync(ANNOUNCEMENT_FILE, 'utf8')); } catch (_) {
+    return { active: false, title: '', text: '', priority: 'normal', updatedAt: null };
+  }
+}
+function saveAnnouncement(data) {
+  fs.writeFileSync(ANNOUNCEMENT_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
 
 // بيانات الأونر الافتراضية
 const DEFAULT_OWNER = {
@@ -160,11 +182,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.20',
-    versionCode: 20,
+    version: '1.0.21',
+    versionCode: 21,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
     downloadUrl: 'https://files.catbox.moe/14x5e1.apk',
-    notes: 'النسخة النهائية النظيفة v1.0.20: إزالة زر الاستعادة نهائياً والتحديث الهوائي الفوري المباشر',
+    notes: 'ترقية كبرى v1.0.21: قفل وتجميد الوكالات، بث التعاميم الإدارية الفورية، إدارة وطرد الأجهزة المتصلة، إعادة تعيين كلمات المرور وتنزيل نسخة احتياطية شاملة للمنظومة.',
     updatedAt: new Date().toISOString()
   });
 });
@@ -203,19 +225,47 @@ app.get('/wakil.apk', (req, res) => {
   }
 });
 
-// ══ 1. AUTHENTICATION (تسجيل الدخول الذكي: مالك أو وكيل) ══
+// ══ 1. AUTHENTICATION (تسجيل الدخول الذكي مع تسجيل الجهاز والجلسة) ══
 app.post('/api/login', (req, res) => {
-  const { username, password, agentType } = req.body;
+  const { username, password, agentType, deviceInfo } = req.body;
   const u = (username || '').trim().toLowerCase();
   const p = (password || '').trim();
+
+  const devId = (deviceInfo && deviceInfo.deviceId) || ('dev_' + Math.random().toString(36).substr(2, 8));
+  const devName = (deviceInfo && deviceInfo.deviceName) || 'هاتف غير معروف';
+  const devPlat = (deviceInfo && deviceInfo.platform) || 'Android';
 
   // 1. فحص حساب الأونر / المالك العام
   const owner = getOwnerConfig();
   if ((u === owner.username.toLowerCase() || u === 'owner' || u === 'admin') && p === owner.password) {
+    const sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    const sessionToken = 'owner_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+    
+    let sessions = getSessions();
+    sessions = sessions.filter(s => !(s.deviceId === devId && s.userRole === 'owner'));
+    sessions.push({
+      id: sessionId,
+      token: sessionToken,
+      userId: 'owner',
+      userRole: 'owner',
+      agencyNumber: null,
+      username: owner.username,
+      name: owner.name || 'المالك العام للمنظومة',
+      deviceId: devId,
+      deviceName: devName,
+      platform: devPlat,
+      loginAt: new Date().toISOString(),
+      lastActive: new Date().toISOString(),
+      status: 'active'
+    });
+    saveSessions(sessions);
+
     return res.json({
       success: true,
       role: 'owner',
-      token: 'owner_session_' + Date.now(),
+      token: sessionToken,
+      sessionId: sessionId,
+      deviceId: devId,
       owner: {
         username: owner.username,
         name: owner.name || 'المالك العام للمنظومة',
@@ -228,10 +278,43 @@ app.post('/api/login', (req, res) => {
   const agents = getAgents();
   const matched = agents.find(ag => ag.username.toLowerCase() === u && ag.password === p);
   if (matched) {
+    // فحص هل الحساب مجمّد من قبل الأونر؟
+    if (matched.isFrozen) {
+      return res.status(403).json({
+        success: false,
+        isFrozen: true,
+        message: 'تم قفل وتجميد حساب الوكالة من قبل الإدارة العامة للمنظومة. يرجى مراجعة المسؤول.'
+      });
+    }
+
+    const sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    const sessionToken = 'agent_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+
+    let sessions = getSessions();
+    sessions = sessions.filter(s => !(s.deviceId === devId && s.userId === matched.id));
+    sessions.push({
+      id: sessionId,
+      token: sessionToken,
+      userId: matched.id,
+      userRole: 'agent',
+      agencyNumber: String(matched.agencyNumber),
+      username: matched.username,
+      name: matched.name,
+      deviceId: devId,
+      deviceName: devName,
+      platform: devPlat,
+      loginAt: new Date().toISOString(),
+      lastActive: new Date().toISOString(),
+      status: 'active'
+    });
+    saveSessions(sessions);
+
     return res.json({
       success: true,
       role: 'agent',
-      token: 'agent_session_' + Date.now(),
+      token: sessionToken,
+      sessionId: sessionId,
+      deviceId: devId,
       agent: {
         id: matched.id,
         name: matched.name,
@@ -240,12 +323,358 @@ app.post('/api/login', (req, res) => {
         type: matched.type || agentType || 'ghiz',
         governorate: matched.governorate || 'ذي قار',
         branch: matched.branch || 'فرع تموين ذي قار',
-        username: matched.username
+        username: matched.username,
+        isFrozen: false
       }
     });
   }
 
   return res.status(401).json({ success: false, message: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
+});
+
+// ══ 1.1 SESSIONS & DEVICES MANAGEMENT (إدارة الأجهزة والجلسات) ══
+
+// نبض الجلسة وفحص الحالة والتعاميم (Heartbeat & Ping)
+app.post('/api/sessions/ping', (req, res) => {
+  const { sessionId, sessionToken, deviceId, userRole, agencyNumber } = req.body;
+  const sessions = getSessions();
+  const ann = getAnnouncement();
+
+  // فحص تجميد حساب الوكيل
+  if (userRole === 'agent' && agencyNumber) {
+    const agents = getAgents();
+    const ag = agents.find(a => String(a.agencyNumber) === String(agencyNumber));
+    if (ag && ag.isFrozen) {
+      return res.json({
+        success: false,
+        isFrozen: true,
+        message: 'تم تجميد حساب الوكالة من قبل الإدارة العامة للمنظومة',
+        announcement: ann
+      });
+    }
+  }
+
+  if (!sessionId && !sessionToken && !deviceId) {
+    return res.json({ success: true, announcement: ann });
+  }
+
+  const session = sessions.find(s => 
+    (s.id === sessionId || s.token === sessionToken || (deviceId && s.deviceId === deviceId)) && 
+    s.status === 'active'
+  );
+
+  if (!session) {
+    return res.json({
+      success: false,
+      revoked: true,
+      message: 'تم إنهاء وتسجيل خروج هذا الجهاز من قبل الإدارة أو من جهاز آخر',
+      announcement: ann
+    });
+  }
+
+  session.lastActive = new Date().toISOString();
+  saveSessions(sessions);
+
+  res.json({
+    success: true,
+    active: true,
+    announcement: ann
+  });
+});
+
+// جلب قائمة الأجهزة المتصلة بحساب الوكيل
+app.get('/api/sessions/my', (req, res) => {
+  const agencyNumber = req.query.agencyNumber;
+  const username = req.query.username;
+  const sessions = getSessions();
+
+  let mySessions = [];
+  if (agencyNumber) {
+    mySessions = sessions.filter(s => String(s.agencyNumber) === String(agencyNumber) && s.status === 'active');
+  } else if (username) {
+    mySessions = sessions.filter(s => s.username && s.username.toLowerCase() === username.toLowerCase() && s.status === 'active');
+  }
+
+  res.json({
+    success: true,
+    total: mySessions.length,
+    sessions: mySessions
+  });
+});
+
+// طرد جهاز للوكيل (مع تأكيد كلمة مرور الوكيل إجبارياً)
+app.post('/api/sessions/revoke', (req, res) => {
+  const { agencyNumber, username, password, targetSessionId, revokeAllOthers, currentSessionId } = req.body;
+
+  if (!password) {
+    return res.status(401).json({ success: false, message: 'يرجى إدخال كلمة المرور لتأكيد الخروج' });
+  }
+
+  const agents = getAgents();
+  const ag = agents.find(a => 
+    (agencyNumber && String(a.agencyNumber) === String(agencyNumber)) ||
+    (username && a.username.toLowerCase() === (username || '').toLowerCase())
+  );
+
+  if (!ag || ag.password !== password.trim()) {
+    return res.status(401).json({ success: false, message: 'كلمة المرور غير صحيحة لتأكيد طرد الجهاز!' });
+  }
+
+  let sessions = getSessions();
+  let revokedCount = 0;
+
+  if (revokeAllOthers) {
+    sessions.forEach(s => {
+      if (s.userId === ag.id && s.id !== currentSessionId && s.status === 'active') {
+        s.status = 'revoked';
+        revokedCount++;
+      }
+    });
+  } else if (targetSessionId) {
+    const s = sessions.find(sess => sess.id === targetSessionId && sess.userId === ag.id);
+    if (s) {
+      s.status = 'revoked';
+      revokedCount++;
+    }
+  }
+
+  saveSessions(sessions);
+  res.json({ success: true, message: 'تم إنهاء الجلسة وطرد الجهاز بنجاح!', revokedCount });
+});
+
+// جلب أجهزة المالك (الأونر) المتصلة
+app.get('/api/owner/sessions/my', (req, res) => {
+  const sessions = getSessions();
+  const ownerSessions = sessions.filter(s => s.userRole === 'owner' && s.status === 'active');
+  res.json({
+    success: true,
+    total: ownerSessions.length,
+    sessions: ownerSessions
+  });
+});
+
+// طرد جهاز من أجهزة الأونر (مع تأكيد كلمة مرور الأونر إجبارياً)
+app.post('/api/owner/sessions/revoke-self', (req, res) => {
+  const { password, targetSessionId, revokeAllOthers, currentSessionId } = req.body;
+  const owner = getOwnerConfig();
+
+  if (!password || password.trim() !== owner.password) {
+    return res.status(401).json({ success: false, message: 'كلمة مرور المالك غير صحيحة لتأكيد طرد الجهاز!' });
+  }
+
+  let sessions = getSessions();
+  let count = 0;
+  if (revokeAllOthers) {
+    sessions.forEach(s => {
+      if (s.userRole === 'owner' && s.id !== currentSessionId && s.status === 'active') {
+        s.status = 'revoked';
+        count++;
+      }
+    });
+  } else if (targetSessionId) {
+    const s = sessions.find(sess => sess.id === targetSessionId && sess.userRole === 'owner');
+    if (s) {
+      s.status = 'revoked';
+      count++;
+    }
+  }
+
+  saveSessions(sessions);
+  res.json({ success: true, message: 'تم تسجيل خروج جهاز المالك بنجاح!', count });
+});
+
+// جلب أجهزة وكيل معين من قبل الأونر
+app.get('/api/owner/agents/:id/sessions', (req, res) => {
+  const id = req.params.id;
+  const agents = getAgents();
+  const ag = agents.find(a => a.id === id || String(a.agencyNumber) === id);
+  if (!ag) return res.status(404).json({ success: false, message: 'الوكيل غير موجود' });
+
+  const sessions = getSessions();
+  const agentSessions = sessions.filter(s => (s.userId === ag.id || String(s.agencyNumber) === String(ag.agencyNumber)) && s.status === 'active');
+
+  res.json({
+    success: true,
+    agent: { id: ag.id, name: ag.name, agencyNumber: ag.agencyNumber },
+    total: agentSessions.length,
+    sessions: agentSessions
+  });
+});
+
+// طرد أجهزة وكيل من قبل الأونر (بدون أي كلمة مرور للوكيل مطلقاً)
+app.post('/api/owner/sessions/revoke', (req, res) => {
+  const { targetSessionId, agentId, agencyNumber, revokeAll } = req.body;
+  let sessions = getSessions();
+  let count = 0;
+
+  if (revokeAll) {
+    sessions.forEach(s => {
+      if (((agentId && s.userId === agentId) || (agencyNumber && String(s.agencyNumber) === String(agencyNumber))) && s.status === 'active') {
+        s.status = 'revoked';
+        count++;
+      }
+    });
+  } else if (targetSessionId) {
+    const s = sessions.find(sess => sess.id === targetSessionId);
+    if (s) {
+      s.status = 'revoked';
+      count++;
+    }
+  }
+
+  saveSessions(sessions);
+  res.json({ success: true, message: 'تم طرد جهاز الوكيل فوراً بنجاح دون الحاجة لكلمة سر!', count });
+});
+
+// ══ 1.2 FREEZE / SUSPEND AGENCY (قفل وتجميد حساب الوكالة) ══
+app.post('/api/owner/agents/:id/freeze', (req, res) => {
+  const id = req.params.id;
+  const agents = getAgents();
+  const ag = agents.find(a => a.id === id || String(a.agencyNumber) === id);
+  if (!ag) return res.status(404).json({ success: false, message: 'الوكيل غير موجود' });
+
+  ag.isFrozen = true;
+  ag.frozenAt = new Date().toISOString();
+  saveAgents(agents);
+
+  // طرد كل جلساته النشطة فوراً
+  let sessions = getSessions();
+  sessions.forEach(s => {
+    if (s.userId === ag.id || String(s.agencyNumber) === String(ag.agencyNumber)) {
+      s.status = 'revoked';
+    }
+  });
+  saveSessions(sessions);
+
+  console.log(`Agent frozen: ${ag.name} (${ag.agencyNumber})`);
+  res.json({
+    success: true,
+    message: `تم قفل وتجميد حساب الوكالة (${ag.name}) فوراً بنجاح!`,
+    agent: ag
+  });
+});
+
+app.post('/api/owner/agents/:id/unfreeze', (req, res) => {
+  const id = req.params.id;
+  const agents = getAgents();
+  const ag = agents.find(a => a.id === id || String(a.agencyNumber) === id);
+  if (!ag) return res.status(404).json({ success: false, message: 'الوكيل غير موجود' });
+
+  ag.isFrozen = false;
+  delete ag.frozenAt;
+  saveAgents(agents);
+
+  console.log(`Agent unfrozen: ${ag.name} (${ag.agencyNumber})`);
+  res.json({
+    success: true,
+    message: `تم فك التجميد وتفعيل حساب الوكالة (${ag.name}) بنجاح!`,
+    agent: ag
+  });
+});
+
+// ══ 1.3 QUICK RESET AGENT PASSWORD (إعادة تعيين كلمة مرور الوكيل فورياً) ══
+app.post('/api/owner/agents/:id/reset-password', (req, res) => {
+  const id = req.params.id;
+  const { newPassword } = req.body;
+  if (!newPassword || !newPassword.trim()) {
+    return res.status(400).json({ success: false, message: 'يرجى إدخال كلمة المرور الجديدة' });
+  }
+
+  const agents = getAgents();
+  const ag = agents.find(a => a.id === id || String(a.agencyNumber) === id);
+  if (!ag) return res.status(404).json({ success: false, message: 'الوكيل غير موجود' });
+
+  ag.password = newPassword.trim();
+  ag.passwordUpdatedAt = new Date().toISOString();
+  saveAgents(agents);
+
+  // إنهاء الجلسات النشطة لكي يطالبه النظام بكلمة السر الجديدة
+  let sessions = getSessions();
+  sessions.forEach(s => {
+    if (s.userId === ag.id || String(s.agencyNumber) === String(ag.agencyNumber)) {
+      s.status = 'revoked';
+    }
+  });
+  saveSessions(sessions);
+
+  console.log(`Password reset for agent: ${ag.name} (${ag.agencyNumber})`);
+  res.json({
+    success: true,
+    message: `تم تعيين كلمة المرور الجديدة للوكيل (${ag.name}) بنجاح!`,
+    agent: ag
+  });
+});
+
+// ══ 1.4 BROADCAST ANNOUNCEMENTS (التعاميم الإدارية الفورية للوكلاء) ══
+app.get('/api/announcement', (req, res) => {
+  res.json(getAnnouncement());
+});
+
+app.post('/api/owner/announcement', (req, res) => {
+  const { title, text, priority } = req.body;
+  if (!text || !text.trim()) {
+    return res.status(400).json({ success: false, message: 'يرجى كتابة نص التعميم' });
+  }
+
+  const ann = {
+    id: 'ann_' + Date.now(),
+    active: true,
+    title: (title || 'تعميم إداري رسمي').trim(),
+    text: text.trim(),
+    priority: priority === 'urgent' ? 'urgent' : 'normal',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  saveAnnouncement(ann);
+  console.log('Broadcast announcement published:', ann.title);
+  res.json({ success: true, message: 'تم نشر التعميم الإداري لجميع الوكلاء بنجاح 📢', announcement: ann });
+});
+
+app.delete('/api/owner/announcement', (req, res) => {
+  const ann = getAnnouncement();
+  ann.active = false;
+  ann.updatedAt = new Date().toISOString();
+  saveAnnouncement(ann);
+  console.log('Broadcast announcement deactivated');
+  res.json({ success: true, message: 'تم إيقاف وحذف التعميم الإداري بنجاح' });
+});
+
+// ══ 1.5 FULL SYSTEM BACKUP (تنزيل نسخة احتياطية شاملة للمنظومة) ══
+app.get('/api/owner/backup/full', (req, res) => {
+  const agents = getAgents();
+  const citizens = getAllCitizensMap();
+  const archive = getAllArchiveMap();
+  const owner = getOwnerConfig();
+  const announcement = getAnnouncement();
+  const sessions = getSessions();
+
+  const totalCitizensCount = Object.values(citizens).reduce((acc, list) => acc + (Array.isArray(list) ? list.length : 0), 0);
+
+  const backupData = {
+    meta: {
+      system: 'WAKIL Cloud Management System',
+      systemVersion: '1.0.20',
+      exportedAt: new Date().toISOString(),
+      totalAgents: agents.length,
+      totalCitizens: totalCitizensCount
+    },
+    agents,
+    citizens,
+    archive,
+    owner: {
+      username: owner.username,
+      name: owner.name,
+      role: owner.role
+    },
+    announcement,
+    activeSessions: sessions.filter(s => s.status === 'active')
+  };
+
+  const filename = `wakil_full_system_backup_${new Date().toISOString().slice(0, 10)}.json`;
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.send(JSON.stringify(backupData, null, 2));
 });
 
 // ══ 2. OWNER MANAGEMENT APIS (خاصة بالمالك فقط) ══
