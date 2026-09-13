@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.23";
+    var compiledVersion = "1.0.24";
     window.COMPILED_APP_VERSION = compiledVersion;
     var otaBundle = localStorage.getItem('wakil_ota_bundle');
     var otaVer = localStorage.getItem('wakil_ota_version');
@@ -29,7 +29,7 @@
     window.ACTIVE_APP_VERSION = (otaVer && otaBundle) ? otaVer : compiledVersion;
   } catch(e) {
     console.warn("OTA boot error:", e);
-    window.ACTIVE_APP_VERSION = "1.0.23";
+    window.ACTIVE_APP_VERSION = "1.0.24";
   }
 })();
 </script>
@@ -74,15 +74,15 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 
 /* Magic Eye Password Toggle */
 .pwd-field-wrap{position:relative;width:100%;display:flex;align-items:center;}
-.pwd-field-wrap .field{padding-left:46px;}
-.magic-eye-btn{position:absolute;left:6px;top:50%;transform:translateY(-50%);background:transparent;border:none;border-radius:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--mt);transition:all .25s cubic-bezier(0.4,0,0.2,1);padding:0;outline:none;user-select:none;-webkit-tap-highlight-color:transparent;z-index:2;}
+.pwd-field-wrap .field{padding-left:52px !important;}
+.magic-eye-btn{position:absolute;left:4px;top:50%;transform:translateY(-50%);background:transparent;border:none;border-radius:10px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--mt);transition:all .2s ease;padding:0;outline:none;user-select:none;-webkit-tap-highlight-color:transparent;z-index:99;touch-action:manipulation;pointer-events:auto;}
 .magic-eye-btn:hover{color:var(--g);background:var(--gbg);}
-.magic-eye-btn:active{transform:translateY(-50%) scale(0.9);}
-.magic-eye-btn.active{color:var(--g);background:var(--gbg);filter:drop-shadow(0 0 6px rgba(46,125,50,.4));}
-.magic-eye-btn svg{width:20px;height:20px;transition:transform .25s ease,stroke .25s ease;}
+.magic-eye-btn:active{transform:translateY(-50%) scale(0.92);}
+.magic-eye-btn.active{color:var(--g);background:var(--gbg);filter:drop-shadow(0 0 6px rgba(46,125,50,.35));}
+.magic-eye-btn svg{width:22px;height:22px;pointer-events:none;transition:transform .2s ease,stroke .2s ease;}
 .magic-eye-btn:hover svg{transform:scale(1.08);}
-@keyframes magicSparkle{0%{transform:translateY(-50%) scale(.8)}50%{transform:translateY(-50%) scale(1.18) rotate(6deg)}100%{transform:translateY(-50%) scale(1) rotate(0deg)}}
-.magic-eye-btn.animating{animation:magicSparkle .3s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes magicSparkle{0%{transform:translateY(-50%) scale(.8)}50%{transform:translateY(-50%) scale(1.15) rotate(6deg)}100%{transform:translateY(-50%) scale(1) rotate(0deg)}}
+.magic-eye-btn.animating{animation:magicSparkle .25s cubic-bezier(.175,.885,.32,1.275);}
 
 .field{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--bd);font-size:14px;direction:rtl;outline:none;color:var(--tx);background:var(--ib);transition:all .3s;}
 .field:focus{border-color:var(--g);background:var(--card);}
@@ -385,8 +385,8 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
             <div class="flbl">كلمة المرور</div>
             <div class="pwd-field-wrap">
               <input class="field" id="fp" type="password" value="" placeholder="أدخل كلمة المرور..." onkeydown="if(event.key==='Enter')doLogin()"/>
-              <button type="button" class="magic-eye-btn" id="btn-toggle-login-pass" onclick="toggleLoginPassVisibility()" title="إظهار / إخفاء كلمة المرور" aria-label="إظهار كلمة المرور">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <button type="button" class="magic-eye-btn" id="btn-toggle-login-pass" onclick="togglePasswordVisibility('fp', this, event)" onpointerdown="event.stopPropagation()" ontouchstart="event.stopPropagation()" title="إظهار / إخفاء كلمة المرور" aria-label="إظهار كلمة المرور">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;width:22px;height:22px;">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
@@ -1608,41 +1608,73 @@ function getItems(){return agentType==='ghiz'?ITEMS_GHIZ:ITEMS_TAHN;}
 
 // ══ LOGIN / LOGOUT ══
 
-function toggleLoginPassVisibility(){
-  const inp = document.getElementById('fp');
-  const btn = document.getElementById('btn-toggle-login-pass');
-  if(!inp || !btn) return;
+// تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية
+function normalizeArabicDigits(str) {
+  if (!str) return '';
+  return String(str).trim()
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+    .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+}
 
-  btn.classList.remove('animating');
-  void btn.offsetWidth;
-  btn.classList.add('animating');
-
-  const isPassword = inp.type === 'password';
-  if(isPassword){
-    inp.type = 'text';
-    btn.classList.add('active');
-    btn.setAttribute('aria-label', 'إخفاء كلمة المرور');
-    btn.title = 'إخفاء كلمة المرور';
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-      <line x1="1" y1="1" x2="23" y2="23"></line>
-    </svg>`;
-  } else {
-    inp.type = 'password';
-    btn.classList.remove('active');
-    btn.setAttribute('aria-label', 'إظهار كلمة المرور');
-    btn.title = 'إظهار كلمة المرور';
-    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-      <circle cx="12" cy="12" r="3"></circle>
-    </svg>`;
+// دالة العين السحرية الموحدة لجميع حقول كلمات المرور
+function togglePasswordVisibility(inputId, btn, event) {
+  if (event) {
+    try { event.preventDefault(); event.stopPropagation(); } catch(_) {}
   }
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+
+  const isPass = (inp.type === 'password');
+  inp.type = isPass ? 'text' : 'password';
+
+  const eyeBtn = btn || (inputId === 'fp' ? document.getElementById('btn-toggle-login-pass') : null);
+  if (eyeBtn) {
+    eyeBtn.classList.remove('animating');
+    void eyeBtn.offsetWidth;
+    eyeBtn.classList.add('animating');
+    eyeBtn.classList.toggle('active', isPass);
+    eyeBtn.setAttribute('aria-label', isPass ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور');
+    eyeBtn.title = isPass ? 'إخفاء كلمة المرور' : 'إظهار كلمة المرور';
+
+    if (isPass) {
+      eyeBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;width:22px;height:22px;">
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+      </svg>`;
+    } else {
+      eyeBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;width:22px;height:22px;">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>`;
+    }
+  }
+}
+
+function toggleLoginPassVisibility(e) {
+  togglePasswordVisibility('fp', document.getElementById('btn-toggle-login-pass'), e);
+}
+
+function togglePasswordVisibilityField(inputId, btn, e) {
+  togglePasswordVisibility(inputId, btn, e);
 }
 
 async function doLogin(){
   loadLocalState();
-  const u = document.getElementById('fu').value.trim();
-  const p = document.getElementById('fp').value.trim();
+  const rawU = document.getElementById('fu').value.trim();
+  const rawP = document.getElementById('fp').value.trim();
+  const u = normalizeArabicDigits(rawU);
+  const p = normalizeArabicDigits(rawP);
+
+  const errEl = document.getElementById('err');
+  if (errEl) errEl.style.display = 'none';
+
+  if (!u || !p) {
+    if (errEl) {
+      errEl.textContent = '⚠️ يرجى إدخال اسم المستخدم وكلمة المرور';
+      errEl.style.display = 'block';
+    }
+    return;
+  }
 
   // حفظ حالة مربع الاختيار بدقة
   const chkRem = document.getElementById('chk-remember');
@@ -1654,14 +1686,30 @@ async function doLogin(){
   localStorage.setItem('wakil_remember_login', rememberLogin ? 'true' : 'false');
 
   // 1. فحص دخول المالك (Owner)
-  const isOwner = (u.toLowerCase() === 'admin' || u.toLowerCase() === 'owner') && p === 'admin2026';
+  const isOwner = (u.toLowerCase() === 'admin' || u.toLowerCase() === 'owner') && (p === 'admin2026' || rawP === 'admin2026');
   if (isOwner) {
     loginAsOwner();
     return;
   }
 
-  // 2. فحص دخول الوكلاء محلياً (متاح أوفلاين 100%)
-  const matchedAgent = allAgents.find(ag => ag.username.toLowerCase() === u.toLowerCase() && ag.password === p);
+  // 2. فحص دخول الوكلاء محلياً (فوري 0ms: باسم المستخدم أو رمز الوكالة أو اسم الوكيل)
+  const matchedAgent = allAgents.find(ag => {
+    const agUser = normalizeArabicDigits(ag.username).toLowerCase();
+    const agAgency = normalizeArabicDigits(ag.agencyNumber);
+    const agName = (ag.name || '').trim().toLowerCase();
+    const agPass = normalizeArabicDigits(ag.password);
+
+    const userMatches = (
+      agUser === u.toLowerCase() || 
+      agAgency === u || 
+      agName === rawU.toLowerCase() || 
+      ag.id.toLowerCase() === u.toLowerCase() ||
+      ag.id.toLowerCase() === ('agent_' + u.toLowerCase())
+    );
+    const passMatches = (agPass === p || ag.password === rawP);
+    return userMatches && passMatches;
+  });
+
   if (matchedAgent) {
     if (matchedAgent.isFrozen) {
       showFrozenScreen();
@@ -1671,17 +1719,37 @@ async function doLogin(){
     return;
   }
 
-  // 3. فحص الدخول سحابياً إذا توفر الإنترنت
+  // 3. فحص الدخول سحابياً إذا لم يتطابق محلياً أو كان وكيلاً جديداً
   if (navigator.onLine) {
+    const loginBtn = document.querySelector('#login-card-online .btn-g');
+    const origBtnHtml = loginBtn ? loginBtn.innerHTML : 'تسجيل الدخول سحابياً ‹';
+    if (loginBtn) {
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<span>جاري التحقق من الحساب... ⏳</span>';
+      loginBtn.style.opacity = '0.8';
+    }
+
     try {
       toast('⏳ جاري التحقق من الحساب سحابياً...', false, 'blue');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 14000);
+
       const res = await fetch('https://wakil-api.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: u, password: p, agentType: agentType, deviceInfo: getDeviceInfo() })
+        body: JSON.stringify({ username: u, password: p, agentType: agentType, deviceInfo: getDeviceInfo() }),
+        signal: controller.signal
       });
-      if (res.ok) {
-        const data = await res.json();
+      clearTimeout(timeoutId);
+
+      const data = await res.json().catch(() => ({}));
+      if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = origBtnHtml;
+        loginBtn.style.opacity = '1';
+      }
+
+      if (res.ok && data.success) {
         if (data.isFrozen || res.status === 403) {
           showFrozenScreen();
           return;
@@ -1698,15 +1766,29 @@ async function doLogin(){
           loginAsAgent(data.agent);
           return;
         }
+      } else {
+        if (errEl) {
+          errEl.textContent = '❌ ' + (data.message || 'اسم المستخدم أو رمز الوكالة أو كلمة المرور غير صحيحة');
+          errEl.style.display = 'block';
+        }
+        return;
       }
     } catch(err) {
       console.warn('Cloud login error:', err);
+      if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = origBtnHtml;
+        loginBtn.style.opacity = '1';
+      }
+      toast('⚠️ تعذر الاتصال بالسيرفر السحابي حالياً. يرجى التأكد من الإنترنت.', true);
     }
   }
 
   // في حال خطأ بيانات الدخول
-  document.getElementById('err').style.display = 'block';
-  document.getElementById('fp').value = '';
+  if (errEl) {
+    errEl.textContent = '❌ اسم المستخدم أو رمز الوكالة أو كلمة المرور غير صحيحة';
+    errEl.style.display = 'block';
+  }
 }
 
 function loginAsOwner(){
@@ -3926,7 +4008,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.23';
+const BASE_APK_VERSION = '1.0.24';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -4103,6 +4185,7 @@ function startSessionHeartbeat() {
 
 async function pingSession() {
   if (!navigator.onLine) return;
+  if (localStorage.getItem('wakil_has_logged_in') !== 'true') return;
   lastPingTime = Date.now();
   const sessionId = localStorage.getItem('wakil_session_id');
   const sessionToken = localStorage.getItem('wakil_session_token');
@@ -4193,6 +4276,7 @@ window.addEventListener('beforeunload', notifyAppOffline);
 
 // عند أي نقرة أو تفاعل، إذا مر أكثر من 4 ثوانٍ يتم فحص الجلسة فوراً
 document.addEventListener('pointerdown', () => {
+  if (localStorage.getItem('wakil_has_logged_in') !== 'true') return;
   const now = Date.now();
   if (now - lastPingTime > 4000) {
     pingSession();

@@ -182,11 +182,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.23',
-    versionCode: 23,
+    version: '1.0.24',
+    versionCode: 24,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/pxqva0.apk',
-    notes: 'إصدار v1.0.23: إصلاح طرد الأجهزة بدقة من الإعدادات، حالة الاتصال أونلاين/أوفلاين المباشرة، والطرد الفوري للجلسات.',
+    downloadUrl: 'https://files.catbox.moe/ydh9qp.apk',
+    notes: 'إصدار v1.0.24: إصلاح فوري للعين السحرية لكلمة المرور ودعم تسجيل الدخول برمز الوكالة أو اسم المستخدم أو الاسم مع معالجة الأرقام العربية.',
     updatedAt: new Date().toISOString()
   });
 });
@@ -228,8 +228,19 @@ app.get('/wakil.apk', (req, res) => {
 // ══ 1. AUTHENTICATION (تسجيل الدخول الذكي مع تسجيل الجهاز والجلسة) ══
 app.post('/api/login', (req, res) => {
   const { username, password, agentType, deviceInfo } = req.body;
-  const u = (username || '').trim().toLowerCase();
-  const p = (password || '').trim();
+
+  // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
+  function normalizeDigits(str) {
+    if (!str) return '';
+    return String(str).trim()
+      .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+      .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+  }
+
+  const rawU = (username || '').trim();
+  const rawP = (password || '').trim();
+  const u = normalizeDigits(rawU).toLowerCase();
+  const p = normalizeDigits(rawP);
 
   const devId = (deviceInfo && deviceInfo.deviceId) || ('dev_' + Math.random().toString(36).substr(2, 8));
   const devName = (deviceInfo && deviceInfo.deviceName) || 'هاتف غير معروف';
@@ -237,12 +248,14 @@ app.post('/api/login', (req, res) => {
 
   // 1. فحص حساب الأونر / المالك العام
   const owner = getOwnerConfig();
-  if ((u === owner.username.toLowerCase() || u === 'owner' || u === 'admin') && p === owner.password) {
+  const ownerPass = normalizeDigits(owner.password);
+  if ((u === owner.username.toLowerCase() || u === 'owner' || u === 'admin') && (p === ownerPass || rawP === owner.password)) {
     const sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
     const sessionToken = 'owner_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
     
     let sessions = getSessions();
-    sessions = sessions.filter(s => !(s.deviceId === devId && s.userRole === 'owner'));
+    // إزالة أي جلسة قديمة ملغاة لنفس الجهاز لضمان عدم وجود طرد مسبق
+    sessions = sessions.filter(s => s.deviceId !== devId);
     sessions.push({
       id: sessionId,
       token: sessionToken,
@@ -275,9 +288,25 @@ app.post('/api/login', (req, res) => {
     });
   }
 
-  // 2. فحص حسابات الوكلاء المسجلين
+  // 2. فحص حسابات الوكلاء المسجلين (مرونة كاملة: اسم المستخدم أو رمز الوكالة أو اسم الوكيل)
   const agents = getAgents();
-  const matched = agents.find(ag => ag.username.toLowerCase() === u && ag.password === p);
+  const matched = agents.find(ag => {
+    const agUser = normalizeDigits(ag.username).toLowerCase();
+    const agAgency = normalizeDigits(ag.agencyNumber);
+    const agName = (ag.name || '').trim().toLowerCase();
+    const agPass = normalizeDigits(ag.password);
+
+    const userMatches = (
+      agUser === u || 
+      agAgency === u || 
+      agName === rawU.toLowerCase() || 
+      ag.id.toLowerCase() === u ||
+      ag.id.toLowerCase() === ('agent_' + u)
+    );
+    const passMatches = (agPass === p || ag.password === rawP);
+    return userMatches && passMatches;
+  });
+
   if (matched) {
     // فحص هل الحساب مجمّد من قبل الأونر؟
     if (matched.isFrozen) {
@@ -292,7 +321,8 @@ app.post('/api/login', (req, res) => {
     const sessionToken = 'agent_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
 
     let sessions = getSessions();
-    sessions = sessions.filter(s => !(s.deviceId === devId && s.userId === matched.id));
+    // إزالة أي سجلات قديمة أو ملغاة لنفس الجهاز
+    sessions = sessions.filter(s => s.deviceId !== devId);
     sessions.push({
       id: sessionId,
       token: sessionToken,
@@ -331,7 +361,7 @@ app.post('/api/login', (req, res) => {
     });
   }
 
-  return res.status(401).json({ success: false, message: 'اسم المستخدم أو كلمة المرور غير صحيحة' });
+  return res.status(401).json({ success: false, message: 'اسم المستخدم أو رمز الوكالة أو كلمة المرور غير صحيحة' });
 });
 
 // ══ 1.1 SESSIONS & DEVICES MANAGEMENT (إدارة الأجهزة والجلسات) ══
