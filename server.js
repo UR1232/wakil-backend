@@ -185,7 +185,7 @@ app.get('/api/app-version', (req, res) => {
     version: '1.0.22',
     versionCode: 22,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/gq146k.apk',
+    downloadUrl: 'https://files.catbox.moe/29ozc5.apk',
     notes: 'إصلاح كامل وفوري لزر تسجيل الدخول v1.0.22: تفعيل دوال الأجهزة والجلسات والربط السحابي التلقائي.',
     updatedAt: new Date().toISOString()
   });
