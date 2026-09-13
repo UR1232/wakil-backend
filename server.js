@@ -185,7 +185,7 @@ app.get('/api/app-version', (req, res) => {
     version: '1.0.21',
     versionCode: 21,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/14x5e1.apk',
+    downloadUrl: 'https://files.catbox.moe/pphq46.apk',
     notes: 'ترقية كبرى v1.0.21: قفل وتجميد الوكالات، بث التعاميم الإدارية الفورية، إدارة وطرد الأجهزة المتصلة، إعادة تعيين كلمات المرور وتنزيل نسخة احتياطية شاملة للمنظومة.',
     updatedAt: new Date().toISOString()
   });
