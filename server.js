@@ -163,7 +163,7 @@ app.get('/api/app-version', (req, res) => {
     version: '1.0.16',
     versionCode: 16,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/59s68e.apk',
+    downloadUrl: 'https://files.catbox.moe/yseyl4.apk',
     notes: 'إصدار التحديث الهوائي الفوري (Live Updates) مع دعم كامل لتأكيد وإلغاء استلام الأرشيف',
     updatedAt: new Date().toISOString()
   });
