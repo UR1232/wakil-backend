@@ -1,17 +1,32 @@
 [
   {
-    "id": "sess_1789273908618_3as97s",
-    "token": "tok_1789273908618_vdlrlivi",
+    "id": "sess_A",
+    "token": "tok_1789273989986_34c49pxj",
     "userId": "agent_868",
     "userRole": "agent",
     "agencyNumber": "868",
     "username": "868",
     "name": "وكيل",
-    "deviceId": "my_phone_test",
-    "deviceName": "Galaxy Phone",
+    "deviceId": "dev_A",
+    "deviceName": "هاتف متصل",
     "platform": "Android",
-    "loginAt": "2026-09-13T04:31:48.618Z",
-    "lastActive": "2026-09-13T04:31:48.618Z",
+    "loginAt": "2026-09-13T04:33:09.986Z",
+    "lastActive": "2026-09-13T04:33:10.007Z",
     "status": "active"
+  },
+  {
+    "id": "sess_B",
+    "token": "tok_1789273989997_4a9ay5dp",
+    "userId": "agent_868",
+    "userRole": "agent",
+    "agencyNumber": "868",
+    "username": "868",
+    "name": "وكيل",
+    "deviceId": "dev_B",
+    "deviceName": "هاتف متصل",
+    "platform": "Android",
+    "loginAt": "2026-09-13T04:33:09.997Z",
+    "lastActive": "2026-09-13T04:33:09.997Z",
+    "status": "revoked"
   }
 ]

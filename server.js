@@ -182,11 +182,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.22',
-    versionCode: 22,
+    version: '1.0.23',
+    versionCode: 23,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/29ozc5.apk',
-    notes: 'إصلاح كامل وفوري لزر تسجيل الدخول v1.0.22: تفعيل دوال الأجهزة والجلسات والربط السحابي التلقائي.',
+    downloadUrl: 'https://files.catbox.moe/pxqva0.apk',
+    notes: 'إصدار v1.0.23: إصلاح طرد الأجهزة بدقة من الإعدادات، حالة الاتصال أونلاين/أوفلاين المباشرة، والطرد الفوري للجلسات.',
     updatedAt: new Date().toISOString()
   });
 });
@@ -256,6 +256,7 @@ app.post('/api/login', (req, res) => {
       platform: devPlat,
       loginAt: new Date().toISOString(),
       lastActive: new Date().toISOString(),
+      isOnline: true,
       status: 'active'
     });
     saveSessions(sessions);
@@ -305,6 +306,7 @@ app.post('/api/login', (req, res) => {
       platform: devPlat,
       loginAt: new Date().toISOString(),
       lastActive: new Date().toISOString(),
+      isOnline: true,
       status: 'active'
     });
     saveSessions(sessions);
@@ -355,9 +357,11 @@ app.post('/api/sessions/ping', (req, res) => {
   }
 
   // 2. فحص هل الجلسة ملغاة / مطرودة صراحة فقط؟
-  // لا يتم طرد المستخدم إلا إذا تم استهدافه صراحة ووضع status = 'revoked'
+  // التحقق إما برقم الجلسة أو التوكن أو معرّف الجهاز
   const explicitRevoked = sessions.find(s => 
-    ((sessionId && s.id === sessionId) || (sessionToken && s.token === sessionToken)) && 
+    ((sessionId && s.id === sessionId) || 
+     (sessionToken && s.token === sessionToken) || 
+     (deviceId && s.deviceId === deviceId && (s.userRole === userRole || (!s.userRole && userRole === 'agent')))) && 
     s.status === 'revoked'
   );
 
@@ -372,29 +376,41 @@ app.post('/api/sessions/ping', (req, res) => {
 
   // 3. تحديث الجلسة النشطة أو تسجيلها تلقائياً إذا لم تكن موجودة
   let activeSession = sessions.find(s => 
-    ((sessionId && s.id === sessionId) || (sessionToken && s.token === sessionToken) || (deviceId && s.deviceId === deviceId && s.userRole === userRole)) && 
+    ((sessionId && s.id === sessionId) || 
+     (sessionToken && s.token === sessionToken) || 
+     (deviceId && s.deviceId === deviceId && s.userRole === userRole)) && 
     s.status === 'active'
   );
 
+  const nowIso = new Date().toISOString();
+
   if (activeSession) {
-    activeSession.lastActive = new Date().toISOString();
+    activeSession.lastActive = nowIso;
+    activeSession.isOnline = true;
+    if (deviceInfo && deviceInfo.deviceName) activeSession.deviceName = deviceInfo.deviceName;
+    if (deviceInfo && deviceInfo.platform) activeSession.platform = deviceInfo.platform;
     saveSessions(sessions);
   } else if (deviceId || sessionId) {
+    const agents = getAgents();
+    const matchedAg = agents.find(a => 
+      (agencyNumber && String(a.agencyNumber) === String(agencyNumber))
+    );
     const devName = (deviceInfo && deviceInfo.deviceName) || 'هاتف متصل';
     const devPlat = (deviceInfo && deviceInfo.platform) || 'Android';
     const newSession = {
       id: sessionId || ('sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6)),
       token: sessionToken || ('tok_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8)),
-      userId: userRole === 'owner' ? 'owner' : (agencyNumber ? 'agent_' + agencyNumber : 'agent'),
+      userId: userRole === 'owner' ? 'owner' : (matchedAg ? matchedAg.id : (agencyNumber ? 'agent_' + agencyNumber : 'agent')),
       userRole: userRole || 'agent',
       agencyNumber: agencyNumber ? String(agencyNumber) : null,
-      username: userRole === 'owner' ? 'admin' : (agencyNumber || 'user'),
-      name: userRole === 'owner' ? 'المالك العام للمنظومة' : 'وكيل',
+      username: userRole === 'owner' ? 'admin' : (matchedAg ? matchedAg.username : (agencyNumber || 'user')),
+      name: userRole === 'owner' ? 'المالك العام للمنظومة' : (matchedAg ? matchedAg.name : 'وكيل'),
       deviceId: deviceId || ('dev_' + Math.random().toString(36).substr(2, 8)),
       deviceName: devName,
       platform: devPlat,
-      loginAt: new Date().toISOString(),
-      lastActive: new Date().toISOString(),
+      loginAt: nowIso,
+      lastActive: nowIso,
+      isOnline: true,
       status: 'active'
     };
     sessions.push(newSession);
@@ -408,27 +424,60 @@ app.post('/api/sessions/ping', (req, res) => {
   });
 });
 
-// جلب قائمة الأجهزة المتصلة بحساب الوكيل
+// إشعار الخروج إلى الخلفية أو إغلاق التطبيق (Offline Presence Signal)
+app.post('/api/sessions/offline', (req, res) => {
+  const { sessionId, sessionToken, deviceId } = req.body;
+  let sessions = getSessions();
+  let updated = false;
+
+  sessions.forEach(s => {
+    if ((sessionId && s.id === sessionId) || 
+        (sessionToken && s.token === sessionToken) || 
+        (deviceId && s.deviceId === deviceId)) {
+      s.isOnline = false;
+      s.lastActive = new Date().toISOString();
+      updated = true;
+    }
+  });
+
+  if (updated) {
+    saveSessions(sessions);
+  }
+  res.json({ success: true, offline: true });
+});
+
+// جلب قائمة الأجهزة المتصلة بحساب الوكيل مع حالة أونلاين/أوفلاين
 app.get('/api/sessions/my', (req, res) => {
   const agencyNumber = req.query.agencyNumber;
   const username = req.query.username;
   const sessions = getSessions();
+  const now = Date.now();
 
-  let mySessions = [];
-  if (agencyNumber) {
-    mySessions = sessions.filter(s => String(s.agencyNumber) === String(agencyNumber) && s.status === 'active');
-  } else if (username) {
-    mySessions = sessions.filter(s => s.username && s.username.toLowerCase() === username.toLowerCase() && s.status === 'active');
-  }
+  let mySessions = sessions.filter(s => {
+    if (s.status !== 'active') return false;
+    if (agencyNumber && String(s.agencyNumber) === String(agencyNumber)) return true;
+    if (username && s.username && s.username.toLowerCase() === username.toLowerCase()) return true;
+    return false;
+  });
+
+  const formatted = mySessions.map(s => {
+    const diffSec = Math.floor((now - new Date(s.lastActive || s.loginAt).getTime()) / 1000);
+    const isOnline = (s.isOnline !== false) && (diffSec <= 15);
+    return {
+      ...s,
+      presence: isOnline ? 'online' : 'offline',
+      diffSec
+    };
+  });
 
   res.json({
     success: true,
-    total: mySessions.length,
-    sessions: mySessions
+    total: formatted.length,
+    sessions: formatted
   });
 });
 
-// طرد جهاز للوكيل (مع تأكيد كلمة مرور الوكيل إجبارياً)
+// طرد جهاز للوكيل أو من الإعدادات (مع تأكيد كلمة مرور الوكيل أو المالك)
 app.post('/api/sessions/revoke', (req, res) => {
   const { agencyNumber, username, password, targetSessionId, revokeAllOthers, currentSessionId } = req.body;
 
@@ -436,13 +485,18 @@ app.post('/api/sessions/revoke', (req, res) => {
     return res.status(401).json({ success: false, message: 'يرجى إدخال كلمة المرور لتأكيد الخروج' });
   }
 
+  const p = password.trim();
+  const owner = getOwnerConfig();
   const agents = getAgents();
-  const ag = agents.find(a => 
+  const matchedAg = agents.find(a => 
     (agencyNumber && String(a.agencyNumber) === String(agencyNumber)) ||
-    (username && a.username.toLowerCase() === (username || '').toLowerCase())
+    (username && a.username && a.username.toLowerCase() === username.toLowerCase())
   );
 
-  if (!ag || ag.password !== password.trim()) {
+  const isOwnerAuth = (p === owner.password);
+  const isAgentAuth = (matchedAg && matchedAg.password === p);
+
+  if (!isOwnerAuth && !isAgentAuth) {
     return res.status(401).json({ success: false, message: 'كلمة المرور غير صحيحة لتأكيد طرد الجهاز!' });
   }
 
@@ -451,31 +505,61 @@ app.post('/api/sessions/revoke', (req, res) => {
 
   if (revokeAllOthers) {
     sessions.forEach(s => {
-      if (s.userId === ag.id && s.id !== currentSessionId && s.status === 'active') {
+      const matchOwner = isOwnerAuth && (s.userRole === 'owner' || s.userId === 'owner');
+      const matchAgent = isAgentAuth && (
+        s.userId === matchedAg.id || 
+        String(s.agencyNumber) === String(matchedAg.agencyNumber) ||
+        (s.username && matchedAg.username && s.username.toLowerCase() === matchedAg.username.toLowerCase())
+      );
+
+      if ((matchOwner || matchAgent) && s.id !== currentSessionId && s.status === 'active') {
         s.status = 'revoked';
+        s.isOnline = false;
+        s.revokedAt = new Date().toISOString();
         revokedCount++;
       }
     });
   } else if (targetSessionId) {
-    const s = sessions.find(sess => sess.id === targetSessionId && sess.userId === ag.id);
-    if (s) {
-      s.status = 'revoked';
-      revokedCount++;
-    }
+    sessions.forEach(s => {
+      const isTarget = (s.id === targetSessionId || s.deviceId === targetSessionId);
+      if (isTarget) {
+        s.status = 'revoked';
+        s.isOnline = false;
+        s.revokedAt = new Date().toISOString();
+        revokedCount++;
+      }
+    });
   }
 
   saveSessions(sessions);
-  res.json({ success: true, message: 'تم إنهاء الجلسة وطرد الجهاز بنجاح!', revokedCount });
+
+  if (revokedCount === 0) {
+    return res.status(404).json({ success: false, message: 'لم يتم العثور على الجهاز المطلوب أو تم طرده مسبقاً' });
+  }
+
+  res.json({ success: true, message: 'تم إنهاء الجلسة وطرد الجهاز فوراً بنجاح!', revokedCount });
 });
 
-// جلب أجهزة المالك (الأونر) المتصلة
+// جلب أجهزة المالك (الأونر) المتصلة مع حالة أونلاين/أوفلاين
 app.get('/api/owner/sessions/my', (req, res) => {
   const sessions = getSessions();
-  const ownerSessions = sessions.filter(s => s.userRole === 'owner' && s.status === 'active');
+  const now = Date.now();
+  const ownerSessions = sessions.filter(s => (s.userRole === 'owner' || s.userId === 'owner') && s.status === 'active');
+
+  const formatted = ownerSessions.map(s => {
+    const diffSec = Math.floor((now - new Date(s.lastActive || s.loginAt).getTime()) / 1000);
+    const isOnline = (s.isOnline !== false) && (diffSec <= 15);
+    return {
+      ...s,
+      presence: isOnline ? 'online' : 'offline',
+      diffSec
+    };
+  });
+
   res.json({
     success: true,
-    total: ownerSessions.length,
-    sessions: ownerSessions
+    total: formatted.length,
+    sessions: formatted
   });
 });
 
@@ -492,24 +576,34 @@ app.post('/api/owner/sessions/revoke-self', (req, res) => {
   let count = 0;
   if (revokeAllOthers) {
     sessions.forEach(s => {
-      if (s.userRole === 'owner' && s.id !== currentSessionId && s.status === 'active') {
+      if ((s.userRole === 'owner' || s.userId === 'owner') && s.id !== currentSessionId && s.status === 'active') {
         s.status = 'revoked';
+        s.isOnline = false;
+        s.revokedAt = new Date().toISOString();
         count++;
       }
     });
   } else if (targetSessionId) {
-    const s = sessions.find(sess => sess.id === targetSessionId && sess.userRole === 'owner');
-    if (s) {
-      s.status = 'revoked';
-      count++;
-    }
+    sessions.forEach(s => {
+      if ((s.id === targetSessionId || s.deviceId === targetSessionId) && (s.userRole === 'owner' || s.userId === 'owner')) {
+        s.status = 'revoked';
+        s.isOnline = false;
+        s.revokedAt = new Date().toISOString();
+        count++;
+      }
+    });
   }
 
   saveSessions(sessions);
+
+  if (count === 0) {
+    return res.status(404).json({ success: false, message: 'لم يتم العثور على الجهاز أو تم طرده مسبقاً' });
+  }
+
   res.json({ success: true, message: 'تم تسجيل خروج جهاز المالك بنجاح!', count });
 });
 
-// جلب أجهزة وكيل معين من قبل الأونر
+// جلب أجهزة وكيل معين من قبل الأونر مع حالة أونلاين/أوفلاين
 app.get('/api/owner/agents/:id/sessions', (req, res) => {
   const id = req.params.id;
   const agents = getAgents();
@@ -517,13 +611,29 @@ app.get('/api/owner/agents/:id/sessions', (req, res) => {
   if (!ag) return res.status(404).json({ success: false, message: 'الوكيل غير موجود' });
 
   const sessions = getSessions();
-  const agentSessions = sessions.filter(s => (s.userId === ag.id || String(s.agencyNumber) === String(ag.agencyNumber)) && s.status === 'active');
+  const now = Date.now();
+  const agentSessions = sessions.filter(s => 
+    (s.userId === ag.id || 
+     String(s.agencyNumber) === String(ag.agencyNumber) || 
+     (s.username && ag.username && s.username.toLowerCase() === ag.username.toLowerCase())) && 
+    s.status === 'active'
+  );
+
+  const formatted = agentSessions.map(s => {
+    const diffSec = Math.floor((now - new Date(s.lastActive || s.loginAt).getTime()) / 1000);
+    const isOnline = (s.isOnline !== false) && (diffSec <= 15);
+    return {
+      ...s,
+      presence: isOnline ? 'online' : 'offline',
+      diffSec
+    };
+  });
 
   res.json({
     success: true,
     agent: { id: ag.id, name: ag.name, agencyNumber: ag.agencyNumber },
-    total: agentSessions.length,
-    sessions: agentSessions
+    total: formatted.length,
+    sessions: formatted
   });
 });
 
@@ -535,17 +645,24 @@ app.post('/api/owner/sessions/revoke', (req, res) => {
 
   if (revokeAll) {
     sessions.forEach(s => {
-      if (((agentId && s.userId === agentId) || (agencyNumber && String(s.agencyNumber) === String(agencyNumber))) && s.status === 'active') {
+      const matchAg = (agentId && (s.userId === agentId || s.userId === 'agent_' + agentId)) ||
+                      (agencyNumber && (String(s.agencyNumber) === String(agencyNumber) || s.userId === 'agent_' + agencyNumber));
+      if (matchAg && s.status === 'active') {
         s.status = 'revoked';
+        s.isOnline = false;
+        s.revokedAt = new Date().toISOString();
         count++;
       }
     });
   } else if (targetSessionId) {
-    const s = sessions.find(sess => sess.id === targetSessionId);
-    if (s) {
-      s.status = 'revoked';
-      count++;
-    }
+    sessions.forEach(s => {
+      if (s.id === targetSessionId || s.deviceId === targetSessionId) {
+        s.status = 'revoked';
+        s.isOnline = false;
+        s.revokedAt = new Date().toISOString();
+        count++;
+      }
+    });
   }
 
   saveSessions(sessions);
