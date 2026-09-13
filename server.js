@@ -182,11 +182,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.24',
-    versionCode: 24,
+    version: '1.0.25',
+    versionCode: 25,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/ydh9qp.apk',
-    notes: 'إصدار v1.0.24: إصلاح فوري للعين السحرية لكلمة المرور ودعم تسجيل الدخول برمز الوكالة أو اسم المستخدم أو الاسم مع معالجة الأرقام العربية.',
+    downloadUrl: 'https://files.catbox.moe/9g2n97.apk',
+    notes: 'إصدار v1.0.25: حل جذري ونهائي لتدبيل زر العين السحرية وإصلاح فوري لتسجيل الدخول وتنظيف شامل للذاكرة التخزينية.',
     updatedAt: new Date().toISOString()
   });
 });

@@ -4,32 +4,17 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.24";
+    var compiledVersion = "1.0.25";
     window.COMPILED_APP_VERSION = compiledVersion;
-    var otaBundle = localStorage.getItem('wakil_ota_bundle');
-    var otaVer = localStorage.getItem('wakil_ota_version');
-    var alreadyBooted = sessionStorage.getItem('wakil_ota_booted');
+    window.ACTIVE_APP_VERSION = compiledVersion;
 
-    // إذا وُجدت حزمة هوائية أحدث ولم يتم تشغيلها بعد في هذه الجلسة
-    if (otaBundle && otaVer && otaVer !== compiledVersion && alreadyBooted !== otaVer) {
-      sessionStorage.setItem('wakil_ota_booted', otaVer);
-      window.ACTIVE_APP_VERSION = otaVer;
-
-      // ضبط base href لضمان تحميل سكريبتات js/seed_1042.js والملفات النسبية
-      var baseDir = window.location.href.split('?')[0].replace(/[^\/]*$/, '');
-      if (baseDir && otaBundle.indexOf('<base ') === -1) {
-        otaBundle = otaBundle.replace(/<head[^>]*>/i, function(m){ return m + '<base href="' + baseDir + '">'; });
-      }
-
-      document.open();
-      document.write(otaBundle);
-      document.close();
-      return;
-    }
-    window.ACTIVE_APP_VERSION = (otaVer && otaBundle) ? otaVer : compiledVersion;
+    // تنظيف شامل وجذري لأي حزم هوائية سابقة لمنع تكرار عناصر الصفحة وتدبيل الأزرار نهائياً
+    localStorage.removeItem('wakil_ota_bundle');
+    localStorage.removeItem('wakil_ota_version');
+    sessionStorage.removeItem('wakil_ota_booted');
   } catch(e) {
-    console.warn("OTA boot error:", e);
-    window.ACTIVE_APP_VERSION = "1.0.24";
+    console.warn("OTA boot cleanup:", e);
+    window.ACTIVE_APP_VERSION = "1.0.25";
   }
 })();
 </script>
@@ -398,7 +383,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
             <label for="chk-remember" style="cursor:pointer;" onclick="event.stopPropagation();"><b>حفظ تسجيل الدخول</b> (البقاء مسجلاً عند الخروج)</label>
           </div>
           <div id="err" class="err">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
-          <button class="btn-g" onclick="doLogin()">تسجيل الدخول سحابياً ‹</button>
+          <button class="btn-g" onclick="doLogin()">تسجيل الدخول ›</button>
           <button class="btn-forgot" onclick="showMod('m-forgot')">هل نسيت اسم الوكالة أو كلمة المرور؟</button>
         </div>
 
@@ -626,7 +611,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.22 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.25 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
@@ -776,7 +761,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--gbg);color:var(--g);border:1px solid var(--gbd);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:14px;" id="forced-ver-badge">
-          الإصدار الجديد: v1.0.17
+          الإصدار الجديد: v1.0.25
         </div>
 
         <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px;text-align:right;background:var(--ib);padding:12px;border-radius:14px;border:1px solid var(--bd);">
@@ -789,7 +774,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <button id="btn-apply-forced-update" onclick="applyForcedOtaUpdate()" style="width:100%;background:linear-gradient(135deg, #2E7D32, #1B5E20);color:#fff;border:none;border-radius:16px;padding:15px;font-size:16px;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(46,125,50,0.35);display:flex;align-items:center;justify-content:center;gap:8px;">
-          <span>تحديث التطبيق الآن ⚡</span>
+          <span>تنزيل وتثبيت التحديث الآن (APK) 📥</span>
         </button>
 
       </div>
@@ -1609,6 +1594,42 @@ function getItems(){return agentType==='ghiz'?ITEMS_GHIZ:ITEMS_TAHN;}
 // ══ LOGIN / LOGOUT ══
 
 // تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية
+
+function getLoginInputValue(id) {
+  const el = document.getElementById(id);
+  if (el && el.value && el.value.trim()) return el.value.trim();
+  const all = document.querySelectorAll('#' + id);
+  for (let i = all.length - 1; i >= 0; i--) {
+    const v = (all[i].value || '').trim();
+    if (v) return v;
+  }
+  return (el ? el.value : '').trim();
+}
+
+function cleanupDuplicateLoginElements() {
+  try {
+    const eyeButtons = document.querySelectorAll('#btn-toggle-login-pass');
+    if (eyeButtons.length > 1) {
+      for (let i = 1; i < eyeButtons.length; i++) {
+        eyeButtons[i].remove();
+      }
+    }
+    const userInputs = document.querySelectorAll('#fu');
+    if (userInputs.length > 1) {
+      for (let i = 1; i < userInputs.length; i++) {
+        userInputs[i].remove();
+      }
+    }
+    const passInputs = document.querySelectorAll('#fp');
+    if (passInputs.length > 1) {
+      for (let i = 1; i < passInputs.length; i++) {
+        passInputs[i].remove();
+      }
+    }
+  } catch(_) {}
+}
+document.addEventListener('DOMContentLoaded', cleanupDuplicateLoginElements);
+
 function normalizeArabicDigits(str) {
   if (!str) return '';
   return String(str).trim()
@@ -1659,11 +1680,12 @@ function togglePasswordVisibilityField(inputId, btn, e) {
 }
 
 async function doLogin(){
+  cleanupDuplicateLoginElements();
   loadLocalState();
-  const rawU = document.getElementById('fu').value.trim();
-  const rawP = document.getElementById('fp').value.trim();
-  const u = normalizeArabicDigits(rawU);
-  const p = normalizeArabicDigits(rawP);
+  const rawU = getLoginInputValue('fu');
+  const rawP = getLoginInputValue('fp');
+  const u = normalizeArabicDigits(rawU).trim();
+  const p = normalizeArabicDigits(rawP).trim();
 
   const errEl = document.getElementById('err');
   if (errEl) errEl.style.display = 'none';
@@ -1685,7 +1707,7 @@ async function doLogin(){
   }
   localStorage.setItem('wakil_remember_login', rememberLogin ? 'true' : 'false');
 
-  // 1. فحص دخول المالك (Owner)
+  // 1. فحص دخول المالك (Owner) فوري محلي 0ms
   const isOwner = (u.toLowerCase() === 'admin' || u.toLowerCase() === 'owner') && (p === 'admin2026' || rawP === 'admin2026');
   if (isOwner) {
     loginAsOwner();
@@ -1719,10 +1741,10 @@ async function doLogin(){
     return;
   }
 
-  // 3. فحص الدخول سحابياً إذا لم يتطابق محلياً أو كان وكيلاً جديداً
+  // 3. فحص الدخول سحابياً إذا لم يتطابق محلياً
   if (navigator.onLine) {
     const loginBtn = document.querySelector('#login-card-online .btn-g');
-    const origBtnHtml = loginBtn ? loginBtn.innerHTML : 'تسجيل الدخول سحابياً ‹';
+    const origBtnHtml = loginBtn ? loginBtn.innerHTML : 'تسجيل الدخول ›';
     if (loginBtn) {
       loginBtn.disabled = true;
       loginBtn.innerHTML = '<span>جاري التحقق من الحساب... ⏳</span>';
@@ -1732,7 +1754,7 @@ async function doLogin(){
     try {
       toast('⏳ جاري التحقق من الحساب سحابياً...', false, 'blue');
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 14000);
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const res = await fetch('https://wakil-api.onrender.com/api/login', {
         method: 'POST',
@@ -1754,15 +1776,18 @@ async function doLogin(){
           showFrozenScreen();
           return;
         }
-        if (data.sessionId) localStorage.setItem('wakil_session_id', data.sessionId);
-        if (data.token) localStorage.setItem('wakil_session_token', data.token);
-        if (data.role === 'owner') {
+        if (data.isOwner) {
           loginAsOwner();
           return;
-        } else if (data.role === 'agent' && data.agent) {
-          if (!allAgents.some(a => a.id === data.agent.id)) {
+        }
+        if (data.agent) {
+          const idx = allAgents.findIndex(a => a.id === data.agent.id || a.agencyNumber === data.agent.agencyNumber);
+          if (idx !== -1) {
+            allAgents[idx] = data.agent;
+          } else {
             allAgents.push(data.agent);
           }
+          saveAgents();
           loginAsAgent(data.agent);
           return;
         }
@@ -4008,7 +4033,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.24';
+const BASE_APK_VERSION = '1.0.25';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -4065,33 +4090,24 @@ async function applyForcedOtaUpdate() {
   const btn = document.getElementById('btn-apply-forced-update');
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<span>جاري تحميل وتثبيت التحديث... ⏳</span>';
+    btn.innerHTML = '<span>جاري فتح رابط تنزيل التحديث... ⏳</span>';
     btn.style.opacity = '0.8';
   }
-  try {
-    const bRes = await fetch('https://wakil-api.onrender.com/api/ota-bundle?t=' + Date.now());
-    if (!bRes.ok) throw new Error('تعذر تنزيل حزمة التحديث من السيرفر');
-    const htmlText = await bRes.text();
-    if (!htmlText || !htmlText.includes('تطبيق وكيل') || htmlText.length < 50000) {
-      throw new Error('حزمة التحديث غير صالحة');
-    }
-    const ver = (pendingOtaUpdate && pendingOtaUpdate.version) ? pendingOtaUpdate.version : '1.0.17';
-    localStorage.setItem('wakil_ota_bundle', htmlText);
-    localStorage.setItem('wakil_ota_version', ver);
-    sessionStorage.removeItem('wakil_ota_booted');
-    
-    if (btn) btn.innerHTML = '<span>✅ تم التثبيت! جاري إعادة التشغيل...</span>';
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  } catch(e) {
-    alert('⚠️ حدث خطأ أثناء تنزيل التحديث: ' + (e.message || e) + '\nيرجى التأكد من اتصال الإنترنت والمحاولة مجدداً.');
+  const apkUrl = (pendingOtaUpdate && pendingOtaUpdate.downloadUrl) ? pendingOtaUpdate.downloadUrl : 'https://wakil-api.onrender.com/wakil.apk';
+
+  // تنظيف أي حزم هوائية قديمة لضمان بيئة نظيفة 100%
+  localStorage.removeItem('wakil_ota_bundle');
+  localStorage.removeItem('wakil_ota_version');
+  sessionStorage.removeItem('wakil_ota_booted');
+
+  setTimeout(() => {
+    window.open(apkUrl, '_system') || (window.location.href = apkUrl);
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '<span>إعادة المحاولة 🔄</span>';
+      btn.innerHTML = '<span>✅ بدأ التنزيل! اضغط هنا لإعادة التنزيل 📥</span>';
       btn.style.opacity = '1';
     }
-  }
+  }, 350);
 }
 
 async function checkOtaUpdate(manual = false) {
@@ -4160,13 +4176,7 @@ function getDeviceInfo() {
   return { deviceId, deviceName, platform };
 }
 
-function togglePasswordVisibilityField(inputId, btn) {
-  const inp = document.getElementById(inputId);
-  if (!inp || !btn) return;
-  const isPass = inp.type === 'password';
-  inp.type = isPass ? 'text' : 'password';
-  btn.classList.toggle('active', isPass);
-}
+// duplicate togglePasswordVisibilityField removed
 
 // ── 1. HEARTBEAT & REALTIME PING ──
 let sessionPingInterval = null;
