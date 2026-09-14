@@ -24,11 +24,12 @@ const AGENTS_FILE = path.join(__dirname, 'agents.json');
 const OWNER_FILE = path.join(__dirname, 'owner.json');
 const SESSIONS_FILE = path.join(__dirname, 'sessions.json');
 const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
+const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.28';
-const APP_VERSION_CODE = 28;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/in91md.apk';
+const APP_VERSION = '1.0.29';
+const APP_VERSION_CODE = 29;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/orzeac.apk';
 
 function getSessions() {
   if (!fs.existsSync(SESSIONS_FILE)) return [];
@@ -61,16 +62,93 @@ function saveRevokedSessions(data) {
   } catch (_) {}
 }
 
+// ══ منظومة التعاميم الإدارية المتعددة والمجدولة والمستهدفة ══
+function getAnnouncementsList() {
+  if (!fs.existsSync(ANNOUNCEMENTS_LIST_FILE)) {
+    // ترقية من الملف القديم الفردي إذا وجد
+    if (fs.existsSync(ANNOUNCEMENT_FILE)) {
+      try {
+        const old = JSON.parse(fs.readFileSync(ANNOUNCEMENT_FILE, 'utf8'));
+        if (old && old.text) {
+          const initList = [{
+            id: 'ann_' + Date.now(),
+            title: old.title || 'تعميم إداري رسمي',
+            text: old.text,
+            priority: old.priority || 'normal',
+            targetType: 'all',
+            targetAgencies: [],
+            targetNames: 'كافة الوكلاء في المنظومة',
+            scheduleType: 'now',
+            scheduledAt: null,
+            createdAt: old.createdAt || new Date().toISOString(),
+            updatedAt: old.updatedAt || new Date().toISOString(),
+            active: old.active !== false
+          }];
+          fs.writeFileSync(ANNOUNCEMENTS_LIST_FILE, JSON.stringify(initList, null, 2), 'utf8');
+          return initList;
+        }
+      } catch (_) {}
+    }
+    return [];
+  }
+  try {
+    const list = JSON.parse(fs.readFileSync(ANNOUNCEMENTS_LIST_FILE, 'utf8'));
+    return Array.isArray(list) ? list : [];
+  } catch (_) { return []; }
+}
+
+function saveAnnouncementsList(list) {
+  try {
+    fs.writeFileSync(ANNOUNCEMENTS_LIST_FILE, JSON.stringify(list, null, 2), 'utf8');
+    // أيضاً تحديث أول تعميم نشط في announcement.json لضمان التوافقية مع الأنظمة السابقة
+    const activeFirst = list.find(a => a.active);
+    fs.writeFileSync(ANNOUNCEMENT_FILE, JSON.stringify(activeFirst || { active: false, title: '', text: '' }, null, 2), 'utf8');
+  } catch (_) {}
+}
+
+function getActiveAnnouncementsForUser(agencyNumber, userRole) {
+  const all = getAnnouncementsList();
+  const now = Date.now();
+
+  return all.filter(ann => {
+    if (!ann.active) return false;
+
+    // فحص الجدولة الزمنية: إذا كان مجدولاً في المستقبل، لا يظهر إلا عندما يحين وقته
+    if (ann.scheduleType === 'scheduled' && ann.scheduledAt) {
+      const schTime = new Date(ann.scheduledAt).getTime();
+      if (now < schTime) return false;
+    }
+
+    // الأونر يرى كافة التعاميم
+    if (userRole === 'owner') return true;
+
+    // فحص الجمهور المستهدف
+    if (!ann.targetType || ann.targetType === 'all') return true;
+
+    if (ann.targetType === 'specific') {
+      const agencies = Array.isArray(ann.targetAgencies) ? ann.targetAgencies.map(String) : [];
+      if (agencyNumber && agencies.includes(String(agencyNumber))) return true;
+      return false;
+    }
+
+    return true;
+  });
+}
+
 function getAnnouncement() {
-  if (!fs.existsSync(ANNOUNCEMENT_FILE)) {
-    return { active: false, title: '', text: '', priority: 'normal', updatedAt: null };
-  }
-  try { return JSON.parse(fs.readFileSync(ANNOUNCEMENT_FILE, 'utf8')); } catch (_) {
-    return { active: false, title: '', text: '', priority: 'normal', updatedAt: null };
-  }
+  const list = getAnnouncementsList();
+  return list.find(a => a.active) || { active: false, title: '', text: '', priority: 'normal' };
 }
 function saveAnnouncement(data) {
-  fs.writeFileSync(ANNOUNCEMENT_FILE, JSON.stringify(data, null, 2), 'utf8');
+  let list = getAnnouncementsList();
+  if (data.id) {
+    const idx = list.findIndex(a => a.id === data.id);
+    if (idx !== -1) list[idx] = { ...list[idx], ...data };
+    else list.unshift(data);
+  } else {
+    list.unshift(data);
+  }
+  saveAnnouncementsList(list);
 }
 
 // بيانات الأونر الافتراضية
@@ -427,7 +505,8 @@ app.post('/api/login', (req, res) => {
 app.post('/api/sessions/ping', (req, res) => {
   const { sessionId, sessionToken, deviceId, userRole, agencyNumber, deviceInfo } = req.body;
   let sessions = getSessions();
-  const ann = getAnnouncement();
+  const userAnnouncements = getActiveAnnouncementsForUser(agencyNumber, userRole);
+  const ann = userAnnouncements[0] || { active: false, title: '', text: '' };
   const nowIso = new Date().toISOString();
 
   // 1. المالك العام (Owner) محمي بنسبة 100% - لا يمكن طرده أو تجميده نهائياً
@@ -476,6 +555,7 @@ app.post('/api/sessions/ping', (req, res) => {
       active: true,
       isOwner: true,
       announcement: ann,
+      announcements: userAnnouncements,
       version: APP_VERSION,
       versionCode: APP_VERSION_CODE,
       downloadUrl: APK_DOWNLOAD_URL
@@ -578,6 +658,7 @@ app.post('/api/sessions/ping', (req, res) => {
     success: true,
     active: true,
     announcement: ann,
+    announcements: userAnnouncements,
     version: APP_VERSION,
     versionCode: APP_VERSION_CODE,
     downloadUrl: APK_DOWNLOAD_URL
@@ -950,38 +1031,137 @@ app.post('/api/owner/agents/:id/reset-password', (req, res) => {
 });
 
 // ══ 1.4 BROADCAST ANNOUNCEMENTS (التعاميم الإدارية الفورية للوكلاء) ══
-app.get('/api/announcement', (req, res) => {
-  res.json(getAnnouncement());
+
+// جلب كافة التعاميم للأونر (قائمة التعاميم الكاملة: النشطة والمجدولة)
+app.get('/api/owner/announcements', (req, res) => {
+  const list = getAnnouncementsList();
+  res.json({
+    success: true,
+    total: list.length,
+    announcements: list
+  });
 });
 
-app.post('/api/owner/announcement', (req, res) => {
-  const { title, text, priority } = req.body;
+// إنشاء أو حفظ تعديل تعميم إداري
+app.post('/api/owner/announcements', (req, res) => {
+  const { id, title, text, priority, targetType, targetAgencies, targetNames, scheduleType, scheduledAt, active } = req.body;
   if (!text || !text.trim()) {
     return res.status(400).json({ success: false, message: 'يرجى كتابة نص التعميم' });
   }
 
-  const ann = {
-    id: 'ann_' + Date.now(),
-    active: true,
-    title: (title || 'تعميم إداري رسمي').trim(),
-    text: text.trim(),
-    priority: priority === 'urgent' ? 'urgent' : 'normal',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
+  let list = getAnnouncementsList();
+  const nowIso = new Date().toISOString();
 
-  saveAnnouncement(ann);
-  console.log('Broadcast announcement published:', ann.title);
-  res.json({ success: true, message: 'تم نشر التعميم الإداري لجميع الوكلاء بنجاح 📢', announcement: ann });
+  let targetAnnouncement = null;
+  if (id) {
+    const idx = list.findIndex(a => a.id === id);
+    if (idx !== -1) {
+      list[idx] = {
+        ...list[idx],
+        title: (title || list[idx].title || 'تعميم إداري رسمي').trim(),
+        text: text.trim(),
+        priority: priority === 'urgent' ? 'urgent' : 'normal',
+        targetType: targetType === 'specific' ? 'specific' : 'all',
+        targetAgencies: Array.isArray(targetAgencies) ? targetAgencies : [],
+        targetNames: targetNames || (targetType === 'specific' ? 'وكلاء محددون' : 'كافة الوكلاء'),
+        scheduleType: scheduleType === 'scheduled' ? 'scheduled' : 'now',
+        scheduledAt: (scheduleType === 'scheduled' && scheduledAt) ? scheduledAt : null,
+        active: active !== undefined ? !!active : true,
+        updatedAt: nowIso
+      };
+      targetAnnouncement = list[idx];
+    }
+  }
+
+  if (!targetAnnouncement) {
+    targetAnnouncement = {
+      id: 'ann_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      title: (title || 'تعميم إداري رسمي').trim(),
+      text: text.trim(),
+      priority: priority === 'urgent' ? 'urgent' : 'normal',
+      targetType: targetType === 'specific' ? 'specific' : 'all',
+      targetAgencies: Array.isArray(targetAgencies) ? targetAgencies : [],
+      targetNames: targetNames || (targetType === 'specific' ? 'وكلاء محددون' : 'كافة الوكلاء في المنظومة'),
+      scheduleType: scheduleType === 'scheduled' ? 'scheduled' : 'now',
+      scheduledAt: (scheduleType === 'scheduled' && scheduledAt) ? scheduledAt : null,
+      active: true,
+      createdAt: nowIso,
+      updatedAt: nowIso
+    };
+    list.unshift(targetAnnouncement);
+  }
+
+  saveAnnouncementsList(list);
+  console.log('Announcement saved:', targetAnnouncement.title, 'Target:', targetAnnouncement.targetNames);
+  res.json({
+    success: true,
+    message: 'تم حفظ ونشر التعميم الإداري بنجاح 📢',
+    announcement: targetAnnouncement,
+    announcements: list
+  });
 });
 
-app.delete('/api/owner/announcement', (req, res) => {
-  const ann = getAnnouncement();
-  ann.active = false;
+// حذف تعميم معين
+app.delete('/api/owner/announcements/:id', (req, res) => {
+  const id = req.params.id;
+  let list = getAnnouncementsList();
+  const initLen = list.length;
+  list = list.filter(a => a.id !== id);
+
+  if (list.length === initLen) {
+    return res.status(404).json({ success: false, message: 'التعميم غير موجود أو تم حذفه مسبقاً' });
+  }
+
+  saveAnnouncementsList(list);
+  res.json({ success: true, message: 'تم حذف التعميم الإداري المحدد بنجاح 🗑️', announcements: list });
+});
+
+// تفعيل أو تعطيل تعميم معين
+app.post('/api/owner/announcements/:id/toggle', (req, res) => {
+  const id = req.params.id;
+  let list = getAnnouncementsList();
+  const ann = list.find(a => a.id === id);
+  if (!ann) return res.status(404).json({ success: false, message: 'التعميم غير موجود' });
+
+  ann.active = !ann.active;
   ann.updatedAt = new Date().toISOString();
-  saveAnnouncement(ann);
-  console.log('Broadcast announcement deactivated');
-  res.json({ success: true, message: 'تم إيقاف وحذف التعميم الإداري بنجاح' });
+  saveAnnouncementsList(list);
+
+  res.json({
+    success: true,
+    message: ann.active ? 'تم تفعيل وعرض التعميم بنجاح' : 'تم إيقاف عرض التعميم مؤقتاً',
+    announcement: ann,
+    announcements: list
+  });
+});
+
+// جلب التعاميم النشطة للوكيل المعني
+app.get('/api/announcements', (req, res) => {
+  const agencyNumber = req.query.agencyNumber;
+  const userRole = req.query.userRole || 'agent';
+  const activeList = getActiveAnnouncementsForUser(agencyNumber, userRole);
+  res.json({
+    success: true,
+    total: activeList.length,
+    announcements: activeList
+  });
+});
+
+// مسارات قديمة للتوافقية
+app.get('/api/announcement', (req, res) => {
+  res.json(getAnnouncement());
+});
+app.post('/api/owner/announcement', (req, res) => {
+  req.url = '/api/owner/announcements';
+  app._router.handle(req, res);
+});
+app.delete('/api/owner/announcement', (req, res) => {
+  let list = getAnnouncementsList();
+  if (list.length > 0) {
+    list[0].active = false;
+    saveAnnouncementsList(list);
+  }
+  res.json({ success: true, message: 'تم إيقاف التعميم الحالي' });
 });
 
 // ══ 1.5 FULL SYSTEM BACKUP (تنزيل نسخة احتياطية شاملة للمنظومة) ══

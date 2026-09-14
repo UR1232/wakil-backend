@@ -14,5 +14,21 @@
     "lastActive": "2026-09-14T23:29:20.671Z",
     "isOnline": true,
     "status": "active"
+  },
+  {
+    "id": "sess_1789429306335_bzbtds",
+    "token": "agent_session_1789429306335_b7g8jp3z",
+    "userId": "agent_868",
+    "userRole": "agent",
+    "agencyNumber": "868",
+    "username": "user",
+    "name": "فاضل عباس كريم",
+    "deviceId": "dev_test_phone_alfadhil",
+    "deviceName": "هاتف الفاضل",
+    "platform": "Android",
+    "loginAt": "2026-09-14T23:41:46.336Z",
+    "lastActive": "2026-09-14T23:41:46.341Z",
+    "isOnline": true,
+    "status": "active"
   }
 ]
