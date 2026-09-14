@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.27";
+    var compiledVersion = "1.0.28";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -14,7 +14,7 @@
     sessionStorage.removeItem('wakil_ota_booted');
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.27";
+    window.ACTIVE_APP_VERSION = "1.0.28";
   }
 })();
 </script>
@@ -611,7 +611,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.27 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.28 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
@@ -761,7 +761,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--gbg);color:var(--g);border:1px solid var(--gbd);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:14px;" id="forced-ver-badge">
-          الإصدار الجديد: v1.0.27
+          الإصدار الجديد: v1.0.28
         </div>
 
         <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px;text-align:right;background:var(--ib);padding:12px;border-radius:14px;border:1px solid var(--bd);">
@@ -1869,6 +1869,16 @@ function loginAsAgent(ag){
   const newSessToken = 'tok_ag_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
   localStorage.setItem('wakil_session_id', newSessId);
   localStorage.setItem('wakil_session_token', newSessToken);
+
+  // مسح أي طرد دائم قديم مسجل لهذا الهاتف فور تسجيل الدخول الصحيح
+  try {
+    const devId = (getDeviceInfo && getDeviceInfo().deviceId) || localStorage.getItem('wakil_device_id');
+    fetch('https://wakil-api.onrender.com/api/sessions/clear-revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deviceId: devId, agencyNumber: ag.agencyNumber, userId: ag.id })
+    }).catch(()=>{});
+  } catch(_){}
 
   startSessionHeartbeat();
 
@@ -4050,7 +4060,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.27';
+const BASE_APK_VERSION = '1.0.28';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -4382,7 +4392,14 @@ function handleRemoteRevokedSession(customReason) {
   localStorage.removeItem('wakil_remember_login');
 
   const reasonText = customReason || 'تم إنهاء جلستك وطرد هذا الجهاز فوراً من قبل الإدارة العامة للمنظومة.';
-  alert('⚠️ تنبيه إداري هام:\n\n' + reasonText);
+  const reasonEl = document.getElementById('remote-kick-reason-text');
+  if (reasonEl) reasonEl.textContent = reasonText;
+
+  showMod('m-remote-kick-dialog');
+}
+
+function dismissRemoteKickDialog() {
+  closeMod('m-remote-kick-dialog');
   doLogout();
 }
 
@@ -5001,7 +5018,38 @@ window.addEventListener('afterprint', () => {
 
     
     <!-- ═══ MODAL: OWNER CUSTOM KICK REASON ═══ -->
-    <div class="overlay" id="m-owner-kick-reason" onclick="closeMod('m-owner-kick-reason',event)">
+    
+    <!-- ═══ MODAL: PROFESSIONAL REMOTE KICK DIALOG ═══ -->
+    <div class="overlay" id="m-remote-kick-dialog" style="z-index:99999999;backdrop-filter:blur(6px);background:rgba(0,0,0,0.65);">
+      <div class="modal" onclick="event.stopPropagation()" style="max-width:380px;border-radius:20px;border:1.5px solid #FFCDD2;box-shadow:0 12px 36px rgba(0,0,0,0.4);text-align:center;padding:22px 18px;">
+        <div style="width:65px;height:65px;border-radius:50%;background:#FFEBEE;border:2px solid #EF9A9A;color:#D32F2F;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;box-shadow:0 4px 14px rgba(211,47,47,0.2);">
+          🚪
+        </div>
+        <h3 style="font-size:18px;font-weight:900;color:#C62828;margin:0 0 6px;">تم تسجيل خروجك من قبل الإدارة</h3>
+        <div style="font-size:12px;color:var(--mt);line-height:1.5;margin-bottom:14px;">
+          تم إنهاء جلسة هذا الجهاز بقرار إداري صادر من إدارة المنظومة العامة (المالك).
+        </div>
+
+        <div style="background:#FFF9C4;border:1.5px dashed #FBC02D;border-radius:12px;padding:12px;margin-bottom:16px;text-align:right;">
+          <div style="font-size:11px;font-weight:800;color:#E65100;margin-bottom:4px;display:flex;align-items:center;gap:5px;">
+            <span>📋</span><span>سبب الطرد المحدد من الإدارة:</span>
+          </div>
+          <div id="remote-kick-reason-text" style="font-size:13.5px;font-weight:800;color:#37474F;line-height:1.5;">
+            تم إنهاء جلستك وطرد هذا الجهاز من قبل الإدارة العامة للمنظومة.
+          </div>
+        </div>
+
+        <div style="font-size:11px;color:var(--mt);margin-bottom:16px;">
+          يمكنك مراجعة إدارة المنظومة أو إعادة تسجيل الدخول بالبيانات الصحيحة.
+        </div>
+
+        <button class="btn-g" onclick="dismissRemoteKickDialog()" style="width:100%;padding:13px;font-size:14px;font-weight:800;background:linear-gradient(135deg,#D32F2F,#B71C1C);box-shadow:0 4px 14px rgba(211,47,47,0.35);margin:0;border-radius:12px;">
+          العودة لشاشة الدخول 🔑
+        </button>
+      </div>
+    </div>
+
+    <div class="overlay" id="m-owner-kick-reason" onclick="closeMod('m-owner-kick-reason',event)" style="z-index:9999999;">
       <div class="modal" onclick="event.stopPropagation()">
         <div class="modal-t" style="display:flex;align-items:center;gap:6px;color:#C62828;">
           <span>🚪</span><span>تأكيد طرد جهاز الوكيل</span>

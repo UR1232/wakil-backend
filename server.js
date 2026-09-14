@@ -26,9 +26,9 @@ const SESSIONS_FILE = path.join(__dirname, 'sessions.json');
 const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.27';
-const APP_VERSION_CODE = 27;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/qbx2tt.apk';
+const APP_VERSION = '1.0.28';
+const APP_VERSION_CODE = 28;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/in91md.apk';
 
 function getSessions() {
   if (!fs.existsSync(SESSIONS_FILE)) return [];
@@ -253,6 +253,27 @@ app.get('/wakil.apk', (req, res) => {
   }
 });
 
+
+// مسح الطرد القديم عند تسجيل الدخول الجديد بكلمة المرور
+app.post('/api/sessions/clear-revoke', (req, res) => {
+  const { deviceId, agencyNumber, userId } = req.body;
+  if (!deviceId) return res.json({ success: true });
+  
+  let revokedList = getRevokedSessions();
+  const initialLen = revokedList.length;
+  revokedList = revokedList.filter(r => {
+    if (r.deviceId === deviceId) {
+      if (agencyNumber && String(r.agencyNumber) === String(agencyNumber)) return false;
+      if (userId && r.userId === userId) return false;
+    }
+    return true;
+  });
+  if (revokedList.length !== initialLen) {
+    saveRevokedSessions(revokedList);
+  }
+  res.json({ success: true, message: 'Revocation cleared' });
+});
+
 // ══ 1. AUTHENTICATION (تسجيل الدخول الذكي مع تسجيل الجهاز والجلسة) ══
 app.post('/api/login', (req, res) => {
   const { username, password, agentType, deviceInfo } = req.body;
@@ -369,6 +390,14 @@ app.post('/api/login', (req, res) => {
     });
     saveSessions(sessions);
 
+    // مسح أي طرد دائم مسجل لهذا الجهاز فور تسجيل الدخول الصحيح بكلمة المرور
+    let revokedList = getRevokedSessions();
+    const prevLen = revokedList.length;
+    revokedList = revokedList.filter(r => !(r.deviceId === devId && (String(r.agencyNumber) === String(matched.agencyNumber) || r.userId === matched.id)));
+    if (revokedList.length !== prevLen) {
+      saveRevokedSessions(revokedList);
+    }
+
     return res.json({
       success: true,
       role: 'agent',
@@ -470,13 +499,33 @@ app.post('/api/sessions/ping', (req, res) => {
     }
   }
 
+  // 4. البحث عن الجلسة النشطة أولاً
+  let activeSession = sessions.find(s => 
+    ((sessionId && s.id === sessionId) || 
+     (sessionToken && s.token === sessionToken) || 
+     (deviceId && s.deviceId === deviceId && s.userRole === 'agent')) && 
+    s.status === 'active'
+  );
+
   // 3. فحص الطرد الدائم (سواء كان الوكيل أونلاين أو كان أوفلاين وعاد للتطبيق لاحقاً)
   const revokedList = getRevokedSessions();
-  const explicitRevoked = revokedList.find(r => 
-    (sessionId && r.sessionId === sessionId) ||
-    (sessionToken && r.sessionToken === sessionToken) ||
-    (deviceId && r.deviceId === deviceId && (agencyNumber ? String(r.agencyNumber) === String(agencyNumber) : true))
-  );
+  const explicitRevoked = revokedList.find(r => {
+    // إذا كان الطرد صريحاً بنفس رقم الجلسة أو التوكن
+    if (sessionId && r.sessionId === sessionId) return true;
+    if (sessionToken && r.sessionToken === sessionToken) return true;
+
+    // إذا كان الطرد بمعرف الجهاز
+    if (deviceId && r.deviceId === deviceId && (agencyNumber ? String(r.agencyNumber) === String(agencyNumber) : true)) {
+      // إذا كانت الجلسة الحالية قد سجلت دخول بعد تاريخ الطرد، فهذا تسجيل دخول جديد شرعي ولا يُطرد
+      if (activeSession && activeSession.loginAt && r.revokedAt) {
+        const loginTime = new Date(activeSession.loginAt).getTime();
+        const revokeTime = new Date(r.revokedAt).getTime();
+        if (loginTime >= revokeTime) return false;
+      }
+      return true;
+    }
+    return false;
+  });
 
   if (explicitRevoked) {
     return res.json({
@@ -490,13 +539,7 @@ app.post('/api/sessions/ping', (req, res) => {
     });
   }
 
-  // 4. تحديث الجلسة النشطة للوكيل
-  let activeSession = sessions.find(s => 
-    ((sessionId && s.id === sessionId) || 
-     (sessionToken && s.token === sessionToken) || 
-     (deviceId && s.deviceId === deviceId && s.userRole === 'agent')) && 
-    s.status === 'active'
-  );
+
 
   if (activeSession) {
     activeSession.lastActive = nowIso;

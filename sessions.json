@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "sess_owner_test",
+    "token": "tok_owner_test",
+    "userId": "owner",
+    "userRole": "owner",
+    "agencyNumber": null,
+    "username": "admin",
+    "name": "المالك العام للمنظومة",
+    "deviceId": "dev_test_phone_offline",
+    "deviceName": "هاتف المالك",
+    "platform": "Android",
+    "loginAt": "2026-09-14T23:29:20.671Z",
+    "lastActive": "2026-09-14T23:29:20.671Z",
+    "isOnline": true,
+    "status": "active"
+  }
+]
