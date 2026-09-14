@@ -24,31 +24,42 @@ const AGENTS_FILE = path.join(__dirname, 'agents.json');
 const OWNER_FILE = path.join(__dirname, 'owner.json');
 const SESSIONS_FILE = path.join(__dirname, 'sessions.json');
 const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
+const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
+
+const APP_VERSION = '1.0.27';
+const APP_VERSION_CODE = 27;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/qbx2tt.apk';
 
 function getSessions() {
   if (!fs.existsSync(SESSIONS_FILE)) return [];
   try {
     const list = JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8'));
     if (!Array.isArray(list)) return [];
-    const now = Date.now();
-    return list.filter(s => {
-      if (s.status === 'revoked') {
-        const t = new Date(s.revokedAt || s.lastActive || 0).getTime();
-        return (now - t < 15 * 60 * 1000);
-      }
-      return true;
-    });
+    return list;
   } catch (_) { return []; }
 }
 function saveSessions(data) {
   fs.writeFileSync(SESSIONS_FILE, JSON.stringify(data, null, 2), 'utf8');
 }
 
-// تنظيف أي جلسات ملغاة قديمة فور إقلاع السيرفر
-try {
-  let initSessions = getSessions().filter(s => s.status === 'active');
-  saveSessions(initSessions);
-} catch(_) {}
+function getRevokedSessions() {
+  if (!fs.existsSync(REVOKED_FILE)) return [];
+  try {
+    const list = JSON.parse(fs.readFileSync(REVOKED_FILE, 'utf8'));
+    if (!Array.isArray(list)) return [];
+    const now = Date.now();
+    // تخليد الطرد الدائم لمدة 30 يوماً لضمان طرد أي جهاز أوفلاين يعود لاحقاً
+    return list.filter(r => {
+      const t = new Date(r.revokedAt || 0).getTime();
+      return (now - t < 30 * 24 * 60 * 60 * 1000);
+    });
+  } catch (_) { return []; }
+}
+function saveRevokedSessions(data) {
+  try {
+    fs.writeFileSync(REVOKED_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (_) {}
+}
 
 function getAnnouncement() {
   if (!fs.existsSync(ANNOUNCEMENT_FILE)) {
@@ -199,11 +210,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.26',
-    versionCode: 26,
+    version: APP_VERSION,
+    versionCode: APP_VERSION_CODE,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/sife8s.apk',
-    notes: 'إصدار v1.0.26: حماية تامة وشاملة لحساب المالك وفصل جلسات الوكلاء لمنع تسجيل الخروج نهائياً وحل مشكلة الأجهزة المتصلة.',
+    downloadUrl: APK_DOWNLOAD_URL,
+    notes: 'إصدار v1.0.27: تحديث فوري وسلس من داخل التطبيق بنقرة واحدة، إمكانية مشاركة وحفظ النسخة الاحتياطية في مجلد التنزيلات، تفعيل تعميم الإدارة، وطرد الأجهزة الأوفلاين بشكل دائم مع سبب الطرد المخصص.',
     updatedAt: new Date().toISOString()
   });
 });
@@ -435,7 +446,10 @@ app.post('/api/sessions/ping', (req, res) => {
       success: true,
       active: true,
       isOwner: true,
-      announcement: ann
+      announcement: ann,
+      version: APP_VERSION,
+      versionCode: APP_VERSION_CODE,
+      downloadUrl: APK_DOWNLOAD_URL
     });
   }
 
@@ -448,24 +462,31 @@ app.post('/api/sessions/ping', (req, res) => {
         success: false,
         isFrozen: true,
         message: 'تم تجميد حساب الوكالة من قبل الإدارة العامة للمنظومة',
-        announcement: ann
+        announcement: ann,
+        version: APP_VERSION,
+        versionCode: APP_VERSION_CODE,
+        downloadUrl: APK_DOWNLOAD_URL
       });
     }
   }
 
-  // 3. فحص هل الجلسة ملغاة / مطرودة صراحة فقط برقم الجلسة أو التوكن (وليس بمعرّف الجهاز)
-  const explicitRevoked = sessions.find(s => 
-    s.status === 'revoked' &&
-    s.userRole !== 'owner' &&
-    ((sessionId && s.id === sessionId) || (sessionToken && s.token === sessionToken))
+  // 3. فحص الطرد الدائم (سواء كان الوكيل أونلاين أو كان أوفلاين وعاد للتطبيق لاحقاً)
+  const revokedList = getRevokedSessions();
+  const explicitRevoked = revokedList.find(r => 
+    (sessionId && r.sessionId === sessionId) ||
+    (sessionToken && r.sessionToken === sessionToken) ||
+    (deviceId && r.deviceId === deviceId && (agencyNumber ? String(r.agencyNumber) === String(agencyNumber) : true))
   );
 
   if (explicitRevoked) {
     return res.json({
       success: false,
       revoked: true,
-      message: 'تم إنهاء جلستك على هذا الجهاز من قبل الإدارة أو من جهاز آخر',
-      announcement: ann
+      message: explicitRevoked.revokeReason || 'تم إنهاء جلستك وطرد هذا الجهاز من قبل الإدارة',
+      announcement: ann,
+      version: APP_VERSION,
+      versionCode: APP_VERSION_CODE,
+      downloadUrl: APK_DOWNLOAD_URL
     });
   }
 
@@ -513,7 +534,10 @@ app.post('/api/sessions/ping', (req, res) => {
   res.json({
     success: true,
     active: true,
-    announcement: ann
+    announcement: ann,
+    version: APP_VERSION,
+    versionCode: APP_VERSION_CODE,
+    downloadUrl: APK_DOWNLOAD_URL
   });
 });
 
@@ -731,9 +755,12 @@ app.get('/api/owner/agents/:id/sessions', (req, res) => {
 
 // طرد أجهزة وكيل من قبل الأونر (بدون أي كلمة مرور للوكيل مطلقاً)
 app.post('/api/owner/sessions/revoke', (req, res) => {
-  const { targetSessionId, agentId, agencyNumber, revokeAll } = req.body;
+  const { targetSessionId, agentId, agencyNumber, revokeAll, reason } = req.body;
+  const kickReason = (reason && reason.trim()) ? reason.trim() : 'تم إنهاء جلستك وطرد هذا الجهاز من قبل الإدارة العامة للمنظومة.';
   let sessions = getSessions();
+  let revokedList = getRevokedSessions();
   let count = 0;
+  const nowIso = new Date().toISOString();
 
   sessions.forEach(s => {
     // حماية تامة للمالك: لا يجوز طرد أو إلغاء أي جلسة تابعة للمالك مطلقاً هنا
@@ -745,21 +772,59 @@ app.post('/api/owner/sessions/revoke', (req, res) => {
       if (matchAg && s.status === 'active') {
         s.status = 'revoked';
         s.isOnline = false;
-        s.revokedAt = new Date().toISOString();
+        s.revokedAt = nowIso;
+        s.revokeReason = kickReason;
         count++;
+
+        revokedList.push({
+          sessionId: s.id,
+          sessionToken: s.token,
+          deviceId: s.deviceId,
+          agencyNumber: s.agencyNumber,
+          userId: s.userId,
+          revokedAt: nowIso,
+          revokeReason: kickReason,
+          revokedBy: 'owner'
+        });
       }
     } else if (targetSessionId) {
-      if ((s.id === targetSessionId) && s.status === 'active') {
+      if ((s.id === targetSessionId || s.deviceId === targetSessionId) && s.status === 'active') {
         s.status = 'revoked';
         s.isOnline = false;
-        s.revokedAt = new Date().toISOString();
+        s.revokedAt = nowIso;
+        s.revokeReason = kickReason;
         count++;
+
+        revokedList.push({
+          sessionId: s.id,
+          sessionToken: s.token,
+          deviceId: s.deviceId,
+          agencyNumber: s.agencyNumber,
+          userId: s.userId,
+          revokedAt: nowIso,
+          revokeReason: kickReason,
+          revokedBy: 'owner'
+        });
       }
     }
   });
 
+  // إذا كانت الجلسة أوفلاين وغير موجودة في الجلسات النشطة، يتم تخليد الطرد الدائم أيضاً
+  if (count === 0 && targetSessionId) {
+    revokedList.push({
+      sessionId: targetSessionId,
+      agencyNumber: agencyNumber || null,
+      userId: agentId || null,
+      revokedAt: nowIso,
+      revokeReason: kickReason,
+      revokedBy: 'owner'
+    });
+    count = 1;
+  }
+
   saveSessions(sessions);
-  res.json({ success: true, message: 'تم طرد جهاز الوكيل فوراً بنجاح دون الحاجة لكلمة سر!', count });
+  saveRevokedSessions(revokedList);
+  res.json({ success: true, message: 'تم طرد جهاز الوكيل فوراً بنجاح وحفظ سبب الطرد!', count, reason: kickReason });
 });
 
 // ══ 1.2 FREEZE / SUSPEND AGENCY (قفل وتجميد حساب الوكالة) ══

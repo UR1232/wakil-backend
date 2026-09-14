@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.26";
+    var compiledVersion = "1.0.27";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -14,7 +14,7 @@
     sessionStorage.removeItem('wakil_ota_booted');
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.26";
+    window.ACTIVE_APP_VERSION = "1.0.27";
   }
 })();
 </script>
@@ -611,7 +611,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.26 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.27 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
@@ -761,7 +761,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--gbg);color:var(--g);border:1px solid var(--gbd);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:14px;" id="forced-ver-badge">
-          الإصدار الجديد: v1.0.26
+          الإصدار الجديد: v1.0.27
         </div>
 
         <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px;text-align:right;background:var(--ib);padding:12px;border-radius:14px;border:1px solid var(--bd);">
@@ -4050,7 +4050,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.26';
+const BASE_APK_VERSION = '1.0.27';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -4105,26 +4105,63 @@ function showForcedUpdateModal(data) {
 
 async function applyForcedOtaUpdate() {
   const btn = document.getElementById('btn-apply-forced-update');
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<span>جاري فتح رابط تنزيل التحديث... ⏳</span>';
-    btn.style.opacity = '0.8';
-  }
   const apkUrl = (pendingOtaUpdate && pendingOtaUpdate.downloadUrl) ? pendingOtaUpdate.downloadUrl : 'https://wakil-api.onrender.com/wakil.apk';
+  const verName = (pendingOtaUpdate && pendingOtaUpdate.version) ? pendingOtaUpdate.version : CURRENT_LIVE_VERSION;
 
-  // تنظيف أي حزم هوائية قديمة لضمان بيئة نظيفة 100%
+  // تنظيف أي حزم قديمة
   localStorage.removeItem('wakil_ota_bundle');
   localStorage.removeItem('wakil_ota_version');
   sessionStorage.removeItem('wakil_ota_booted');
 
+  // 1. التنزيل والتثبيت المباشر من داخل التطبيق إذا كان على هاتف أندرويد
+  if (window.AndroidNativeApp && window.AndroidNativeApp.downloadAndInstallApk) {
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span id="update-download-text">⏳ جاري تنزيل التحديث... 0%</span>';
+      btn.style.opacity = '0.9';
+    }
+
+    window.onUpdateDownloadProgress = function(percent) {
+      const t = document.getElementById('update-download-text');
+      if (t) t.textContent = '⏳ جاري تنزيل التحديث... ' + percent + '%';
+      if (btn) btn.style.background = 'linear-gradient(to left, #2E7D32 ' + percent + '%, #1565C0 ' + percent + '%)';
+    };
+
+    window.onUpdateDownloadComplete = function() {
+      const t = document.getElementById('update-download-text');
+      if (t) t.textContent = '✅ اكتمل التنزيل! جاري فتح التثبيت...';
+      if (btn) {
+        btn.disabled = false;
+        btn.style.background = '#2E7D32';
+        btn.innerHTML = '<span>✅ اضغط هنا لتثبيت التحديث الآن 📲</span>';
+      }
+    };
+
+    window.onUpdateDownloadError = function(err) {
+      if (btn) {
+        btn.disabled = false;
+        btn.style.background = '#C62828';
+        btn.innerHTML = '<span>❌ فشل التنزيل المباشر — اضغط للتحميل عبر المتصفح</span>';
+        btn.onclick = () => window.open(apkUrl, '_system');
+      }
+    };
+
+    window.AndroidNativeApp.downloadAndInstallApk(apkUrl, verName);
+    return;
+  }
+
+  // 2. في المتصفح العادي كإجراء احتياطي
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>جاري فتح رابط التحديث... ⏳</span>';
+  }
   setTimeout(() => {
     window.open(apkUrl, '_system') || (window.location.href = apkUrl);
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '<span>✅ بدأ التنزيل! اضغط هنا لإعادة التنزيل 📥</span>';
-      btn.style.opacity = '1';
+      btn.innerHTML = '<span>📥 بدأ التنزيل عبر المتصفح! اضغط للإعادة</span>';
     }
-  }, 350);
+  }, 300);
 }
 
 async function checkOtaUpdate(manual = false) {
@@ -4245,6 +4282,17 @@ async function pingSession() {
         renderBroadcastBanner(data.announcement);
       }
 
+      // التحقق من وجود تحديث جديد مباشرة أثناء استخدام التطبيق
+      if (data.version && data.version !== CURRENT_LIVE_VERSION) {
+        pendingOtaUpdate = {
+          version: data.version,
+          versionCode: data.versionCode || 27,
+          downloadUrl: data.downloadUrl || 'https://wakil-api.onrender.com/wakil.apk',
+          notes: data.notes || 'يتوفر إصدار جديد للمنظومة'
+        };
+        showForcedUpdateModal(pendingOtaUpdate);
+      }
+
       // المالك محمي بنسبة 100% ولا يخضع لأي طرد أو تجميد
       if (isOwner) {
         hideFrozenScreen();
@@ -4261,7 +4309,7 @@ async function pingSession() {
 
       // Check Revocation (طرد فوري للجهاز للوكلاء فقط)
       if (data.revoked) {
-        handleRemoteRevokedSession();
+        handleRemoteRevokedSession(data.message);
         return;
       }
     }
@@ -4319,7 +4367,7 @@ document.addEventListener('pointerdown', () => {
   }
 }, { passive: true });
 
-function handleRemoteRevokedSession() {
+function handleRemoteRevokedSession(customReason) {
   // المالك محمي كلياً
   if (currentUserRole === 'owner') return;
 
@@ -4333,7 +4381,8 @@ function handleRemoteRevokedSession() {
   localStorage.removeItem('wakil_has_logged_in');
   localStorage.removeItem('wakil_remember_login');
 
-  alert('⚠️ تم إنهاء جلستك وطرد هذا الجهاز فوراً من قبل الإدارة.');
+  const reasonText = customReason || 'تم إنهاء جلستك وطرد هذا الجهاز فوراً من قبل الإدارة العامة للمنظومة.';
+  alert('⚠️ تنبيه إداري هام:\n\n' + reasonText);
   doLogout();
 }
 
@@ -4369,12 +4418,37 @@ function closeBroadcastBanner() {
 }
 
 function openBroadcastModal() {
-  document.getElementById('broadcast-input-text').value = '';
+  const tInput = document.getElementById('broadcast-text-input');
+  const titleInput = document.getElementById('broadcast-title-input');
+  const badge = document.getElementById('broadcast-status-badge');
+  const delBtn = document.getElementById('btn-delete-broadcast');
+
+  if (currentActiveAnnouncement && currentActiveAnnouncement.active && currentActiveAnnouncement.text) {
+    if (tInput) tInput.value = currentActiveAnnouncement.text;
+    if (titleInput) titleInput.value = currentActiveAnnouncement.title || '';
+    if (badge) {
+      badge.style.display = 'block';
+      badge.innerHTML = '📌 هناك تعميم نشط حالياً معروض لكافة الوكلاء. يمكنك تعديله أو حذفه.';
+    }
+    if (delBtn) delBtn.style.display = 'block';
+  } else {
+    if (tInput) tInput.value = '';
+    if (titleInput) titleInput.value = '';
+    if (badge) badge.style.display = 'none';
+    if (delBtn) delBtn.style.display = 'none';
+  }
   showMod('m-broadcast-modal');
 }
 
-async function sendBroadcastAnnouncement() {
-  const text = document.getElementById('broadcast-input-text').value.trim();
+async function submitBroadcastAnnouncement() {
+  const textEl = document.getElementById('broadcast-text-input');
+  const titleEl = document.getElementById('broadcast-title-input');
+  const prioEl = document.querySelector('input[name="broadcast-priority"]:checked');
+
+  const text = textEl ? textEl.value.trim() : '';
+  const title = titleEl ? titleEl.value.trim() : 'تعميم إداري رسمي';
+  const priority = prioEl ? prioEl.value : 'normal';
+
   if (!text) {
     toast('⚠️ يرجى كتابة نص التعميم أولاً', true);
     return;
@@ -4384,33 +4458,43 @@ async function sendBroadcastAnnouncement() {
     const res = await fetch('https://wakil-api.onrender.com/api/owner/announcement', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, active: true })
+      body: JSON.stringify({ title, text, priority })
     });
     const data = await res.json();
     if (data.success) {
-      toast('📢 تم بث التعميم بنجاح لجميع الوكلاء!', false);
+      toast('📢 تم نشر التعميم الإداري بنجاح!', false);
       closeMod('m-broadcast-modal');
-      renderBroadcastBanner({ active: true, text });
+      renderBroadcastBanner({ active: true, title, text, priority });
+    } else {
+      toast('❌ ' + (data.message || 'تعذر نشر التعميم'), true);
     }
   } catch(_) {
-    toast('❌ تعذر بث التعميم', true);
+    toast('❌ تعذر الاتصال بالسيرفر لبث التعميم', true);
   }
 }
+const sendBroadcastAnnouncement = submitBroadcastAnnouncement;
 
-async function clearBroadcastAnnouncement() {
+async function deleteActiveBroadcast() {
+  if (!confirm('هل أنت متأكد من إيقاف وحذف هذا التعميم؟ لن يظهر مجدداً للوكلاء.')) return;
   try {
-    await fetch('https://wakil-api.onrender.com/api/owner/announcement', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: '', active: false })
+    toast('⏳ جاري إيقاف التعميم...', false, 'blue');
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/announcement', {
+      method: 'DELETE'
     });
-    toast('تم إلغاء التعميم', false);
-    closeMod('m-broadcast-modal');
-    closeBroadcastBanner();
+    const data = await res.json();
+    if (data.success) {
+      toast('🗑️ تم إيقاف وحذف التعميم بنجاح', false);
+      currentActiveAnnouncement = null;
+      closeMod('m-broadcast-modal');
+      closeBroadcastBanner();
+    } else {
+      toast('❌ تعذر حذف التعميم', true);
+    }
   } catch(_) {
-    toast('❌ خطأ في إلغاء التعميم', true);
+    toast('❌ تعذر الاتصال بالسيرفر لحذف التعميم', true);
   }
 }
+const clearBroadcastAnnouncement = deleteActiveBroadcast;
 
 // ── شارة حالة الاتصال (أونلاين / أوفلاين) ──
 function renderPresenceBadge(s) {
@@ -4624,48 +4708,49 @@ function renderOwnerAgentSessionsList(sessions) {
   }).join('');
 }
 
-async function ownerRevokeSingleAgentDevice(sessionId) {
-  try {
-    toast('⏳ جاري طرد الجهاز فوراً...', false, 'blue');
-    const res = await fetch('https://wakil-api.onrender.com/api/owner/sessions/revoke', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        targetSessionId: sessionId,
-        agentId: ownerInspectingAgentId
-      })
-    });
-    const data = await res.json();
-    if (data.success) {
-      toast('🚪 تم طرد جهاز الوكيل فوراً بنجاح!', false);
-      openAgentSessionsModal(ownerInspectingAgentId, ownerInspectingAgencyNumber, '');
-    }
-  } catch(_) {
-    toast('❌ تعذر الاتصال بالسيرفر', true);
-  }
+let pendingOwnerRevokeData = null;
+
+function ownerRevokeSingleAgentDevice(sessionId) {
+  pendingOwnerRevokeData = { targetSessionId: sessionId, agentId: ownerInspectingAgentId, agencyNumber: ownerInspectingAgencyNumber, revokeAll: false };
+  const rInput = document.getElementById('owner-kick-reason-input');
+  if (rInput) rInput.value = 'تم إنهاء جلستك وطرد هذا الجهاز من قبل الإدارة العامة للمنظومة.';
+  showMod('m-owner-kick-reason');
 }
 
-async function ownerRevokeAllAgentDevices() {
-  if (!confirm('هل أنت متأكد من رغبتك بطرد كافة الأجهزة المتصلة بحساب هذا الوكيل فوراً؟')) return;
+function ownerRevokeAllAgentDevices() {
+  pendingOwnerRevokeData = { agentId: ownerInspectingAgentId, agencyNumber: ownerInspectingAgencyNumber, revokeAll: true };
+  const rInput = document.getElementById('owner-kick-reason-input');
+  if (rInput) rInput.value = 'تم إنهاء كافة جلسات هذا الحساب من قبل الإدارة العامة للمنظومة.';
+  showMod('m-owner-kick-reason');
+}
+
+async function confirmOwnerRevokeWithReason() {
+  if (!pendingOwnerRevokeData) return;
+  const rInput = document.getElementById('owner-kick-reason-input');
+  const reason = (rInput && rInput.value.trim()) ? rInput.value.trim() : 'تم إنهاء جلستك وطرد هذا الجهاز من قبل الإدارة العامة للمنظومة.';
+
+  closeMod('m-owner-kick-reason');
   try {
-    toast('⏳ جاري طرد كافة أجهزة الوكيل...', false, 'blue');
+    toast('⏳ جاري طرد الجهاز وحفظ سبب الطرد...', false, 'blue');
     const res = await fetch('https://wakil-api.onrender.com/api/owner/sessions/revoke', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        agentId: ownerInspectingAgentId,
-        agencyNumber: ownerInspectingAgencyNumber,
-        revokeAll: true
+        ...pendingOwnerRevokeData,
+        reason
       })
     });
     const data = await res.json();
     if (data.success) {
-      toast('🚪 تم طرد كافة أجهزة الوكيل فوراً بنجاح!', false);
+      toast('🚪 تم طرد جهاز الوكيل وحفظ السبب بنجاح!', false);
       openAgentSessionsModal(ownerInspectingAgentId, ownerInspectingAgencyNumber, '');
+    } else {
+      toast('❌ ' + (data.message || 'فشلت عملية الطرد'), true);
     }
   } catch(_) {
     toast('❌ تعذر الاتصال بالسيرفر', true);
   }
+  pendingOwnerRevokeData = null;
 }
 
 // ── 5. OWNER'S OWN DEVICES (PASSWORD REQUIRED) ──
@@ -4862,18 +4947,28 @@ async function downloadFullSystemBackup() {
 
     const backupData = await res.json();
     const jsonStr = JSON.stringify(backupData, null, 2);
+    const fileName = `wakil_full_system_backup_${new Date().toISOString().slice(0, 10)}.json`;
+
+    // 1. إذا كان التطبيق يعمل داخل بيئة الأندرويد الأصلية
+    if (window.AndroidNativeApp && window.AndroidNativeApp.saveAndShareBackup) {
+      window.AndroidNativeApp.saveAndShareBackup(fileName, jsonStr);
+      toast('💾 تم إرسال النسخة الاحتياطية إلى التنزيلات وفتح نافذة المشاركة!', false, 'green');
+      return;
+    }
+
+    // 2. في المتصفح أو بيئة الويب
     const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = `wakil_full_system_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    toast('💾 تم تنزيل النسخة الاحتياطية الشاملة للمنظومة بنجاح!', false);
+    toast('💾 تم تنزيل النسخة الاحتياطية بنجاح إلى مجلد التنزيلات على جهازك!', false);
   } catch(err) {
     console.error('Backup download error:', err);
     toast('❌ تعذر تنزيل النسخة الاحتياطية سحابياً', true);
@@ -4903,6 +4998,33 @@ window.addEventListener('afterprint', () => {
   if (pm) pm.innerHTML = '';
 });
 </script>
+
+    
+    <!-- ═══ MODAL: OWNER CUSTOM KICK REASON ═══ -->
+    <div class="overlay" id="m-owner-kick-reason" onclick="closeMod('m-owner-kick-reason',event)">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-t" style="display:flex;align-items:center;gap:6px;color:#C62828;">
+          <span>🚪</span><span>تأكيد طرد جهاز الوكيل</span>
+        </div>
+        <div style="font-size:12px;color:var(--mt);margin-bottom:12px;">
+          اكتب رسالة توضيحية لسبب الطرد لتظهر للوكيل فوراً على شاشته عند تسجيل خروجه:
+        </div>
+
+        <div>
+          <label style="font-size:11.5px;font-weight:700;color:var(--tx2);">سبب إنهاء الجلسة والطرد:</label>
+          <textarea id="owner-kick-reason-input" class="srch-i" style="width:100%;height:80px;margin-top:4px;resize:none;line-height:1.4;" placeholder="اكتب سبب الطرد هنا...">تم إنهاء جلستك وطرد هذا الجهاز من قبل الإدارة العامة للمنظومة.</textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+          <button class="btn-g" onclick="confirmOwnerRevokeWithReason()" style="margin:0;background:#D32F2F;box-shadow:0 3px 10px rgba(211,47,47,0.3);">
+            🚪 تأكيد الطرد فوراً
+          </button>
+          <button class="btn-close" onclick="closeMod('m-owner-kick-reason')" style="margin:0;">
+            إلغاء
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- ═══ MODAL: OWNER BROADCAST ANNOUNCEMENT ═══ -->
     <div class="overlay" id="m-broadcast-modal" onclick="closeMod('m-broadcast-modal',event)">
