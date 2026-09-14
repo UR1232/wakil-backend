@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.25";
+    var compiledVersion = "1.0.26";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -14,7 +14,7 @@
     sessionStorage.removeItem('wakil_ota_booted');
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.25";
+    window.ACTIVE_APP_VERSION = "1.0.26";
   }
 })();
 </script>
@@ -611,7 +611,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.25 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.26 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
@@ -761,7 +761,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--gbg);color:var(--g);border:1px solid var(--gbd);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:14px;" id="forced-ver-badge">
-          الإصدار الجديد: v1.0.25
+          الإصدار الجديد: v1.0.26
         </div>
 
         <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px;text-align:right;background:var(--ib);padding:12px;border-radius:14px;border:1px solid var(--bd);">
@@ -1817,12 +1817,21 @@ async function doLogin(){
 }
 
 function loginAsOwner(){
-  startSessionHeartbeat();
   currentUserRole = 'owner';
   ownerViewingAgent = null;
+  currentAgent = null;
   localStorage.setItem('wakil_user_role', 'owner');
   localStorage.setItem('wakil_has_logged_in', 'true');
+  localStorage.removeItem('wakil_current_agent');
   if (rememberLogin) localStorage.setItem('wakil_remember_login', 'true');
+
+  // توليد معرّف جلسة جديد ونظيف خاص بالمالك
+  const newSessId = 'sess_owner_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const newSessToken = 'tok_owner_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+  localStorage.setItem('wakil_session_id', newSessId);
+  localStorage.setItem('wakil_session_token', newSessToken);
+
+  startSessionHeartbeat();
 
   document.getElementById('err').style.display = 'none';
   document.getElementById('bnav').style.display = 'flex';
@@ -1845,7 +1854,6 @@ function loginAsOwner(){
 }
 
 function loginAsAgent(ag){
-  startSessionHeartbeat();
   currentUserRole = 'agent';
   currentAgent = ag;
   ownerViewingAgent = null;
@@ -1855,6 +1863,14 @@ function loginAsAgent(ag){
   localStorage.setItem('wakil_current_agent', JSON.stringify(ag));
   localStorage.setItem('wakil_has_logged_in', 'true');
   if (rememberLogin) localStorage.setItem('wakil_remember_login', 'true');
+
+  // توليد معرّف جلسة جديد ونظيف خاص بالوكيل
+  const newSessId = 'sess_ag_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+  const newSessToken = 'tok_ag_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+  localStorage.setItem('wakil_session_id', newSessId);
+  localStorage.setItem('wakil_session_token', newSessToken);
+
+  startSessionHeartbeat();
 
   document.getElementById('err').style.display = 'none';
   document.getElementById('bnav').style.display = 'flex';
@@ -2421,6 +2437,7 @@ async function openAgentRosterView(agentId){
 
 function exitOwnerAgentView(){
   ownerViewingAgent = null;
+  currentAgent = null;
   const banner = document.getElementById('owner-agent-banner');
   if (banner) banner.style.display = 'none';
   goAgents();
@@ -4033,7 +4050,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.25';
+const BASE_APK_VERSION = '1.0.26';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -4200,8 +4217,11 @@ async function pingSession() {
   const sessionId = localStorage.getItem('wakil_session_id');
   const sessionToken = localStorage.getItem('wakil_session_token');
   const deviceInfo = getDeviceInfo();
-  const agencyNumber = currentAgent ? currentAgent.agencyNumber : null;
-  const userRole = currentUserRole || 'agent';
+
+  // إذا كان المستخدم مالكاً، لا نرسل رمز وكالة نهائياً لمنع أي ربط غير مقصود
+  const isOwner = (currentUserRole === 'owner');
+  const userRole = isOwner ? 'owner' : 'agent';
+  const agencyNumber = isOwner ? null : (currentAgent ? currentAgent.agencyNumber : null);
 
   try {
     const res = await fetch('https://wakil-api.onrender.com/api/sessions/ping', {
@@ -4225,7 +4245,13 @@ async function pingSession() {
         renderBroadcastBanner(data.announcement);
       }
 
-      // Check Account Freeze
+      // المالك محمي بنسبة 100% ولا يخضع لأي طرد أو تجميد
+      if (isOwner) {
+        hideFrozenScreen();
+        return;
+      }
+
+      // Check Account Freeze (للوكلاء فقط)
       if (data.isFrozen) {
         showFrozenScreen();
         return;
@@ -4233,7 +4259,7 @@ async function pingSession() {
         hideFrozenScreen();
       }
 
-      // Check Revocation (طرد فوري للجهاز)
+      // Check Revocation (طرد فوري للجهاز للوكلاء فقط)
       if (data.revoked) {
         handleRemoteRevokedSession();
         return;
@@ -4294,6 +4320,9 @@ document.addEventListener('pointerdown', () => {
 }, { passive: true });
 
 function handleRemoteRevokedSession() {
+  // المالك محمي كلياً
+  if (currentUserRole === 'owner') return;
+
   if (sessionPingInterval) clearInterval(sessionPingInterval);
   
   // مسح بيانات الدخول محلياً فوراً لمنع أي وصول

@@ -27,11 +27,28 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 
 function getSessions() {
   if (!fs.existsSync(SESSIONS_FILE)) return [];
-  try { return JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8')); } catch (_) { return []; }
+  try {
+    const list = JSON.parse(fs.readFileSync(SESSIONS_FILE, 'utf8'));
+    if (!Array.isArray(list)) return [];
+    const now = Date.now();
+    return list.filter(s => {
+      if (s.status === 'revoked') {
+        const t = new Date(s.revokedAt || s.lastActive || 0).getTime();
+        return (now - t < 15 * 60 * 1000);
+      }
+      return true;
+    });
+  } catch (_) { return []; }
 }
 function saveSessions(data) {
   fs.writeFileSync(SESSIONS_FILE, JSON.stringify(data, null, 2), 'utf8');
 }
+
+// تنظيف أي جلسات ملغاة قديمة فور إقلاع السيرفر
+try {
+  let initSessions = getSessions().filter(s => s.status === 'active');
+  saveSessions(initSessions);
+} catch(_) {}
 
 function getAnnouncement() {
   if (!fs.existsSync(ANNOUNCEMENT_FILE)) {
@@ -182,11 +199,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: '1.0.25',
-    versionCode: 25,
+    version: '1.0.26',
+    versionCode: 26,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
-    downloadUrl: 'https://files.catbox.moe/9g2n97.apk',
-    notes: 'إصدار v1.0.25: حل جذري ونهائي لتدبيل زر العين السحرية وإصلاح فوري لتسجيل الدخول وتنظيف شامل للذاكرة التخزينية.',
+    downloadUrl: 'https://files.catbox.moe/sife8s.apk',
+    notes: 'إصدار v1.0.26: حماية تامة وشاملة لحساب المالك وفصل جلسات الوكلاء لمنع تسجيل الخروج نهائياً وحل مشكلة الأجهزة المتصلة.',
     updatedAt: new Date().toISOString()
   });
 });
@@ -369,11 +386,61 @@ app.post('/api/login', (req, res) => {
 // نبض الجلسة وفحص الحالة والتعاميم (Heartbeat & Ping)
 app.post('/api/sessions/ping', (req, res) => {
   const { sessionId, sessionToken, deviceId, userRole, agencyNumber, deviceInfo } = req.body;
-  const sessions = getSessions();
+  let sessions = getSessions();
   const ann = getAnnouncement();
+  const nowIso = new Date().toISOString();
 
-  // 1. فحص هل حساب الوكيل مجمّد؟
-  if (userRole === 'agent' && agencyNumber) {
+  // 1. المالك العام (Owner) محمي بنسبة 100% - لا يمكن طرده أو تجميده نهائياً
+  const isOwner = (userRole === 'owner');
+
+  if (isOwner) {
+    let activeSession = sessions.find(s => 
+      ((sessionId && s.id === sessionId) || 
+       (sessionToken && s.token === sessionToken) || 
+       (deviceId && s.deviceId === deviceId && (s.userRole === 'owner' || s.userId === 'owner'))) && 
+      s.status === 'active'
+    );
+
+    if (activeSession) {
+      activeSession.lastActive = nowIso;
+      activeSession.isOnline = true;
+      activeSession.agencyNumber = null; // المالك ليس له رمز وكالة
+      if (deviceInfo && deviceInfo.deviceName) activeSession.deviceName = deviceInfo.deviceName;
+      if (deviceInfo && deviceInfo.platform) activeSession.platform = deviceInfo.platform;
+      saveSessions(sessions);
+    } else if (deviceId || sessionId) {
+      const devName = (deviceInfo && deviceInfo.deviceName) || 'هاتف المالك';
+      const devPlat = (deviceInfo && deviceInfo.platform) || 'Android';
+      const newSession = {
+        id: sessionId || ('sess_owner_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6)),
+        token: sessionToken || ('tok_owner_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8)),
+        userId: 'owner',
+        userRole: 'owner',
+        agencyNumber: null,
+        username: 'admin',
+        name: 'المالك العام للمنظومة',
+        deviceId: deviceId || ('dev_' + Math.random().toString(36).substr(2, 8)),
+        deviceName: devName,
+        platform: devPlat,
+        loginAt: nowIso,
+        lastActive: nowIso,
+        isOnline: true,
+        status: 'active'
+      };
+      sessions.push(newSession);
+      saveSessions(sessions);
+    }
+
+    return res.json({
+      success: true,
+      active: true,
+      isOwner: true,
+      announcement: ann
+    });
+  }
+
+  // 2. فحص هل حساب الوكيل مجمّد؟ (للوكلاء فقط)
+  if (agencyNumber) {
     const agents = getAgents();
     const ag = agents.find(a => String(a.agencyNumber) === String(agencyNumber));
     if (ag && ag.isFrozen) {
@@ -386,13 +453,11 @@ app.post('/api/sessions/ping', (req, res) => {
     }
   }
 
-  // 2. فحص هل الجلسة ملغاة / مطرودة صراحة فقط؟
-  // التحقق إما برقم الجلسة أو التوكن أو معرّف الجهاز
+  // 3. فحص هل الجلسة ملغاة / مطرودة صراحة فقط برقم الجلسة أو التوكن (وليس بمعرّف الجهاز)
   const explicitRevoked = sessions.find(s => 
-    ((sessionId && s.id === sessionId) || 
-     (sessionToken && s.token === sessionToken) || 
-     (deviceId && s.deviceId === deviceId && (s.userRole === userRole || (!s.userRole && userRole === 'agent')))) && 
-    s.status === 'revoked'
+    s.status === 'revoked' &&
+    s.userRole !== 'owner' &&
+    ((sessionId && s.id === sessionId) || (sessionToken && s.token === sessionToken))
   );
 
   if (explicitRevoked) {
@@ -404,15 +469,13 @@ app.post('/api/sessions/ping', (req, res) => {
     });
   }
 
-  // 3. تحديث الجلسة النشطة أو تسجيلها تلقائياً إذا لم تكن موجودة
+  // 4. تحديث الجلسة النشطة للوكيل
   let activeSession = sessions.find(s => 
     ((sessionId && s.id === sessionId) || 
      (sessionToken && s.token === sessionToken) || 
-     (deviceId && s.deviceId === deviceId && s.userRole === userRole)) && 
+     (deviceId && s.deviceId === deviceId && s.userRole === 'agent')) && 
     s.status === 'active'
   );
-
-  const nowIso = new Date().toISOString();
 
   if (activeSession) {
     activeSession.lastActive = nowIso;
@@ -430,11 +493,11 @@ app.post('/api/sessions/ping', (req, res) => {
     const newSession = {
       id: sessionId || ('sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6)),
       token: sessionToken || ('tok_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8)),
-      userId: userRole === 'owner' ? 'owner' : (matchedAg ? matchedAg.id : (agencyNumber ? 'agent_' + agencyNumber : 'agent')),
-      userRole: userRole || 'agent',
+      userId: matchedAg ? matchedAg.id : (agencyNumber ? 'agent_' + agencyNumber : 'agent'),
+      userRole: 'agent',
       agencyNumber: agencyNumber ? String(agencyNumber) : null,
-      username: userRole === 'owner' ? 'admin' : (matchedAg ? matchedAg.username : (agencyNumber || 'user')),
-      name: userRole === 'owner' ? 'المالك العام للمنظومة' : (matchedAg ? matchedAg.name : 'وكيل'),
+      username: matchedAg ? matchedAg.username : (agencyNumber || 'user'),
+      name: matchedAg ? matchedAg.name : 'وكيل',
       deviceId: deviceId || ('dev_' + Math.random().toString(36).substr(2, 8)),
       deviceName: devName,
       platform: devPlat,
@@ -454,7 +517,6 @@ app.post('/api/sessions/ping', (req, res) => {
   });
 });
 
-// إشعار الخروج إلى الخلفية أو إغلاق التطبيق (Offline Presence Signal)
 app.post('/api/sessions/offline', (req, res) => {
   const { sessionId, sessionToken, deviceId } = req.body;
   let sessions = getSessions();
@@ -533,8 +595,11 @@ app.post('/api/sessions/revoke', (req, res) => {
   let sessions = getSessions();
   let revokedCount = 0;
 
-  if (revokeAllOthers) {
-    sessions.forEach(s => {
+  sessions.forEach(s => {
+    // لا يمكن لأي وكيل طرد جلسة مالك
+    if (!isOwnerAuth && (s.userRole === 'owner' || s.userId === 'owner')) return;
+
+    if (revokeAllOthers) {
       const matchOwner = isOwnerAuth && (s.userRole === 'owner' || s.userId === 'owner');
       const matchAgent = isAgentAuth && (
         s.userId === matchedAg.id || 
@@ -548,18 +613,15 @@ app.post('/api/sessions/revoke', (req, res) => {
         s.revokedAt = new Date().toISOString();
         revokedCount++;
       }
-    });
-  } else if (targetSessionId) {
-    sessions.forEach(s => {
-      const isTarget = (s.id === targetSessionId || s.deviceId === targetSessionId);
-      if (isTarget) {
+    } else if (targetSessionId) {
+      if (s.id === targetSessionId && s.status === 'active') {
         s.status = 'revoked';
         s.isOnline = false;
         s.revokedAt = new Date().toISOString();
         revokedCount++;
       }
-    });
-  }
+    }
+  });
 
   saveSessions(sessions);
 
@@ -673,8 +735,11 @@ app.post('/api/owner/sessions/revoke', (req, res) => {
   let sessions = getSessions();
   let count = 0;
 
-  if (revokeAll) {
-    sessions.forEach(s => {
+  sessions.forEach(s => {
+    // حماية تامة للمالك: لا يجوز طرد أو إلغاء أي جلسة تابعة للمالك مطلقاً هنا
+    if (s.userRole === 'owner' || s.userId === 'owner') return;
+
+    if (revokeAll) {
       const matchAg = (agentId && (s.userId === agentId || s.userId === 'agent_' + agentId)) ||
                       (agencyNumber && (String(s.agencyNumber) === String(agencyNumber) || s.userId === 'agent_' + agencyNumber));
       if (matchAg && s.status === 'active') {
@@ -683,17 +748,15 @@ app.post('/api/owner/sessions/revoke', (req, res) => {
         s.revokedAt = new Date().toISOString();
         count++;
       }
-    });
-  } else if (targetSessionId) {
-    sessions.forEach(s => {
-      if (s.id === targetSessionId || s.deviceId === targetSessionId) {
+    } else if (targetSessionId) {
+      if ((s.id === targetSessionId) && s.status === 'active') {
         s.status = 'revoked';
         s.isOnline = false;
         s.revokedAt = new Date().toISOString();
         count++;
       }
-    });
-  }
+    }
+  });
 
   saveSessions(sessions);
   res.json({ success: true, message: 'تم طرد جهاز الوكيل فوراً بنجاح دون الحاجة لكلمة سر!', count });
