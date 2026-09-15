@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.50";
+    var compiledVersion = "1.0.51";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.50";
+    window.ACTIVE_APP_VERSION = "1.0.51";
   }
 })();
 </script>
@@ -1096,7 +1096,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
       </div>
     </div>
 
-            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.50) ═══ -->
+            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.51) ═══ -->
     <div class="overlay" id="m-switch-accounts" onclick="closeMod('m-switch-accounts',event)">
       <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;width:92%;padding:20px;border-radius:24px;">
         <div class="modal-t" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -1107,7 +1107,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
           <button onclick="closeMod('m-switch-accounts')" style="background:transparent;border:none;font-size:20px;color:var(--tx2);cursor:pointer;padding:2px 8px;">✕</button>
         </div>
         <p style="font-size:12.5px;color:var(--mt);margin-bottom:14px;line-height:1.5;">
-          يمكنك التبديل فوراً بين وكالتك الغذائية ووكالة الطحين أو الحسابات المسجلة لديك بنقرة واحدة:
+          التبديل الفوري بين وكالتك الغذائية ووكالة الطحين التابعة لك بنقرة واحدة:
         </p>
 
         <!-- Saved Accounts List Mount -->
@@ -1115,11 +1115,14 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
           <!-- Dynamically populated -->
         </div>
 
-        <!-- Add Another Account Button -->
-        <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
-          <button class="btn-g" onclick="openAddAccountToSwitchModal()" style="background:#2E7D32;margin:0;padding:11px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;">
-            <span>➕ إضافة وكالة / حساب آخر للحفظ والتبديل</span>
+        <!-- Add Another Account Button Box -->
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;" id="switch-actions-box">
+          <button class="btn-g" id="btn-open-add-switch" onclick="openAddAccountToSwitchModal()" style="background:#2E7D32;margin:0;padding:11px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <span id="btn-open-add-switch-text">➕ إضافة الوكالة الثانية للحفظ والتبديل</span>
           </button>
+          <div id="both-accounts-linked-badge" style="display:none;background:var(--ib);border:1.5px solid var(--bd);border-radius:12px;padding:10px 12px;text-align:center;font-size:12px;color:var(--g);font-weight:800;align-items:center;justify-content:center;gap:6px;">
+            <span>✅</span><span>تم ربط الوكالتين (الغذائية والطحين) بنجاح</span>
+          </div>
           <button class="btn-close" onclick="closeMod('m-switch-accounts')" style="margin:0;">إغلاق النافذة</button>
         </div>
       </div>
@@ -1129,13 +1132,15 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
     <div class="overlay" id="m-add-switch-account" onclick="closeMod('m-add-switch-account',event)">
       <div class="modal" onclick="event.stopPropagation()" style="max-width:380px;width:90%;padding:22px;border-radius:22px;">
         <div class="modal-t" style="display:flex;align-items:center;gap:8px;font-size:16px;">
-          <span>➕</span><span>إضافة حساب للتبديل السريع</span>
+          <span>➕</span><span id="sw-add-modal-title">إضافة الوكالة الثانية للتبديل</span>
         </div>
-        <p style="font-size:12px;color:var(--mt);margin-bottom:14px;">أدخل بيانات الوكالة الأخرى (مثلاً وكالة الطحين أو وكيل آخر) لحفظها في قائمة التبديل السريع على هذا الهاتف:</p>
+        <p style="font-size:12px;color:var(--mt);margin-bottom:14px;line-height:1.5;" id="sw-add-modal-desc">
+          أدخل بيانات الوكالة الثانية لحفظها في قائمة التبديل السريع على هذا الهاتف:
+        </p>
 
         <div style="margin-bottom:12px;">
           <div class="flbl">اسم المستخدم (أو رقم الوكالة)</div>
-          <input class="field" id="sw-add-username" type="text" placeholder="مثال: tahn_user أو رقم الوكالة..." />
+          <input class="field" id="sw-add-username" type="text" placeholder="اسم المستخدم أو رقم الوكالة..." />
         </div>
 
         <div style="margin-bottom:14px;">
@@ -4359,7 +4364,7 @@ function executeRenameMonth(){
 }
 
 
-// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.50) ══
+// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.51) ══
 function saveLocalState() {
   try {
     const agency = (ownerViewingAgent && ownerViewingAgent.agencyNumber) ? ownerViewingAgent.agencyNumber : (currentAgent ? currentAgent.agencyNumber : '868');
@@ -4466,8 +4471,8 @@ function loadLocalState() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.50) ═══
-// ══════════════════════════════════════════════════════════════════
+// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.51) ═══
+// 🔒 قاعدة صارمة: تظهر فقط الحسابات التي سجل الدخول بها المستخدم أو أضافها يدوياً (غذائية + طحين)
 
 function getSavedAccounts() {
   let list = [];
@@ -4478,30 +4483,43 @@ function getSavedAccounts() {
 
   if (!Array.isArray(list)) list = [];
 
-  // دائماً نضمن وجود الحساب الحالي النشط في القائمة
+  // تصفية صارمة: لا نأخذ كل وكلاء allAgents إطلاقاً، بل فقط الحساب النشط والحساب الذي أضافه المستخدم يدوياً
+  list = list.filter(a => {
+    if (!a) return false;
+    // إذا كان حساب المالك وهو مسجل كمالك حالياً
+    if (a.role === 'owner' && currentUserRole === 'owner') return true;
+    // إذا كان هو الوكيل النشط حالياً
+    if (a.role === 'agent' && currentAgent && String(a.agencyNumber) === String(currentAgent.agencyNumber)) return true;
+    // أو إذا كان حساباً أضافه المستخدم بيده وموثقاً
+    return !!a.isManuallyAdded;
+  });
+
+  // نضمن تسجيل الحساب النشط دائماً
   autoRegisterCurrentAccountToList(list);
 
-  // إتاحة الوكالات المسجلة في allAgents
-  if (Array.isArray(allAgents)) {
-    allAgents.forEach(ag => {
-      const exists = list.some(a => a.role === 'agent' && String(a.agencyNumber) === String(ag.agencyNumber));
-      if (!exists) {
-        list.push({
-          id: ag.id || ('agent_' + ag.agencyNumber),
-          name: ag.name,
-          username: ag.username,
-          agencyNumber: ag.agencyNumber,
-          type: ag.type || 'ghiz',
-          role: 'agent',
-          lastUsed: (currentAgent && String(currentAgent.agencyNumber) === String(ag.agencyNumber)) ? Date.now() : 0
-        });
-      }
-    });
+  // حصر القائمة: وكيل غذائية واحد + وكيل طحين واحد فقط (أو حساب الأونر)
+  const ghizAcc = list.find(a => a.type === 'ghiz' || a.type === 'غذائية');
+  const tahnAcc = list.find(a => a.type === 'tahn' || a.type === 'طحين');
+  const ownerAcc = list.find(a => a.role === 'owner');
+
+  const finalList = [];
+  if (currentUserRole === 'owner' && ownerAcc) {
+    finalList.push(ownerAcc);
+    if (ghizAcc) finalList.push(ghizAcc);
+    if (tahnAcc) finalList.push(tahnAcc);
+  } else {
+    // للأفراد والوكلاء: فقط الغذائية والطحين التابعين له
+    if (currentAgent && (currentAgent.type === 'tahn' || currentAgent.type === 'طحين')) {
+      if (tahnAcc) finalList.push(tahnAcc);
+      if (ghizAcc) finalList.push(ghizAcc);
+    } else {
+      if (ghizAcc) finalList.push(ghizAcc);
+      if (tahnAcc) finalList.push(tahnAcc);
+    }
   }
 
-  list.sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
-  try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
-  return list;
+  try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(finalList)); } catch(_) {}
+  return finalList;
 }
 
 function autoRegisterCurrentAccountToList(list) {
@@ -4522,27 +4540,28 @@ function autoRegisterCurrentAccountToList(list) {
       if (ow) ow.lastUsed = Date.now();
     }
   } else if (currentAgent) {
-    const idx = list.findIndex(a => a.role === 'agent' && String(a.agencyNumber) === String(currentAgent.agencyNumber));
-    if (idx !== -1) {
-      list[idx] = {
-        ...list[idx],
-        name: currentAgent.name,
-        username: currentAgent.username,
-        agencyNumber: currentAgent.agencyNumber,
-        type: currentAgent.type || 'ghiz',
-        role: 'agent',
-        lastUsed: Date.now()
-      };
+    const isTahn = (currentAgent.type === 'tahn' || currentAgent.type === 'طحين');
+    const existingIdx = list.findIndex(a => 
+      String(a.agencyNumber) === String(currentAgent.agencyNumber) || 
+      (isTahn && (a.type === 'tahn' || a.type === 'طحين') && !a.isManuallyAdded) ||
+      (!isTahn && (a.type === 'ghiz' || a.type === 'غذائية') && !a.isManuallyAdded)
+    );
+
+    const agObj = {
+      id: currentAgent.id || ('agent_' + currentAgent.agencyNumber),
+      name: currentAgent.name,
+      username: currentAgent.username,
+      agencyNumber: currentAgent.agencyNumber,
+      type: currentAgent.type || 'ghiz',
+      role: 'agent',
+      isManuallyAdded: false, // الحساب الأساسي الذي بدأ به
+      lastUsed: Date.now()
+    };
+
+    if (existingIdx !== -1) {
+      list[existingIdx] = { ...list[existingIdx], ...agObj };
     } else {
-      list.unshift({
-        id: currentAgent.id || ('agent_' + currentAgent.agencyNumber),
-        name: currentAgent.name,
-        username: currentAgent.username,
-        agencyNumber: currentAgent.agencyNumber,
-        type: currentAgent.type || 'ghiz',
-        role: 'agent',
-        lastUsed: Date.now()
-      });
+      list.unshift(agObj);
     }
   }
 }
@@ -4562,8 +4581,37 @@ function renderSwitchAccountsList() {
   if (!container) return;
 
   const accounts = getSavedAccounts();
+  const currentIsGhiz = (currentAgent && (currentAgent.type === 'ghiz' || currentAgent.type === 'غذائية'));
+  const currentIsTahn = (currentAgent && (currentAgent.type === 'tahn' || currentAgent.type === 'طحين'));
+
+  const hasGhiz = accounts.some(a => a.type === 'ghiz' || a.type === 'غذائية');
+  const hasTahn = accounts.some(a => a.type === 'tahn' || a.type === 'طحين');
+
+  // التحكم بظهور زر "إضافة الوكالة الثانية"
+  const addBtn = document.getElementById('btn-open-add-switch');
+  const addBtnText = document.getElementById('btn-open-add-switch-text');
+  const bothBadge = document.getElementById('both-accounts-linked-badge');
+
+  if (addBtn && bothBadge) {
+    if (hasGhiz && hasTahn) {
+      // كلاهما مربوطان (غذائية + طحين)
+      addBtn.style.display = 'none';
+      bothBadge.style.display = 'flex';
+    } else {
+      addBtn.style.display = 'flex';
+      bothBadge.style.display = 'none';
+      if (addBtnText) {
+        if (currentIsGhiz || !hasTahn) {
+          addBtnText.textContent = '➕ إضافة وكالة الطحين (الوكالة الثانية) 🌾';
+        } else {
+          addBtnText.textContent = '➕ إضافة الوكالة الغذائية (الوكالة الثانية) 🛒';
+        }
+      }
+    }
+  }
+
   if (!accounts || accounts.length === 0) {
-    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">لا توجد حسابات أخرى محفوظة حالياً</div>';
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">لا توجد حسابات مسجلة حالياً</div>';
     return;
   }
 
@@ -4605,17 +4653,15 @@ function renderSwitchAccountsList() {
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
           ${isCurrent ? `
             <span style="font-size:11px;font-weight:900;color:#2E7D32;background:#E8F5E9;padding:6px 10px;border-radius:10px;border:1px solid #A5D6A7;display:flex;align-items:center;gap:4px;">
-              <span>🟢</span><span>الحساب الحالي</span>
+              <span>🟢</span><span>النشط حالياً</span>
             </span>
           ` : `
-            <button onclick="switchToSavedAccount('${acc.id}')" style="background:linear-gradient(135deg, #1565C0, #0D47A1);color:#fff;border:none;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(21,101,192,0.3);">
+            <button onclick="switchToSavedAccount('${acc.id || acc.agencyNumber}')" style="background:linear-gradient(135deg, #1565C0, #0D47A1);color:#fff;border:none;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(21,101,192,0.3);">
               <span>تبديل ‹</span>
             </button>
-            ${accounts.length > 1 ? `
-              <button onclick="removeSavedAccountFromSwitcher('${acc.id}', '${safeName}')" style="background:var(--rbg);color:var(--r);border:none;border-radius:8px;padding:6px 8px;font-size:11px;cursor:pointer;" title="إزالة الحساب من القائمة">
-                ✕
-              </button>
-            ` : ''}
+            <button onclick="removeSavedAccountFromSwitcher('${acc.id || acc.agencyNumber}', '${safeName}')" style="background:var(--rbg);color:var(--r);border:none;border-radius:8px;padding:6px 8px;font-size:11px;cursor:pointer;" title="حذف ربط هذا الحساب">
+              ✕
+            </button>
           `}
         </div>
       </div>
@@ -4627,7 +4673,7 @@ function renderSwitchAccountsList() {
 
 function switchToSavedAccount(accountId) {
   const accounts = getSavedAccounts();
-  const target = accounts.find(a => a.id === accountId);
+  const target = accounts.find(a => (a.id && a.id === accountId) || String(a.agencyNumber) === String(accountId));
   if (!target) return;
 
   // 1. حفظ بيانات الحساب الحالي قبل التبديل
@@ -4669,19 +4715,43 @@ function switchToSavedAccount(accountId) {
 
 function removeSavedAccountFromSwitcher(accId, accName) {
   let list = getSavedAccounts();
-  list = list.filter(a => a.id !== accId);
+  // التأكد من عدم حذف الحساب النشط
+  const target = list.find(a => (a.id && a.id === accId) || String(a.agencyNumber) === String(accId));
+  if (target) {
+    const isCurrent = (target.role === 'owner' && currentUserRole === 'owner') ||
+      (target.role === 'agent' && currentAgent && String(target.agencyNumber) === String(currentAgent.agencyNumber));
+    if (isCurrent) {
+      toast('⚠️ لا يمكن إزالة الحساب النشط حالياً، يجب التبديل للحساب الآخر أولاً', false, 'orange');
+      return;
+    }
+  }
+
+  list = list.filter(a => !( (a.id && a.id === accId) || String(a.agencyNumber) === String(accId) ));
   try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
   renderSwitchAccountsList();
-  toast(`تمت إزالة (${accName}) من قائمة التبديل السريع`, false, 'blue');
+  toast(`تم فك ربط (${accName}) من قائمة التبديل السريع`, false, 'blue');
 }
 
 function openAddAccountToSwitchModal() {
-  const uInp = document.getElementById('sw-add-username');
-  const pInp = document.getElementById('sw-add-password');
-  if (uInp) uInp.value = '';
-  if (pInp) pInp.value = '';
+  const currentIsGhiz = (currentAgent && (currentAgent.type === 'ghiz' || currentAgent.type === 'غذائية'));
+  const targetTypeLabel = currentIsGhiz ? 'وكالة الطحين 🌾' : 'الوكالة الغذائية 🛒';
+  const targetTypeHint = currentIsGhiz ? 'طحين' : 'غذائية';
+
+  const titleEl = document.getElementById('sw-add-modal-title');
+  const descEl = document.getElementById('sw-add-modal-desc');
+  const inp = document.getElementById('sw-add-username');
+  const pass = document.getElementById('sw-add-password');
+
+  if (titleEl) titleEl.textContent = '➕ إضافة ' + targetTypeLabel;
+  if (descEl) descEl.textContent = `أدخل بيانات ${targetTypeLabel} التابعة لك (اسم المستخدم أو رقم الوكالة وكلمة المرور) لحفظها والتبديل بين الوكالتين بسهولة:`;
+  if (inp) {
+    inp.value = '';
+    inp.placeholder = `اسم مستخدم أو رقم وكالة الـ ${targetTypeHint}...`;
+  }
+  if (pass) pass.value = '';
+
   showMod('m-add-switch-account');
-  setTimeout(() => { if (uInp) uInp.focus(); }, 150);
+  setTimeout(() => { if (inp) inp.focus(); }, 150);
 }
 
 async function submitAddAccountToSwitcher() {
@@ -4695,103 +4765,80 @@ async function submitAddAccountToSwitcher() {
     return;
   }
 
-  // 1. هل هو حساب المالك؟
-  const ownerPhones = ['07832629471', '07800000000'];
-  if (ownerPhones.includes(u) && (p === '07832629471' || p === '123123' || p === '112233' || p === '0000')) {
-    const list = getSavedAccounts();
-    const exists = list.some(a => a.role === 'owner');
-    if (!exists) {
-      list.push({
-        id: 'owner_main',
-        name: 'المالك العام للمنظومة 👑',
-        username: u,
-        agencyNumber: '—',
-        type: 'owner',
-        role: 'owner',
-        lastUsed: Date.now()
-      });
-      try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
-    }
-    closeMod('m-add-switch-account');
-    renderSwitchAccountsList();
-    toast('✅ تمت إضافة حساب المالك بنجاح إلى قائمة التبديل!', false, 'green');
-    return;
-  }
+  const currentIsGhiz = (currentAgent && (currentAgent.type === 'ghiz' || currentAgent.type === 'غذائية'));
+  const currentIsTahn = (currentAgent && (currentAgent.type === 'tahn' || currentAgent.type === 'طحين'));
 
-  // 2. هل الحساب موجود محلياً في allAgents؟
-  const localAgent = (allAgents || []).find(a => 
+  // 1. فحص الحساب محلياً في allAgents أولاً
+  let matchedAgent = (allAgents || []).find(a => 
     (a.username && a.username.toLowerCase() === u.toLowerCase()) || 
     String(a.agencyNumber) === u
   );
 
-  if (localAgent && (localAgent.password === p || p === '00000000')) {
-    const list = getSavedAccounts();
-    const exists = list.some(a => a.role === 'agent' && String(a.agencyNumber) === String(localAgent.agencyNumber));
-    if (!exists) {
-      list.push({
-        id: localAgent.id || ('agent_' + localAgent.agencyNumber),
-        name: localAgent.name,
-        username: localAgent.username,
-        agencyNumber: localAgent.agencyNumber,
-        type: localAgent.type || 'ghiz',
-        role: 'agent',
-        lastUsed: Date.now()
+  let verifiedAgent = null;
+  if (matchedAgent && (matchedAgent.password === p || p === '00000000')) {
+    verifiedAgent = matchedAgent;
+  } else if (navigator.onLine) {
+    // 2. التحقق السحابي عبر السيرفر
+    toast('⏳ جاري التحقق من بيانات الحساب سحابياً...', false, 'blue');
+    try {
+      const res = await fetch('https://wakil-api.onrender.com/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: u, password: p })
       });
-      try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
-    }
-    closeMod('m-add-switch-account');
-    renderSwitchAccountsList();
-    toast(`✅ تمت إضافة وكالة (${localAgent.name} - ${localAgent.agencyNumber}) لقائمة التبديل!`, false, 'green');
-    return;
-  }
-
-  // 3. التحقق السحابي عبر السيرفر
-  if (!navigator.onLine) {
-    toast('⚠️ لم يتم العثور على الحساب محلياً، ويتطلب التحقق اتصالاً بالإنترنت', false, 'red');
-    return;
-  }
-
-  toast('⏳ جاري التحقق من بيانات الحساب سحابياً...', false, 'blue');
-  try {
-    const res = await fetch('https://wakil-api.onrender.com/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: u, password: p })
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success && data.agent) {
-        const ag = data.agent;
-        if (!allAgents) allAgents = [];
-        if (!allAgents.some(a => String(a.agencyNumber) === String(ag.agencyNumber))) {
-          allAgents.push(ag);
-          saveAgents();
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.agent) {
+          verifiedAgent = data.agent;
+          if (!allAgents) allAgents = [];
+          if (!allAgents.some(a => String(a.agencyNumber) === String(verifiedAgent.agencyNumber))) {
+            allAgents.push(verifiedAgent);
+            saveAgents();
+          }
         }
-
-        const list = getSavedAccounts();
-        const exists = list.some(a => a.role === 'agent' && String(a.agencyNumber) === String(ag.agencyNumber));
-        if (!exists) {
-          list.push({
-            id: ag.id || ('agent_' + ag.agencyNumber),
-            name: ag.name,
-            username: ag.username,
-            agencyNumber: ag.agencyNumber,
-            type: ag.type || 'ghiz',
-            role: 'agent',
-            lastUsed: Date.now()
-          });
-          try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
-        }
-
-        closeMod('m-add-switch-account');
-        renderSwitchAccountsList();
-        toast(`✅ تم التحقق وإضافة وكالة (${ag.name}) بنجاح!`, false, 'green');
-        return;
       }
-    }
-  } catch(_) {}
+    } catch(_) {}
+  }
 
-  toast('⚠️ اسم المستخدم أو كلمة المرور غير صحيحة، يرجى التأكد والمحاولة مجدداً', false, 'red');
+  if (!verifiedAgent) {
+    toast('⚠️ اسم المستخدم أو كلمة المرور غير صحيحة، يرجى التأكد والمحاولة مجدداً', false, 'red');
+    return;
+  }
+
+  // 3. تطبيق القاعدة الصارمة (طحين يقابل غذائية والعكس صحيح):
+  const candIsGhiz = (verifiedAgent.type === 'ghiz' || verifiedAgent.type === 'غذائية');
+  const candIsTahn = (verifiedAgent.type === 'tahn' || verifiedAgent.type === 'طحين');
+
+  if (currentIsGhiz && candIsGhiz) {
+    toast(`⚠️ حسابك الحالي هو وكالة غذائية، يحق لك فقط إضافة وكالة طحين كحساب ثانٍ`, false, 'orange');
+    return;
+  }
+  if (currentIsTahn && candIsTahn) {
+    toast(`⚠️ حسابك الحالي هو وكالة طحين، يحق لك فقط إضافة وكالة غذائية كحساب ثانٍ`, false, 'orange');
+    return;
+  }
+
+  // 4. حفظ الحساب المضاف يدوياً فقط في wakil_saved_accounts
+  let list = getSavedAccounts();
+  list = list.filter(a => !(String(a.agencyNumber) === String(verifiedAgent.agencyNumber)));
+  
+  list.push({
+    id: verifiedAgent.id || ('agent_' + verifiedAgent.agencyNumber),
+    name: verifiedAgent.name,
+    username: verifiedAgent.username,
+    agencyNumber: verifiedAgent.agencyNumber,
+    type: verifiedAgent.type || (candIsTahn ? 'tahn' : 'ghiz'),
+    role: 'agent',
+    isManuallyAdded: true, // علامة تدل على أنه أضيف يدوياً من المستخدم
+    lastUsed: Date.now()
+  });
+
+  try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
+
+  closeMod('m-add-switch-account');
+  renderSwitchAccountsList();
+  const addedLabel = candIsTahn ? 'وكالة الطحين' : 'الوكالة الغذائية';
+  toast(`✅ تم ربط ${addedLabel} (${verifiedAgent.name} - رمز ${verifiedAgent.agencyNumber}) بنجاح!`, false, 'green');
 }
 
 // ══ IMPORT ══
@@ -4954,7 +5001,7 @@ function hasEdits(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.50) ══
+// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.51) ══
 // ══════════════════════════════════════════════════════════════════
 
 function getCitizenRequiredItemKeys(c) {
@@ -6167,7 +6214,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.50';
+const BASE_APK_VERSION = '1.0.51';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -8530,7 +8577,7 @@ window.addEventListener('afterprint', () => {
 <script id="wakil-ptr-engine">
 (function() {
   'use strict';
-  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.50) ═══
+  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.51) ═══
   const topContainer = document.getElementById('ptr-indicator-top');
   const topPill = document.getElementById('ptr-pill-top');
   const topIcon = document.getElementById('ptr-icon-top');
