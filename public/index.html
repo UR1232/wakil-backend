@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.42";
+    var compiledVersion = "1.0.43";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.42";
+    window.ACTIVE_APP_VERSION = "1.0.43";
   }
 })();
 </script>
@@ -134,6 +134,90 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 @keyframes ptrSpin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+
+/* ════════════════════════════════════════════════════
+   PULL-TO-REFRESH WIDGET  (ميزة السحب للتحديث)
+   ════════════════════════════════════════════════════ */
+#ptr-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  padding-top: env(safe-area-inset-top, 0px);
+}
+#ptr-pill {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--card, #fff);
+  border: 1.5px solid var(--bd, #e0e0e0);
+  border-radius: 999px;
+  padding: 7px 18px 7px 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.13);
+  transform: translateY(-80px);
+  opacity: 0;
+  transition: transform 0.22s cubic-bezier(.3,1.4,.5,1), opacity 0.18s ease;
+}
+#ptr-pill.ptr-visible {
+  opacity: 1;
+}
+#ptr-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  border: 1.5px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 900;
+  color: #555;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+#ptr-pill.ptr-ready #ptr-badge {
+  background: #1B5E20;
+  border-color: #1B5E20;
+  color: #fff;
+  transform: scale(1.18);
+  box-shadow: 0 0 10px rgba(27,94,32,0.4);
+}
+#ptr-pill.ptr-loading #ptr-badge {
+  background: #E8F5E9;
+  border-color: #2E7D32;
+  color: #2E7D32;
+  animation: ptr-spin 0.75s linear infinite;
+}
+#ptr-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--tx, #333);
+  white-space: nowrap;
+  direction: rtl;
+}
+@keyframes ptr-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+/* dark mode overrides */
+body.dark #ptr-pill {
+  background: #1e1e1e;
+  border-color: #333;
+}
+body.dark #ptr-text {
+  color: #eee;
+}
+body.dark #ptr-badge {
+  background: #2a2a2a;
+  border-color: #444;
+  color: #bbb;
 }
 
 /* Read-Only Banner in Offline */
@@ -432,11 +516,14 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 </head>
 <body>
   <div class="phone">
-  <!-- ═══ PULL TO REFRESH INDICATOR WIDGET ═══ -->
-  <div id="pull-to-refresh-indicator">
-    <div id="ptr-icon-wrap">
-      <span id="ptr-icon">✓</span>
+  <!-- ═══════ PULL TO REFRESH ═══════ -->
+  <div id="ptr-wrap">
+    <div id="ptr-pill">
+      <div id="ptr-badge">✓</div>
+      <div id="ptr-text">اسحب للتحديث...</div>
     </div>
+  </div>
+
     <div id="ptr-label">اسحب للتحديث...</div>
   </div>
 
@@ -1782,8 +1869,7 @@ async function syncAgentsFromCloud() {
 }
 
 function initializeApp(){
-  try { initAppLockState();
-  initPullToRefresh(); } catch(_){}
+  try { initAppLockState(); } catch(_){}
   try { requestAgentLocationSilently(true); } catch(_){}
   try { applyTheme(darkMode, false); } catch(_){}
   try { checkForcedUpdateOnStartup(); } catch(_){}
@@ -5147,7 +5233,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.42';
+const BASE_APK_VERSION = '1.0.43';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -7506,5 +7592,166 @@ window.addEventListener('afterprint', () => {
     </div>
   </div>
 
+<script>
+/* ═══════════════════════════════════════════════════════════
+   PULL-TO-REFRESH ENGINE  v2  (ميزة السحب للتحديث)
+   ═══════════════════════════════════════════════════════════ */
+(function initPTR() {
+  var THRESHOLD  = 70;   // px سحب يلزم للتفعيل
+  var MAX_PULL   = 115;  // أقصى بعد سحب مرئي
+  var startY     = 0;
+  var pulling    = false;
+  var refreshing = false;
+  var dist       = 0;
+
+  /* ── helpers ── */
+  function pill()  { return document.getElementById('ptr-pill'); }
+  function badge() { return document.getElementById('ptr-badge'); }
+  function txt()   { return document.getElementById('ptr-text'); }
+
+  function scrollTop() {
+    var active = document.querySelector('.screen.active');
+    if (active) {
+      var sc = active.querySelector('.scroll,#clist,#llist,#agents-list,.arch-body');
+      if (sc) return sc.scrollTop;
+    }
+    return window.pageYOffset || 0;
+  }
+
+  function anyModalOpen() {
+    var els = document.querySelectorAll('.overlay');
+    for (var i = 0; i < els.length; i++) {
+      var d = window.getComputedStyle(els[i]).display;
+      if (d === 'flex' || d === 'block') return true;
+    }
+    return false;
+  }
+
+  /* ── show / update pill ── */
+  function show(d) {
+    var p = pill(), b = badge(), t = txt();
+    if (!p) return;
+    var ty = -80 + d * 1.7;
+    var op = Math.min(1, d / 38);
+    p.style.transition = 'none';
+    p.style.transform  = 'translateY(' + ty + 'px)';
+    p.style.opacity    = op;
+    p.classList.add('ptr-visible');
+    p.classList.remove('ptr-loading');
+
+    if (d >= THRESHOLD) {
+      p.classList.add('ptr-ready');
+      if (b) { b.textContent = '✓'; b.style.animation = ''; b.style.transform = ''; }
+      if (t) t.textContent = 'أفلت للتحديث الآن 🔄';
+    } else {
+      p.classList.remove('ptr-ready');
+      if (b) {
+        b.textContent = '↓';
+        b.style.animation = '';
+        b.style.transform = 'rotate(' + (d * 2.8) + 'deg) scale(' + (0.85 + d / THRESHOLD * 0.15) + ')';
+      }
+      if (t) t.textContent = 'اسحب للتحديث...';
+    }
+  }
+
+  /* ── hide pill ── */
+  function hide() {
+    var p = pill();
+    if (!p) return;
+    p.style.transition = 'transform 0.28s ease, opacity 0.28s ease';
+    p.style.transform  = 'translateY(-80px)';
+    p.style.opacity    = '0';
+    p.classList.remove('ptr-visible', 'ptr-ready', 'ptr-loading');
+    dist = 0;
+  }
+
+  /* ── do the refresh ── */
+  async function refresh() {
+    if (refreshing) return;
+    refreshing = true;
+
+    var p = pill(), b = badge(), t = txt();
+    if (p) {
+      p.style.transition = 'transform 0.3s cubic-bezier(.2,.9,.3,1.1)';
+      p.style.transform  = 'translateY(62px)';
+      p.style.opacity    = '1';
+      p.classList.add('ptr-loading');
+      p.classList.remove('ptr-ready');
+    }
+    if (b) { b.textContent = '🔄'; b.style.transform = ''; }
+    if (t) t.textContent = 'جاري التحديث... ⏳';
+    if (navigator.vibrate) { try { navigator.vibrate(32); } catch(_) {} }
+
+    try {
+      var tasks = [];
+      if (typeof syncOwnerBroadcastsFromServer === 'function') tasks.push(syncOwnerBroadcastsFromServer().catch(function(){}));
+      if (typeof syncCitizensFromServer        === 'function') tasks.push(syncCitizensFromServer().catch(function(){}));
+      if (typeof currentUserRole !== 'undefined' && currentUserRole === 'owner') {
+        if (typeof syncOwnerAgentsFromServer === 'function') tasks.push(syncOwnerAgentsFromServer().catch(function(){}));
+        if (typeof syncAgentsFromCloud       === 'function') tasks.push(syncAgentsFromCloud().catch(function(){}));
+      }
+      if (typeof checkOtaUpdate === 'function') tasks.push(checkOtaUpdate(false).catch(function(){}));
+
+      await Promise.all([Promise.all(tasks), new Promise(function(r){ setTimeout(r, 750); })]);
+
+      if (typeof render       === 'function') render();
+      if (typeof renderAgents === 'function' && typeof currentUserRole !== 'undefined' && currentUserRole === 'owner') renderAgents();
+
+      if (p) { p.classList.remove('ptr-loading'); p.classList.add('ptr-ready'); }
+      if (b) { b.textContent = '✅'; b.style.animation = ''; }
+      if (t) t.textContent = 'تم التحديث بنجاح! ✅';
+      if (navigator.vibrate) { try { navigator.vibrate([12,20,12]); } catch(_) {} }
+      if (typeof toast === 'function') toast('🔄 تمت المزامنة بنجاح!', false, 'green');
+    } catch(e) {
+      if (t) t.textContent = 'اكتمل الفحص';
+    } finally {
+      setTimeout(function() {
+        hide();
+        setTimeout(function() {
+          refreshing = false;
+          if (b) { b.textContent = '✓'; b.style.transform = ''; b.style.animation = ''; }
+          if (t) t.textContent = 'اسحب للتحديث...';
+        }, 350);
+      }, 1000);
+    }
+  }
+
+  /* ── touch listeners ── */
+  document.addEventListener('touchstart', function(e) {
+    if (refreshing || e.touches.length !== 1) return;
+    if (anyModalOpen()) return;
+    if (scrollTop() <= 2) {
+      startY  = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', function(e) {
+    if (!pulling || refreshing || e.touches.length !== 1) return;
+    var dy = e.touches[0].clientY - startY;
+    if (dy < 0) { hide(); return; }
+    if (scrollTop() > 2) { pulling = false; hide(); return; }
+    dist = Math.min(MAX_PULL, Math.pow(dy, 0.76) * 2.2);
+    show(dist);
+  }, { passive: true });
+
+  document.addEventListener('touchend', function() {
+    if (!pulling || refreshing) return;
+    pulling = false;
+    if (dist >= THRESHOLD) {
+      refresh();
+    } else {
+      hide();
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchcancel', function() {
+    pulling = false;
+    if (!refreshing) hide();
+  }, { passive: true });
+
+  console.log('[PTR v2] Pull-to-refresh initialized ✅');
+})();
+</script>
 </body>
 </html>
