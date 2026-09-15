@@ -29,7 +29,7 @@ const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
 const APP_VERSION = '1.0.34';
 const APP_VERSION_CODE = 34;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/vps3ef.apk';
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/tpnphw.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
 function normalizeDigits(str) {
@@ -322,11 +322,11 @@ app.get('/', (req, res) => {
 // فحص إصدار التطبيق والتحديث الهوائي الفوري
 app.get('/api/app-version', (req, res) => {
   res.json({
-    version: APP_VERSION,
+    latestVersion: APP_VERSION,
     versionCode: APP_VERSION_CODE,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
     downloadUrl: APK_DOWNLOAD_URL,
-    notes: 'إصدار v1.0.30: زر تعميم مباشر لكل وكيل، تخصيص فوري للتعميم الفردي أو المشترك، وتحسينات متقدمة لإدارة التعاميم.',
+    notes: 'إصدار v1.0.34: إلغاء شريط التعاميم من واجهة الأونر الرئيسية بالكامل، وعرض سجلات التعاميم مباشرة مع تبويبات الفلترة والتعديل.',
     updatedAt: new Date().toISOString()
   });
 });
@@ -589,10 +589,7 @@ app.post('/api/sessions/ping', (req, res) => {
       active: true,
       isOwner: true,
       announcement: ann,
-      announcements: userAnnouncements,
-      version: APP_VERSION,
-      versionCode: APP_VERSION_CODE,
-      downloadUrl: APK_DOWNLOAD_URL
+      announcements: userAnnouncements
     });
   }
 
@@ -605,10 +602,7 @@ app.post('/api/sessions/ping', (req, res) => {
         success: false,
         isFrozen: true,
         message: 'تم تجميد حساب الوكالة من قبل الإدارة العامة للمنظومة',
-        announcement: ann,
-        version: APP_VERSION,
-        versionCode: APP_VERSION_CODE,
-        downloadUrl: APK_DOWNLOAD_URL
+        announcement: ann
       });
     }
   }
@@ -692,10 +686,7 @@ app.post('/api/sessions/ping', (req, res) => {
     success: true,
     active: true,
     announcement: ann,
-    announcements: userAnnouncements,
-    version: APP_VERSION,
-    versionCode: APP_VERSION_CODE,
-    downloadUrl: APK_DOWNLOAD_URL
+    announcements: userAnnouncements
   });
 });
 
