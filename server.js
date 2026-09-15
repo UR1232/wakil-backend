@@ -27,9 +27,9 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.32';
-const APP_VERSION_CODE = 32;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/gqq453.apk';
+const APP_VERSION = '1.0.33';
+const APP_VERSION_CODE = 33;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/hux5np.apk';
 
 function getSessions() {
   if (!fs.existsSync(SESSIONS_FILE)) return [];
@@ -126,10 +126,15 @@ function getActiveAnnouncementsForUser(agencyNumber, userRole, userId, username)
     if (!ann.targetType || ann.targetType === 'all') return true;
 
     if (ann.targetType === 'specific') {
-      const agencies = Array.isArray(ann.targetAgencies) ? ann.targetAgencies.map(String) : [];
-      if (agencyNumber && agencies.includes(String(agencyNumber))) return true;
-      if (userId && agencies.includes(String(userId))) return true;
-      if (username && agencies.includes(String(username))) return true;
+      const agencies = (Array.isArray(ann.targetAgencies) ? ann.targetAgencies : [])
+        .map(a => normalizeDigits(a).toLowerCase().trim());
+      const normAgency = normalizeDigits(agencyNumber).toLowerCase().trim();
+      const normUser = normalizeDigits(userId).toLowerCase().trim();
+      const normUname = normalizeDigits(username).toLowerCase().trim();
+
+      if (normAgency && agencies.includes(normAgency)) return true;
+      if (normUser && agencies.includes(normUser)) return true;
+      if (normUname && agencies.includes(normUname)) return true;
       return false;
     }
 
