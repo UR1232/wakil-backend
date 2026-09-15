@@ -31,6 +31,14 @@ const APP_VERSION = '1.0.33';
 const APP_VERSION_CODE = 33;
 let APK_DOWNLOAD_URL = 'https://files.catbox.moe/hux5np.apk';
 
+// دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
+function normalizeDigits(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).trim()
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+    .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+}
+
 function getSessions() {
   if (!fs.existsSync(SESSIONS_FILE)) return [];
   try {
@@ -381,14 +389,6 @@ app.post('/api/sessions/clear-revoke', (req, res) => {
 // ══ 1. AUTHENTICATION (تسجيل الدخول الذكي مع تسجيل الجهاز والجلسة) ══
 app.post('/api/login', (req, res) => {
   const { username, password, agentType, deviceInfo } = req.body;
-
-  // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
-  function normalizeDigits(str) {
-    if (!str) return '';
-    return String(str).trim()
-      .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
-      .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
-  }
 
   const rawU = (username || '').trim();
   const rawP = (password || '').trim();
@@ -1078,13 +1078,17 @@ app.get('/api/owner/announcements', (req, res) => {
 
 // إنشاء أو حفظ تعديل تعميم إداري
 app.post('/api/owner/announcements', (req, res) => {
-  const { id, title, text, priority, targetType, targetAgencies, targetNames, scheduleType, scheduledAt, active } = req.body;
-  if (!text || !text.trim()) {
+  const { id, title, text, message, priority, targetType, targetAgencies, targetNames, scheduleType, scheduledAt, isScheduled, active } = req.body;
+  const content = (text || message || '').trim();
+  if (!content) {
     return res.status(400).json({ success: false, message: 'يرجى كتابة نص التعميم' });
   }
 
   let list = getAnnouncementsList();
   const nowIso = new Date().toISOString();
+  const isSch = (scheduleType === 'scheduled') || (isScheduled === true);
+  const finalScheduleType = isSch ? 'scheduled' : 'now';
+  const finalScheduledAt = (isSch && scheduledAt) ? scheduledAt : null;
 
   let targetAnnouncement = null;
   if (id) {
@@ -1093,13 +1097,13 @@ app.post('/api/owner/announcements', (req, res) => {
       list[idx] = {
         ...list[idx],
         title: (title || list[idx].title || 'تعميم إداري رسمي').trim(),
-        text: text.trim(),
+        text: content,
         priority: priority === 'urgent' ? 'urgent' : 'normal',
         targetType: targetType === 'specific' ? 'specific' : 'all',
         targetAgencies: Array.isArray(targetAgencies) ? targetAgencies : [],
         targetNames: targetNames || (targetType === 'specific' ? 'وكلاء محددون' : 'كافة الوكلاء'),
-        scheduleType: scheduleType === 'scheduled' ? 'scheduled' : 'now',
-        scheduledAt: (scheduleType === 'scheduled' && scheduledAt) ? scheduledAt : null,
+        scheduleType: finalScheduleType,
+        scheduledAt: finalScheduledAt,
         active: active !== undefined ? !!active : true,
         updatedAt: nowIso
       };
@@ -1111,13 +1115,13 @@ app.post('/api/owner/announcements', (req, res) => {
     targetAnnouncement = {
       id: 'ann_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
       title: (title || 'تعميم إداري رسمي').trim(),
-      text: text.trim(),
+      text: content,
       priority: priority === 'urgent' ? 'urgent' : 'normal',
       targetType: targetType === 'specific' ? 'specific' : 'all',
       targetAgencies: Array.isArray(targetAgencies) ? targetAgencies : [],
       targetNames: targetNames || (targetType === 'specific' ? 'وكلاء محددون' : 'كافة الوكلاء في المنظومة'),
-      scheduleType: scheduleType === 'scheduled' ? 'scheduled' : 'now',
-      scheduledAt: (scheduleType === 'scheduled' && scheduledAt) ? scheduledAt : null,
+      scheduleType: finalScheduleType,
+      scheduledAt: finalScheduledAt,
       active: true,
       createdAt: nowIso,
       updatedAt: nowIso
