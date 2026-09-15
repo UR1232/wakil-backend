@@ -30,5 +30,21 @@
     "lastActive": "2026-09-14T23:41:46.341Z",
     "isOnline": true,
     "status": "active"
+  },
+  {
+    "id": "sess_ag_test",
+    "token": "tok_ag_test",
+    "userId": "agent_868",
+    "userRole": "agent",
+    "agencyNumber": "868",
+    "username": "user",
+    "name": "فاضل عباس كريم",
+    "deviceId": "dev_test",
+    "deviceName": "هاتف متصل",
+    "platform": "Android",
+    "loginAt": "2026-09-14T23:54:02.117Z",
+    "lastActive": "2026-09-14T23:54:02.117Z",
+    "isOnline": true,
+    "status": "active"
   }
 ]

@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.29";
+    var compiledVersion = "1.0.30";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -14,7 +14,7 @@
     sessionStorage.removeItem('wakil_ota_booted');
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.29";
+    window.ACTIVE_APP_VERSION = "1.0.30";
   }
 })();
 </script>
@@ -611,7 +611,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.29 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.30 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
@@ -761,7 +761,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--gbg);color:var(--g);border:1px solid var(--gbd);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:14px;" id="forced-ver-badge">
-          الإصدار الجديد: v1.0.29
+          الإصدار الجديد: v1.0.30
         </div>
 
         <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px;text-align:right;background:var(--ib);padding:12px;border-radius:14px;border:1px solid var(--bd);">
@@ -2194,6 +2194,11 @@ function agentCardHTML(ag) {
         <span>📄 طباعة PDF</span>
       </button>
 
+      <!-- Broadcast to Agent Button -->
+      <button class="btn-close" onclick="openDirectAgentBroadcastModal('${ag.id}', '${safeName}', '${ag.agencyNumber}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:800;background:#E3F2FD;color:#1565C0;border-color:#90CAF9;display:flex;align-items:center;justify-content:center;gap:4px;">
+        <span>📢 تعميم للوكيل</span>
+      </button>
+
       <!-- Connected Devices Button -->
       <button class="btn-close" onclick="openAgentSessionsModal('${ag.id}', '${ag.agencyNumber}', '${safeName}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:800;background:#E0F2F1;color:#00796B;border-color:#80CBC4;display:flex;align-items:center;justify-content:center;gap:4px;">
         <span>📱 الأجهزة المتصلة</span>
@@ -2210,7 +2215,7 @@ function agentCardHTML(ag) {
       </button>
 
       <!-- Edit Agent Button -->
-      <button class="btn-close" onclick="openEditAgentModal('${ag.id}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:700;background:var(--card);color:var(--tx);">
+      <button class="btn-close" onclick="openEditAgentModal('${ag.id}')" style="margin:0;padding:7px 6px;font-size:11px;font-weight:700;background:var(--card);color:var(--tx);grid-column:span 2;">
         ✏️ تعديل البيانات
       </button>
 
@@ -4060,7 +4065,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.29';
+const BASE_APK_VERSION = '1.0.30';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -4269,6 +4274,7 @@ async function pingSession() {
   const isOwner = (currentUserRole === 'owner');
   const userRole = isOwner ? 'owner' : 'agent';
   const agencyNumber = isOwner ? null : (currentAgent ? currentAgent.agencyNumber : null);
+  const userId = isOwner ? 'owner' : (currentAgent ? (currentAgent.id || currentAgent.agencyNumber) : null);
 
   try {
     const res = await fetch('https://wakil-api.onrender.com/api/sessions/ping', {
@@ -4280,6 +4286,7 @@ async function pingSession() {
         deviceId: deviceInfo.deviceId,
         userRole,
         agencyNumber,
+        userId,
         deviceInfo
       })
     });
@@ -4417,9 +4424,64 @@ function hideFrozenScreen() {
   if (el) el.style.display = 'none';
 }
 
-// ── 2. ADVANCED BROADCAST ANNOUNCEMENTS SYSTEM (v1.0.29) ──
+// ── 2. ADVANCED BROADCAST ANNOUNCEMENTS SYSTEM (v1.0.30) ──
 let ownerBroadcastsCache = [];
 let isBroadcastFormActive = false;
+
+function openDirectAgentBroadcastModal(agId, agName, agencyNumber) {
+  // 1. Open the modal
+  showMod('m-broadcast-modal');
+
+  // 2. Switch view to Form
+  switchToBroadcastFormView();
+
+  // 3. Set custom title and heading for this specific agent
+  const headingEl = document.getElementById('broadcast-form-heading');
+  if (headingEl) headingEl.textContent = '📢 تعميم مخصص للوكيل: ' + agName;
+
+  const titleEl = document.getElementById('broadcast-title-input');
+  if (titleEl) titleEl.value = 'توجيه إداري للوكيل: ' + agName;
+
+  // 4. Set target type radio to 'specific' (وكلاء محددون)
+  const targetRadios = document.getElementsByName('broadcast-target-type');
+  for (let r of targetRadios) {
+    if (r.value === 'specific') r.checked = true;
+  }
+  handleBroadcastTargetTypeChange();
+
+  // 5. Check ONLY this agent in the checklist and visually highlight them
+  const targetVal = String(agencyNumber || agId);
+  const targetIdStr = String(agId);
+  const targetAgencyStr = String(agencyNumber || '');
+
+  const checkboxes = document.querySelectorAll('.broadcast-agent-cb');
+  checkboxes.forEach(cb => {
+    const val = String(cb.value);
+    const isThis = (val === targetVal || val === targetIdStr || (targetAgencyStr && val === targetAgencyStr));
+    cb.checked = isThis;
+    if (cb.parentElement) {
+      if (isThis) {
+        cb.parentElement.style.background = '#E3F2FD';
+        cb.parentElement.style.borderColor = '#1565C0';
+        setTimeout(() => {
+          cb.parentElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 120);
+      } else {
+        cb.parentElement.style.background = 'var(--card)';
+        cb.parentElement.style.borderColor = 'var(--bd)';
+      }
+    }
+  });
+
+  // 6. Set message placeholder and auto-focus
+  setTimeout(() => {
+    const textEl = document.getElementById('broadcast-text-input');
+    if (textEl) {
+      textEl.focus();
+      textEl.placeholder = 'اكتب نص التوجيه أو التعميم الموجه إلى (' + agName + ') هنا...';
+    }
+  }, 250);
+}
 
 function openBroadcastModal() {
   switchToBroadcastListView();
@@ -4556,7 +4618,7 @@ function populateBroadcastAgentsChecklist() {
   container.innerHTML = agentsList.map(ag => {
     return `
       <label style="display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--bd);padding:6px 10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">
-        <input type="checkbox" class="broadcast-agent-cb" value="${ag.agencyNumber || ag.id}" data-name="${ag.name || ag.username}"/>
+        <input type="checkbox" class="broadcast-agent-cb" value="${ag.agencyNumber || ag.id}" data-name="${ag.name || ag.username}" onchange="this.parentElement.style.background = this.checked ? '#E3F2FD' : 'var(--card)'; this.parentElement.style.borderColor = this.checked ? '#1565C0' : 'var(--bd)';" />
         <span>${ag.name || ag.username}</span>
         <span style="font-size:10px;color:var(--mt);margin-right:auto;">(رمز: ${ag.agencyNumber || '—'})</span>
       </label>

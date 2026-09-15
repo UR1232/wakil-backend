@@ -1,0 +1,60 @@
+[
+  {
+    "id": "ann_1789430042079_hax5l",
+    "title": "تعميم مجدول للغد",
+    "text": "لن يظهر هذا إلا غداً في الوقت المحدد",
+    "priority": "normal",
+    "targetType": "all",
+    "targetAgencies": [],
+    "targetNames": "كافة الوكلاء في المنظومة",
+    "scheduleType": "scheduled",
+    "scheduledAt": "2026-09-15T23:54:02.074Z",
+    "active": true,
+    "createdAt": "2026-09-14T23:54:02.079Z",
+    "updatedAt": "2026-09-14T23:54:02.079Z"
+  },
+  {
+    "id": "ann_1789430042062_fue1b",
+    "title": "توجيه خاص ومعدل للوكيل الفاضل",
+    "text": "تم تعديل وقت استلام الوجبة إلى الساعة 4 عصراً",
+    "priority": "urgent",
+    "targetType": "specific",
+    "targetAgencies": [
+      "868"
+    ],
+    "targetNames": "وكلاء محددون",
+    "scheduleType": "now",
+    "scheduledAt": null,
+    "active": true,
+    "createdAt": "2026-09-14T23:54:02.062Z",
+    "updatedAt": "2026-09-14T23:54:02.106Z"
+  },
+  {
+    "id": "ann_1789430042034_adauf",
+    "title": "تعميم عام للجميع",
+    "text": "يرجى الالتزام بمواعيد التجهيز الرسمية",
+    "priority": "normal",
+    "targetType": "all",
+    "targetAgencies": [],
+    "targetNames": "كافة الوكلاء في المنظومة",
+    "scheduleType": "now",
+    "scheduledAt": null,
+    "active": true,
+    "createdAt": "2026-09-14T23:54:02.025Z",
+    "updatedAt": "2026-09-14T23:54:02.025Z"
+  },
+  {
+    "id": "ann_1789430042025",
+    "title": "تنبيه هام للمواطنين والوكلاء",
+    "text": "مواعيد تجهيز الحصص التموينية لشهر أيلول",
+    "priority": "urgent",
+    "targetType": "all",
+    "targetAgencies": [],
+    "targetNames": "كافة الوكلاء في المنظومة",
+    "scheduleType": "now",
+    "scheduledAt": null,
+    "createdAt": "2026-09-14T23:29:20.630Z",
+    "updatedAt": "2026-09-14T23:29:20.630Z",
+    "active": true
+  }
+]

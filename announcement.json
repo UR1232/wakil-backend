@@ -1,9 +1,14 @@
 {
-  "id": "ann_1789428560629",
+  "id": "ann_1789430042079_hax5l",
+  "title": "تعميم مجدول للغد",
+  "text": "لن يظهر هذا إلا غداً في الوقت المحدد",
+  "priority": "normal",
+  "targetType": "all",
+  "targetAgencies": [],
+  "targetNames": "كافة الوكلاء في المنظومة",
+  "scheduleType": "scheduled",
+  "scheduledAt": "2026-09-15T23:54:02.074Z",
   "active": true,
-  "title": "تنبيه هام للمواطنين والوكلاء",
-  "text": "مواعيد تجهيز الحصص التموينية لشهر أيلول",
-  "priority": "urgent",
-  "createdAt": "2026-09-14T23:29:20.630Z",
-  "updatedAt": "2026-09-14T23:29:20.630Z"
+  "createdAt": "2026-09-14T23:54:02.079Z",
+  "updatedAt": "2026-09-14T23:54:02.079Z"
 }
