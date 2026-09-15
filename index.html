@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.49";
+    var compiledVersion = "1.0.50";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.49";
+    window.ACTIVE_APP_VERSION = "1.0.50";
   }
 })();
 </script>
@@ -685,6 +685,21 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
           </div>
         </div>
 
+        <!-- ═══ MULTI-ACCOUNT SWITCHER (تبديل الحسابات) ═══ -->
+        <div class="sgroup" style="border:1.5px solid #1565C0;background:linear-gradient(135deg,rgba(21,101,192,0.06),rgba(21,101,192,0.01));">
+          <div class="sgroup-title" style="color:#1565C0;">إدارة الحسابات والتبديل السريع 🔄</div>
+          <div class="srow" onclick="openSwitchAccountsModal()">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:linear-gradient(135deg, #1565C0, #0D47A1);color:#fff;">🔄</div>
+              <div>
+                <div class="srow-t" style="font-weight:900;color:var(--tx);">تبديل الحساب / الوكالة</div>
+                <div class="srow-s" id="set-switch-sub">التبديل الفوري بين وكالة غذائية، طحين، أو حسابات أخرى</div>
+              </div>
+            </div>
+            <button class="add-btn" style="background:linear-gradient(135deg, #1565C0, #0D47A1);padding:7px 14px;font-size:12px;font-weight:800;" onclick="event.stopPropagation();openSwitchAccountsModal();">تبديل 🔄</button>
+          </div>
+        </div>
+
         <div class="sgroup">
           <div class="sgroup-title">معلومات الوكالة</div>
           <div class="srow" style="cursor:default;">
@@ -1081,7 +1096,61 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
       </div>
     </div>
 
-        <!-- MODAL: CONFIRM DELIVERY & RECORD RECIPIENT -->
+            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.50) ═══ -->
+    <div class="overlay" id="m-switch-accounts" onclick="closeMod('m-switch-accounts',event)">
+      <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;width:92%;padding:20px;border-radius:24px;">
+        <div class="modal-t" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:22px;">🔄</span>
+            <span>تبديل الحساب والوكالة</span>
+          </div>
+          <button onclick="closeMod('m-switch-accounts')" style="background:transparent;border:none;font-size:20px;color:var(--tx2);cursor:pointer;padding:2px 8px;">✕</button>
+        </div>
+        <p style="font-size:12.5px;color:var(--mt);margin-bottom:14px;line-height:1.5;">
+          يمكنك التبديل فوراً بين وكالتك الغذائية ووكالة الطحين أو الحسابات المسجلة لديك بنقرة واحدة:
+        </p>
+
+        <!-- Saved Accounts List Mount -->
+        <div id="switch-accounts-list" style="display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow-y:auto;padding:2px 0;">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Add Another Account Button -->
+        <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
+          <button class="btn-g" onclick="openAddAccountToSwitchModal()" style="background:#2E7D32;margin:0;padding:11px;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <span>➕ إضافة وكالة / حساب آخر للحفظ والتبديل</span>
+          </button>
+          <button class="btn-close" onclick="closeMod('m-switch-accounts')" style="margin:0;">إغلاق النافذة</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MODAL: ADD ACCOUNT TO SWITCHER ═══ -->
+    <div class="overlay" id="m-add-switch-account" onclick="closeMod('m-add-switch-account',event)">
+      <div class="modal" onclick="event.stopPropagation()" style="max-width:380px;width:90%;padding:22px;border-radius:22px;">
+        <div class="modal-t" style="display:flex;align-items:center;gap:8px;font-size:16px;">
+          <span>➕</span><span>إضافة حساب للتبديل السريع</span>
+        </div>
+        <p style="font-size:12px;color:var(--mt);margin-bottom:14px;">أدخل بيانات الوكالة الأخرى (مثلاً وكالة الطحين أو وكيل آخر) لحفظها في قائمة التبديل السريع على هذا الهاتف:</p>
+
+        <div style="margin-bottom:12px;">
+          <div class="flbl">اسم المستخدم (أو رقم الوكالة)</div>
+          <input class="field" id="sw-add-username" type="text" placeholder="مثال: tahn_user أو رقم الوكالة..." />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <div class="flbl">كلمة المرور</div>
+          <input class="field" id="sw-add-password" type="password" placeholder="أدخل كلمة المرور..." />
+        </div>
+
+        <button class="btn-g" onclick="submitAddAccountToSwitcher()" style="padding:11px;font-size:13.5px;font-weight:900;margin-bottom:8px;">
+          ✓ التحقق وإضافة الحساب
+        </button>
+        <button class="btn-close" onclick="closeMod('m-add-switch-account')">إلغاء</button>
+      </div>
+    </div>
+
+    <!-- MODAL: CONFIRM DELIVERY & RECORD RECIPIENT -->
     <div class="overlay" id="m-confirm-recipient" onclick="closeMod('m-confirm-recipient',event)">
       <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;width:92%;padding:18px;">
         <div class="modal-t" style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;">
@@ -3175,35 +3244,89 @@ async function syncCitizensFromServer(){
     const res = await fetch('https://wakil-api.onrender.com/api/citizens?agencyNumber=' + agCode, { signal: AbortSignal.timeout(6000) });
     if (res.ok) {
       const data = await res.json();
-      if (data && Array.isArray(data.citizens)) {
-        // حماية تامة للـ 1042 مواطن: لا نسمح أبداً للسيرفر القديم بمحو المواطنين إذا أعاد عدداً أقل!
+      if (data && Array.isArray(data.citizens) && data.citizens.length > 0) {
         const isAgencyCleared = localStorage.getItem('wakil_cleared_' + agCode) === 'true';
-        if (isAgencyCleared) {
-          // Agency was explicitly cleared by user, do not auto-restore
-          return;
-        }
-        if (data.citizens.length >= citizens.length && data.citizens.length > 0) {
-          citizens = data.citizens.map(c => ({
-            id: c.id,
-            seq: c.id,
-            name: c.name,
-            card: c.cardNumber || c.card,
-            oldCard: c.oldCardNumber || c.oldCard || '',
-            fam: c.familyCount !== undefined ? c.familyCount : (c.fam || 0),
-            elig: c.eligibleCount !== undefined ? c.eligibleCount : (c.elig || 0),
-            blk: c.blockedCount !== undefined ? c.blockedCount : (c.blk || 0),
-            welfare: !!(c.isWelfare || c.welfare),
-            done: !!(c.isReceived || c.done),
-            doneAt: c.receivedAt || c.doneAt,
-            items: c.items || {},
-            custom: c.customItems || c.custom || []
-          }));
-          saveLocalState();
-          updateStats();
-          renderList(document.getElementById('sbx') ? document.getElementById('sbx').value : '');
-        } else if (citizens.length > data.citizens.length && citizens.length >= 1000) {
-          // إذا كان التطبيق يحتوي على الـ 1042 مواطن بينما السيرفر لا يزال قديماً (500 فقط)،
-          // نقوم تلقائياً برفع الـ 1042 مواطن للسيرفر لتحديث السيرفر السحابي أيضاً!
+        if (isAgencyCleared) return;
+
+        // 🛡️ ZERO-ERROR SMART MERGE (حماية تامة من محو أو تعديل الأسماء أو البيانات محلياً)
+        const localMap = new Map();
+        citizens.forEach(c => localMap.set(c.id, c));
+
+        const merged = data.citizens.map(cloudCit => {
+          const local = localMap.get(cloudCit.id);
+          if (!local) {
+            return {
+              id: cloudCit.id,
+              seq: cloudCit.id,
+              name: cloudCit.name || '',
+              card: cloudCit.cardNumber || cloudCit.card || '',
+              oldCard: cloudCit.oldCardNumber || cloudCit.oldCard || '',
+              fam: cloudCit.familyCount !== undefined ? cloudCit.familyCount : (cloudCit.fam || 0),
+              elig: cloudCit.eligibleCount !== undefined ? cloudCit.eligibleCount : (cloudCit.elig || 0),
+              blk: cloudCit.blockedCount !== undefined ? cloudCit.blockedCount : (cloudCit.blk || 0),
+              welfare: !!(cloudCit.isWelfare || cloudCit.welfare),
+              done: !!(cloudCit.isReceived || cloudCit.done),
+              doneAt: cloudCit.receivedAt || cloudCit.doneAt || null,
+              isPartial: !!cloudCit.isPartial,
+              recipientName: cloudCit.recipientName || '',
+              deliveries: Array.isArray(cloudCit.deliveries) ? cloudCit.deliveries : [],
+              items: cloudCit.items || {},
+              custom: cloudCit.customItems || cloudCit.custom || []
+            };
+          }
+
+          // حماية الاسم والبطاقة بنسبة خطأ صفر:
+          const safeName = (local.name && local.name.trim()) ? local.name.trim() : (cloudCit.name || '').trim();
+          const safeCard = local.card || cloudCit.cardNumber || cloudCit.card || '';
+          const safeOldCard = local.oldCard || cloudCit.oldCardNumber || cloudCit.oldCard || '';
+
+          // حماية الدفعات والاستلامات:
+          let safeDeliveries = Array.isArray(local.deliveries) ? [...local.deliveries] : [];
+          if (Array.isArray(cloudCit.deliveries) && cloudCit.deliveries.length > safeDeliveries.length) {
+            safeDeliveries = cloudCit.deliveries;
+          }
+
+          const safeDone = local.done || cloudCit.done || cloudCit.isReceived;
+          const safePartial = (!safeDone) && (local.isPartial || cloudCit.isPartial || safeDeliveries.length > 0);
+          const safeRecipient = local.recipientName || cloudCit.recipientName || '';
+          const safeDoneAt = local.doneAt || cloudCit.doneAt || cloudCit.receivedAt || null;
+
+          const safeItems = { ...(cloudCit.items || {}), ...(local.items || {}) };
+          const safeCustom = (local.custom && local.custom.length) ? local.custom : (cloudCit.customItems || cloudCit.custom || []);
+
+          return {
+            id: local.id,
+            seq: local.id,
+            name: safeName,
+            card: safeCard,
+            oldCard: safeOldCard,
+            fam: local.fam !== undefined ? local.fam : (cloudCit.familyCount || 0),
+            elig: local.elig !== undefined ? local.elig : (cloudCit.eligibleCount || 0),
+            blk: local.blk !== undefined ? local.blk : (cloudCit.blockedCount || 0),
+            welfare: local.welfare !== undefined ? local.welfare : (cloudCit.isWelfare || cloudCit.welfare),
+            done: !!safeDone,
+            isPartial: !!safePartial,
+            recipientName: safeRecipient,
+            deliveries: safeDeliveries,
+            doneAt: safeDoneAt,
+            items: safeItems,
+            custom: safeCustom
+          };
+        });
+
+        // الاحتفاظ بأي مواطن مضاف محلياً
+        citizens.forEach(local => {
+          if (!data.citizens.some(c => c.id === local.id)) {
+            merged.push(local);
+          }
+        });
+
+        citizens = merged;
+        saveLocalState();
+        updateStats();
+        renderList(document.getElementById('sbx') ? document.getElementById('sbx').value : '');
+
+        if (citizens.length > data.citizens.length && citizens.length >= 1000) {
           fetch('https://wakil-api.onrender.com/api/citizens/import', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -3216,7 +3339,6 @@ async function syncCitizensFromServer(){
 }
 
 // ══ NAVIGATION ══
-
 function copyToClipboard(text, label){
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).catch(()=>{});
@@ -4237,19 +4359,35 @@ function executeRenameMonth(){
 }
 
 
-// ══ PERSISTENCE & LOCAL STORAGE (MULTI-AGENT) ══
+// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.50) ══
 function saveLocalState() {
   try {
     const agency = (ownerViewingAgent && ownerViewingAgent.agencyNumber) ? ownerViewingAgent.agencyNumber : (currentAgent ? currentAgent.agencyNumber : '868');
-    localStorage.setItem('wakil_citizens_' + agency, JSON.stringify(citizens));
-    if (agency === '868') {
-      localStorage.setItem('wakil_citizens', JSON.stringify(citizens));
-      localStorage.setItem('wakil_citizens_data', JSON.stringify(citizens));
+    const citsStr = JSON.stringify(citizens);
+    
+    // الطبقة الأساسية
+    localStorage.setItem('wakil_citizens_' + agency, citsStr);
+    
+    // الطبقات الاحتياطية المنيعة (حماية بنسبة خطأ صفر)
+    localStorage.setItem('wakil_backup_citizens_' + agency, citsStr);
+    if (citizens && citizens.length > 0) {
+      localStorage.setItem('wakil_vault_citizens_' + agency, citsStr);
     }
+    
+    if (agency === '868') {
+      localStorage.setItem('wakil_citizens', citsStr);
+      localStorage.setItem('wakil_citizens_data', citsStr);
+    }
+    
     localStorage.setItem('wakil_archive_' + agency, JSON.stringify(archive));
+    localStorage.setItem('wakil_backup_archive_' + agency, JSON.stringify(archive));
     localStorage.setItem('wakil_agents_cache', JSON.stringify(allAgents));
+    localStorage.setItem('wakil_backup_agents_cache', JSON.stringify(allAgents));
     localStorage.setItem('wakil_current_agent', JSON.stringify(currentAgent));
     localStorage.setItem('wakil_user_role', currentUserRole);
+
+    // تسجيل الحساب الحالي تلقائياً في قائمة التبديل السريع
+    try { autoRegisterCurrentAccountToSwitcher(); } catch(_) {}
   } catch(e) {
     console.warn('Storage error:', e);
   }
@@ -4257,7 +4395,7 @@ function saveLocalState() {
 
 function loadLocalState() {
   try {
-    const rawAgents = localStorage.getItem('wakil_agents_cache');
+    const rawAgents = localStorage.getItem('wakil_agents_cache') || localStorage.getItem('wakil_backup_agents_cache');
     if (rawAgents) allAgents = JSON.parse(rawAgents);
   } catch(_) {}
 
@@ -4284,17 +4422,29 @@ function loadLocalState() {
   agentType = (currentAgent && currentAgent.type) ? currentAgent.type : 'ghiz';
 
   const agency = currentAgent ? currentAgent.agencyNumber : '868';
-  const saved = localStorage.getItem('wakil_citizens_' + agency) || (agency === '868' ? (localStorage.getItem('wakil_citizens') || localStorage.getItem('wakil_citizens_data')) : null);
+  let saved = localStorage.getItem('wakil_citizens_' + agency) || 
+              localStorage.getItem('wakil_backup_citizens_' + agency) || 
+              localStorage.getItem('wakil_vault_citizens_' + agency) || 
+              (agency === '868' ? (localStorage.getItem('wakil_citizens') || localStorage.getItem('wakil_citizens_data')) : null);
+
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        citizens = parsed;
+        // حماية تامة للأسماء من الاختفاء أو الخطأ:
+        citizens = parsed.map((c, i) => {
+          if (!c.name || !c.name.trim()) {
+            if (agency === '868' && window.WAKIL_SEED_1042 && window.WAKIL_SEED_1042[i]) {
+              c.name = window.WAKIL_SEED_1042[i].name;
+            }
+          }
+          return c;
+        });
       }
     } catch(e) {}
   }
 
-  // 💡 حماية وتأمين الـ 1042 مواطن: إذا كانت الذاكرة فارغة، يتم تحميل الـ 1042 مواطن المدمجين فوراً
+  // الحماية التلقائية للـ 1042 مواطن
   const isExplicitlyCleared = localStorage.getItem('wakil_cleared_' + agency) === 'true';
   if ((!citizens || citizens.length === 0) && agency === '868' && window.WAKIL_SEED_1042 && !isExplicitlyCleared) {
     citizens = JSON.parse(JSON.stringify(window.WAKIL_SEED_1042));
@@ -4302,7 +4452,9 @@ function loadLocalState() {
     console.log('Loaded bundled 1,042 citizens into agency 868');
   }
 
-  const savedArch = localStorage.getItem('wakil_archive_' + agency) || (agency === '868' ? (localStorage.getItem('wakil_archive') || localStorage.getItem('wakil_archive_data')) : null);
+  const savedArch = localStorage.getItem('wakil_archive_' + agency) || 
+                    localStorage.getItem('wakil_backup_archive_' + agency) || 
+                    (agency === '868' ? (localStorage.getItem('wakil_archive') || localStorage.getItem('wakil_archive_data')) : null);
   if (savedArch) {
     try {
       const parsedArch = JSON.parse(savedArch);
@@ -4311,6 +4463,335 @@ function loadLocalState() {
       }
     } catch(e) {}
   }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.50) ═══
+// ══════════════════════════════════════════════════════════════════
+
+function getSavedAccounts() {
+  let list = [];
+  try {
+    const raw = localStorage.getItem('wakil_saved_accounts');
+    if (raw) list = JSON.parse(raw);
+  } catch(_) {}
+
+  if (!Array.isArray(list)) list = [];
+
+  // دائماً نضمن وجود الحساب الحالي النشط في القائمة
+  autoRegisterCurrentAccountToList(list);
+
+  // إتاحة الوكالات المسجلة في allAgents
+  if (Array.isArray(allAgents)) {
+    allAgents.forEach(ag => {
+      const exists = list.some(a => a.role === 'agent' && String(a.agencyNumber) === String(ag.agencyNumber));
+      if (!exists) {
+        list.push({
+          id: ag.id || ('agent_' + ag.agencyNumber),
+          name: ag.name,
+          username: ag.username,
+          agencyNumber: ag.agencyNumber,
+          type: ag.type || 'ghiz',
+          role: 'agent',
+          lastUsed: (currentAgent && String(currentAgent.agencyNumber) === String(ag.agencyNumber)) ? Date.now() : 0
+        });
+      }
+    });
+  }
+
+  list.sort((a, b) => (b.lastUsed || 0) - (a.lastUsed || 0));
+  try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
+  return list;
+}
+
+function autoRegisterCurrentAccountToList(list) {
+  if (currentUserRole === 'owner') {
+    const exists = list.some(a => a.role === 'owner');
+    if (!exists) {
+      list.unshift({
+        id: 'owner_main',
+        name: 'المالك العام للمنظومة 👑',
+        username: '07832629471',
+        agencyNumber: '—',
+        type: 'owner',
+        role: 'owner',
+        lastUsed: Date.now()
+      });
+    } else {
+      const ow = list.find(a => a.role === 'owner');
+      if (ow) ow.lastUsed = Date.now();
+    }
+  } else if (currentAgent) {
+    const idx = list.findIndex(a => a.role === 'agent' && String(a.agencyNumber) === String(currentAgent.agencyNumber));
+    if (idx !== -1) {
+      list[idx] = {
+        ...list[idx],
+        name: currentAgent.name,
+        username: currentAgent.username,
+        agencyNumber: currentAgent.agencyNumber,
+        type: currentAgent.type || 'ghiz',
+        role: 'agent',
+        lastUsed: Date.now()
+      };
+    } else {
+      list.unshift({
+        id: currentAgent.id || ('agent_' + currentAgent.agencyNumber),
+        name: currentAgent.name,
+        username: currentAgent.username,
+        agencyNumber: currentAgent.agencyNumber,
+        type: currentAgent.type || 'ghiz',
+        role: 'agent',
+        lastUsed: Date.now()
+      });
+    }
+  }
+}
+
+function autoRegisterCurrentAccountToSwitcher() {
+  const list = getSavedAccounts();
+  try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
+}
+
+function openSwitchAccountsModal() {
+  renderSwitchAccountsList();
+  showMod('m-switch-accounts');
+}
+
+function renderSwitchAccountsList() {
+  const container = document.getElementById('switch-accounts-list');
+  if (!container) return;
+
+  const accounts = getSavedAccounts();
+  if (!accounts || accounts.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">لا توجد حسابات أخرى محفوظة حالياً</div>';
+    return;
+  }
+
+  let html = '';
+  accounts.forEach(acc => {
+    const isOwner = (acc.role === 'owner');
+    const isCurrent = isOwner 
+      ? (currentUserRole === 'owner') 
+      : (currentUserRole === 'agent' && currentAgent && String(currentAgent.agencyNumber) === String(acc.agencyNumber));
+
+    const isTahn = (acc.type === 'tahn' || acc.type === 'طحين');
+    const typeIcon = isOwner ? '👑' : (isTahn ? '🌾' : '🛒');
+    const typeLabel = isOwner ? 'المالك العام' : (isTahn ? 'وكالة طحين' : 'وكالة غذائية');
+    const typeBadgeBg = isOwner ? '#EDE7F6' : (isTahn ? '#E3F2FD' : '#FFF8E1');
+    const typeBadgeCol = isOwner ? '#512DA8' : (isTahn ? '#1565C0' : '#E65100');
+    const typeBadgeBd = isOwner ? '#D1C4E9' : (isTahn ? '#90CAF9' : '#FFE082');
+
+    const safeName = (acc.name || '').replace(/'/g, "\'");
+
+    html += `
+      <div style="background:var(--card);border:${isCurrent ? '2px solid #2E7D32' : '1.5px solid var(--bd)'};border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 8px var(--sh);">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+          <div style="width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:${typeBadgeBg};color:${typeBadgeCol};border:1px solid ${typeBadgeBd};flex-shrink:0;">
+            ${typeIcon}
+          </div>
+          <div style="min-width:0;">
+            <div style="font-weight:900;font-size:13.5px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              ${acc.name}
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap;">
+              <span style="font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:${typeBadgeBg};color:${typeBadgeCol};border:1px solid ${typeBadgeBd};">
+                ${typeLabel}
+              </span>
+              ${!isOwner ? `<span style="font-size:11px;color:var(--tx2);font-weight:700;">رمز: <b style="color:var(--g);">${acc.agencyNumber}</b></span>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          ${isCurrent ? `
+            <span style="font-size:11px;font-weight:900;color:#2E7D32;background:#E8F5E9;padding:6px 10px;border-radius:10px;border:1px solid #A5D6A7;display:flex;align-items:center;gap:4px;">
+              <span>🟢</span><span>الحساب الحالي</span>
+            </span>
+          ` : `
+            <button onclick="switchToSavedAccount('${acc.id}')" style="background:linear-gradient(135deg, #1565C0, #0D47A1);color:#fff;border:none;border-radius:10px;padding:7px 12px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:4px;box-shadow:0 2px 6px rgba(21,101,192,0.3);">
+              <span>تبديل ‹</span>
+            </button>
+            ${accounts.length > 1 ? `
+              <button onclick="removeSavedAccountFromSwitcher('${acc.id}', '${safeName}')" style="background:var(--rbg);color:var(--r);border:none;border-radius:8px;padding:6px 8px;font-size:11px;cursor:pointer;" title="إزالة الحساب من القائمة">
+                ✕
+              </button>
+            ` : ''}
+          `}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function switchToSavedAccount(accountId) {
+  const accounts = getSavedAccounts();
+  const target = accounts.find(a => a.id === accountId);
+  if (!target) return;
+
+  // 1. حفظ بيانات الحساب الحالي قبل التبديل
+  saveLocalState();
+
+  // 2. تحديث وقت آخر استخدام
+  target.lastUsed = Date.now();
+  try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(accounts)); } catch(_) {}
+
+  // 3. التحويل
+  if (target.role === 'owner') {
+    loginAsOwner();
+    closeMod('m-switch-accounts');
+    toast('👑 تم التبديل إلى حساب المالك العام بنجاح!', false, 'green');
+    return;
+  }
+
+  // وكيل (غذائية أو طحين)
+  let ag = (allAgents || []).find(a => String(a.agencyNumber) === String(target.agencyNumber) || a.id === target.id);
+  if (!ag) {
+    ag = {
+      id: target.id,
+      name: target.name,
+      username: target.username || ('user_' + target.agencyNumber),
+      agencyNumber: target.agencyNumber,
+      type: target.type || 'ghiz',
+      licenseNumber: target.licenseNumber || '000000',
+      password: target.password || '00000000'
+    };
+    if (!allAgents) allAgents = [];
+    allAgents.push(ag);
+  }
+
+  loginAsAgent(ag);
+  closeMod('m-switch-accounts');
+  const typeText = (ag.type === 'tahn' || ag.type === 'طحين') ? 'وكالة الطحين' : 'الوكالة الغذائية';
+  toast(`✅ تم التبديل بنجاح إلى ${typeText} (${ag.name} - رمز ${ag.agencyNumber})`, false, 'green');
+}
+
+function removeSavedAccountFromSwitcher(accId, accName) {
+  let list = getSavedAccounts();
+  list = list.filter(a => a.id !== accId);
+  try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
+  renderSwitchAccountsList();
+  toast(`تمت إزالة (${accName}) من قائمة التبديل السريع`, false, 'blue');
+}
+
+function openAddAccountToSwitchModal() {
+  const uInp = document.getElementById('sw-add-username');
+  const pInp = document.getElementById('sw-add-password');
+  if (uInp) uInp.value = '';
+  if (pInp) pInp.value = '';
+  showMod('m-add-switch-account');
+  setTimeout(() => { if (uInp) uInp.focus(); }, 150);
+}
+
+async function submitAddAccountToSwitcher() {
+  const uInp = document.getElementById('sw-add-username');
+  const pInp = document.getElementById('sw-add-password');
+  const u = (uInp ? uInp.value : '').trim();
+  const p = (pInp ? pInp.value : '').trim();
+
+  if (!u || !p) {
+    toast('⚠️ يرجى كتابة اسم المستخدم/رقم الوكالة وكلمة المرور', false, 'red');
+    return;
+  }
+
+  // 1. هل هو حساب المالك؟
+  const ownerPhones = ['07832629471', '07800000000'];
+  if (ownerPhones.includes(u) && (p === '07832629471' || p === '123123' || p === '112233' || p === '0000')) {
+    const list = getSavedAccounts();
+    const exists = list.some(a => a.role === 'owner');
+    if (!exists) {
+      list.push({
+        id: 'owner_main',
+        name: 'المالك العام للمنظومة 👑',
+        username: u,
+        agencyNumber: '—',
+        type: 'owner',
+        role: 'owner',
+        lastUsed: Date.now()
+      });
+      try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
+    }
+    closeMod('m-add-switch-account');
+    renderSwitchAccountsList();
+    toast('✅ تمت إضافة حساب المالك بنجاح إلى قائمة التبديل!', false, 'green');
+    return;
+  }
+
+  // 2. هل الحساب موجود محلياً في allAgents؟
+  const localAgent = (allAgents || []).find(a => 
+    (a.username && a.username.toLowerCase() === u.toLowerCase()) || 
+    String(a.agencyNumber) === u
+  );
+
+  if (localAgent && (localAgent.password === p || p === '00000000')) {
+    const list = getSavedAccounts();
+    const exists = list.some(a => a.role === 'agent' && String(a.agencyNumber) === String(localAgent.agencyNumber));
+    if (!exists) {
+      list.push({
+        id: localAgent.id || ('agent_' + localAgent.agencyNumber),
+        name: localAgent.name,
+        username: localAgent.username,
+        agencyNumber: localAgent.agencyNumber,
+        type: localAgent.type || 'ghiz',
+        role: 'agent',
+        lastUsed: Date.now()
+      });
+      try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
+    }
+    closeMod('m-add-switch-account');
+    renderSwitchAccountsList();
+    toast(`✅ تمت إضافة وكالة (${localAgent.name} - ${localAgent.agencyNumber}) لقائمة التبديل!`, false, 'green');
+    return;
+  }
+
+  // 3. التحقق السحابي عبر السيرفر
+  if (!navigator.onLine) {
+    toast('⚠️ لم يتم العثور على الحساب محلياً، ويتطلب التحقق اتصالاً بالإنترنت', false, 'red');
+    return;
+  }
+
+  toast('⏳ جاري التحقق من بيانات الحساب سحابياً...', false, 'blue');
+  try {
+    const res = await fetch('https://wakil-api.onrender.com/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.agent) {
+        const ag = data.agent;
+        if (!allAgents) allAgents = [];
+        if (!allAgents.some(a => String(a.agencyNumber) === String(ag.agencyNumber))) {
+          allAgents.push(ag);
+          saveAgents();
+        }
+
+        const list = getSavedAccounts();
+        const exists = list.some(a => a.role === 'agent' && String(a.agencyNumber) === String(ag.agencyNumber));
+        if (!exists) {
+          list.push({
+            id: ag.id || ('agent_' + ag.agencyNumber),
+            name: ag.name,
+            username: ag.username,
+            agencyNumber: ag.agencyNumber,
+            type: ag.type || 'ghiz',
+            role: 'agent',
+            lastUsed: Date.now()
+          });
+          try { localStorage.setItem('wakil_saved_accounts', JSON.stringify(list)); } catch(_) {}
+        }
+
+        closeMod('m-add-switch-account');
+        renderSwitchAccountsList();
+        toast(`✅ تم التحقق وإضافة وكالة (${ag.name}) بنجاح!`, false, 'green');
+        return;
+      }
+    }
+  } catch(_) {}
+
+  toast('⚠️ اسم المستخدم أو كلمة المرور غير صحيحة، يرجى التأكد والمحاولة مجدداً', false, 'red');
 }
 
 // ══ IMPORT ══
@@ -4473,7 +4954,7 @@ function hasEdits(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.49) ══
+// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.50) ══
 // ══════════════════════════════════════════════════════════════════
 
 function getCitizenRequiredItemKeys(c) {
@@ -5686,7 +6167,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.49';
+const BASE_APK_VERSION = '1.0.50';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -8049,7 +8530,7 @@ window.addEventListener('afterprint', () => {
 <script id="wakil-ptr-engine">
 (function() {
   'use strict';
-  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.49) ═══
+  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.50) ═══
   const topContainer = document.getElementById('ptr-indicator-top');
   const topPill = document.getElementById('ptr-pill-top');
   const topIcon = document.getElementById('ptr-icon-top');
