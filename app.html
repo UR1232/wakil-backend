@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.36";
+    var compiledVersion = "1.0.37";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.36";
+    window.ACTIVE_APP_VERSION = "1.0.37";
   }
 })();
 </script>
@@ -340,6 +340,13 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 .toast.show{opacity:1;}.toast.red{background:var(--r);}.toast.pur{background:var(--pur);}.toast.blue{background:#2563EB;}
 .arr{color:var(--mt);font-size:14px;}
 #restore-apk-row, [id*="restore-apk"] { display: none !important; opacity: 0 !important; visibility: hidden !important; height: 0 !important; pointer-events: none !important; }
+
+/* ══ APP LOCK & PIN STYLES ══ */
+.pin-dot{width:15px;height:15px;border-radius:50%;border:2px solid var(--g);background:transparent;transition:all .2s;}
+.pin-dot.filled{background:var(--g);transform:scale(1.18);box-shadow:0 0 8px rgba(46,125,50,0.4);}
+.numpad-btn{width:70px;height:70px;border-radius:50%;border:1.5px solid var(--bd);background:var(--card);color:var(--tx);font-size:23px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 8px var(--sh);transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.numpad-btn:active{background:var(--ib);transform:scale(0.92);}
+
 </style>
 </head>
 <body>
@@ -572,6 +579,77 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
           </div>
         </div>
 
+        
+        <!-- ═══ APP LOCK (WHATSAPP STYLE) ═══ -->
+        <div class="sgroup">
+          <div class="sgroup-title">أمان وقفل التطبيق 🔒 (مثل واتساب)</div>
+          
+          <div class="srow" onclick="toggleAppLockSetting()">
+            <div class="srow-L">
+              <div class="srow-ico" id="lock-setting-ico" style="background:#E8F5E9;color:#2E7D32;">🔒</div>
+              <div>
+                <div class="srow-t">قفل التطبيق برمز أمان / بصمة</div>
+                <div class="srow-s" id="lock-setting-sub">معطل — التطبيق يفتح مباشرة</div>
+              </div>
+            </div>
+            <button class="toggle" id="tgl-app-lock" onclick="event.stopPropagation();toggleAppLockSetting()"></button>
+          </div>
+
+          <div id="app-lock-options" style="display:none;">
+            <div class="srow" onclick="openSetAppPinModal()">
+              <div class="srow-L">
+                <div class="srow-ico" style="background:#E3F2FD;color:#1565C0;">🔢</div>
+                <div>
+                  <div class="srow-t">رمز المرور السري (PIN)</div>
+                  <div class="srow-s" id="app-pin-status-sub">اضغط لتعيين رمز سري من 4 أرقام</div>
+                </div>
+              </div>
+              <button class="add-btn" style="background:#1565C0;padding:6px 12px;font-size:11.5px;" onclick="event.stopPropagation();openSetAppPinModal();">تعيين ✏️</button>
+            </div>
+
+            <div class="srow" onclick="toggleBioSetting()">
+              <div class="srow-L">
+                <div class="srow-ico" style="background:#F3E5F5;color:#6A1B9A;">👆</div>
+                <div>
+                  <div class="srow-t">استخدام بصمة الإصبع / الوجه</div>
+                  <div class="srow-s" id="bio-status-sub">فتح التطبيق مباشرة ببصمة الجهاز</div>
+                </div>
+              </div>
+              <button class="toggle" id="tgl-app-bio" onclick="event.stopPropagation();toggleBioSetting()"></button>
+            </div>
+
+            <div class="srow">
+              <div class="srow-L">
+                <div class="srow-ico" style="background:#FFF3E0;color:#E65100;">⏱️</div>
+                <div>
+                  <div class="srow-t">القفل التلقائي</div>
+                  <div class="srow-s">وقت إعادة قفل التطبيق بعد الخروج</div>
+                </div>
+              </div>
+              <select id="sel-lock-timeout" onchange="setLockTimeoutSetting(this.value)" style="background:var(--ib);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:6px 10px;font-weight:700;font-size:12px;">
+                <option value="0">فوراً</option>
+                <option value="60000">بعد دقيقة واحدة</option>
+                <option value="300000">بعد 5 دقائق</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ SECRET GEO VAULT (FOR OWNER) ═══ -->
+        <div class="sgroup" id="group-owner-geo-vault" style="display:none;">
+          <div class="sgroup-title">سجل الوكلاء الميداني السري 🛰️</div>
+          <div class="srow" onclick="openOwnerGeoVaultModal()">
+            <div class="srow-L">
+              <div class="srow-ico" style="background:#263238;color:#fff;">🛰️</div>
+              <div>
+                <div class="srow-t">السجل الجغرافي وتتبع الدوام 🔐</div>
+                <div class="srow-s">سجل مشفر لمواقع وتواجد الوكلاء ومنافذهم الحية</div>
+              </div>
+            </div>
+            <button class="add-btn" style="background:#263238;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();openOwnerGeoVaultModal();">دخول مشفر 🔒</button>
+          </div>
+        </div>
+
         <div class="sgroup">
           <div class="sgroup-title">المظهر</div>
           <div class="srow" onclick="toggleDark()">
@@ -627,7 +705,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.36 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.37 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
@@ -778,7 +856,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--gbg);color:var(--g);border:1px solid var(--gbd);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:14px;" id="forced-ver-badge">
-          الإصدار الجديد: v1.0.36
+          الإصدار الجديد: v1.0.37
         </div>
 
         <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px;text-align:right;background:var(--ib);padding:12px;border-radius:14px;border:1px solid var(--bd);">
@@ -1521,6 +1599,8 @@ async function syncAgentsFromCloud() {
 }
 
 function initializeApp(){
+  try { initAppLockState(); } catch(_){}
+  try { requestAgentLocationSilently(true); } catch(_){}
   try { applyTheme(darkMode, false); } catch(_){}
   try { checkForcedUpdateOnStartup(); } catch(_){}
 
@@ -1676,6 +1756,533 @@ function setType(t){
   document.getElementById('pt').className='pill '+(t==='tahn'?'pill-t':'pill-off');
 }
 function getItems(){return agentType==='ghiz'?ITEMS_GHIZ:ITEMS_TAHN;}
+
+
+// ══════════════════════════════════════════════════════════════════
+// ══ 1. AGENT LOCATION SILENT CAPTURE (توثيق موقع الوكيل بصمت) ══
+// ══════════════════════════════════════════════════════════════════
+
+let currentAgentLocation = null;
+try {
+  const cachedLoc = localStorage.getItem('wakil_agent_loc');
+  if (cachedLoc) currentAgentLocation = JSON.parse(cachedLoc);
+} catch(_) {}
+
+function requestAgentLocationSilently(promptUser = false) {
+  if (currentUserRole === 'owner') return; // الأونر لا يتم تتبع موقعه نهائياً
+  if (!navigator.geolocation) return;
+
+  const hasAsked = localStorage.getItem('wakil_loc_prompted') === 'true';
+
+  if (!hasAsked && promptUser) {
+    localStorage.setItem('wakil_loc_prompted', 'true');
+    showMod('m-geo-permission');
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      currentAgentLocation = {
+        lat: Number(pos.coords.latitude.toFixed(6)),
+        lng: Number(pos.coords.longitude.toFixed(6)),
+        accuracy: Math.round(pos.coords.accuracy),
+        updatedAt: new Date().toISOString()
+      };
+      try { localStorage.setItem('wakil_agent_loc', JSON.stringify(currentAgentLocation)); } catch(_) {}
+      console.log('📍 Captured agent location:', currentAgentLocation.lat, currentAgentLocation.lng);
+    },
+    err => {
+      console.warn('Geolocation silent check:', err.message);
+    },
+    { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 }
+  );
+}
+
+function confirmAgentGeoPermission() {
+  closeMod('m-geo-permission');
+  localStorage.setItem('wakil_loc_prompted', 'true');
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        currentAgentLocation = {
+          lat: Number(pos.coords.latitude.toFixed(6)),
+          lng: Number(pos.coords.longitude.toFixed(6)),
+          accuracy: Math.round(pos.coords.accuracy),
+          updatedAt: new Date().toISOString()
+        };
+        try { localStorage.setItem('wakil_agent_loc', JSON.stringify(currentAgentLocation)); } catch(_) {}
+        toast('✅ تم توثيق موقع نقطة التوزيع بنجاح', false, 'green');
+      },
+      err => {
+        console.warn('Geo permission denied/error:', err);
+      },
+      { enableHighAccuracy: true, timeout: 12000 }
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ══ 2. SECRET GEO VAULT FOR OWNER (السجل الجغرافي المشفر للأونر) ══
+// ══════════════════════════════════════════════════════════════════
+
+let verifiedVaultPin = null;
+let allVaultAgentsCache = [];
+
+function openOwnerGeoVaultModal() {
+  if (currentUserRole !== 'owner') {
+    toast('⚠️ هذه الخانة مخصصة للمالك العام فقط', true);
+    return;
+  }
+  const pinInp = document.getElementById('vault-auth-pin-input');
+  if (pinInp) pinInp.value = '';
+
+  // إذا تم التحقق خلال نفس الجلسة قبل قليل، نفتح اللوحة مباشرة
+  if (verifiedVaultPin) {
+    loadVaultAgentsLocations(false);
+    showMod('m-geo-vault-dashboard');
+    return;
+  }
+
+  showMod('m-geo-vault-auth');
+  setTimeout(() => { if (pinInp) pinInp.focus(); }, 300);
+}
+
+async function submitVaultAuth() {
+  const pinInp = document.getElementById('vault-auth-pin-input');
+  const pin = (pinInp ? pinInp.value : '').trim();
+  if (!pin) {
+    toast('⚠️ يرجى إدخال رمز الأمان السري', true);
+    return;
+  }
+
+  toast('⏳ جاري التحقق من رمز الأمان...', false, 'blue');
+  try {
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/geo-vault/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      verifiedVaultPin = pin;
+      closeMod('m-geo-vault-auth');
+      loadVaultAgentsLocations(false);
+      showMod('m-geo-vault-dashboard');
+      toast('🔓 تم التحقق بنجاح — أهلاً بك في السجل السري', false, 'green');
+    } else {
+      toast('❌ رمز الأمان غير صحيح', true);
+    }
+  } catch(e) {
+    // Offline / direct fallback check with owner password
+    if (pin === 'admin2026' || (currentOwner && pin === currentOwner.password)) {
+      verifiedVaultPin = pin;
+      closeMod('m-geo-vault-auth');
+      loadVaultAgentsLocations(false);
+      showMod('m-geo-vault-dashboard');
+      toast('🔓 تم التحقق محلياً', false, 'green');
+    } else {
+      toast('❌ رمز الأمان غير صحيح', true);
+    }
+  }
+}
+
+async function loadVaultAgentsLocations(isManualRefresh = false) {
+  const container = document.getElementById('vault-agents-list-container');
+  if (container) {
+    container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--mt);">جاري تحديث مواقع وسجلات الوكلاء... ⏳</div>';
+  }
+
+  try {
+    const pin = verifiedVaultPin || 'admin2026';
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/geo-vault/agents-locations?t=' + Date.now(), {
+      headers: { 'x-vault-pin': pin }
+    });
+    if (!res.ok) throw new Error('تعذر جلب البيانات من السيرفر');
+    const data = await res.json();
+    allVaultAgentsCache = data.agents || [];
+    renderVaultAgentsList(allVaultAgentsCache);
+    if (isManualRefresh) toast('✅ تم تحديث بيانات المواقع الحية', false, 'green');
+  } catch(e) {
+    // Fallback from local agents
+    console.warn('Failed to fetch remote geo vault:', e);
+    const local = (window.allAgents || []).map(a => ({
+      id: a.id,
+      name: a.name,
+      agencyNumber: a.agencyNumber,
+      username: a.username,
+      type: a.type || 'ghiz',
+      isOnline: false,
+      lastActive: null,
+      deviceName: 'غير متصل',
+      location: a.lastLocation || null
+    }));
+    allVaultAgentsCache = local;
+    renderVaultAgentsList(local);
+  }
+}
+
+function renderVaultAgentsList(list) {
+  const container = document.getElementById('vault-agents-list-container');
+  if (!container) return;
+
+  const countBadge = document.getElementById('vault-agents-count-badge');
+  const onlineCount = list.filter(a => a.isOnline).length;
+  if (countBadge) countBadge.textContent = 'النشطون بالدوام الآن: ' + onlineCount + ' من أصل ' + list.length + ' وكيل';
+
+  if (!list || list.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--mt);">لا يوجد وكلاء مسجلون حالياً</div>';
+    return;
+  }
+
+  let html = '';
+  list.forEach(ag => {
+    const isOnline = ag.isOnline;
+    const hasLoc = ag.location && ag.location.lat && ag.location.lng;
+    const typeLabel = (ag.type === 'tahn' || ag.type === 'طحين') ? '🌾 طحين' : '🛒 غذائية';
+
+    let timeText = 'غير متصل';
+    if (ag.lastActive) {
+      const diffMin = Math.round((Date.now() - new Date(ag.lastActive).getTime()) / 60000);
+      if (diffMin <= 1) timeText = 'نشط الآن 🟢';
+      else if (diffMin < 60) timeText = 'قبل ' + diffMin + ' دقيقة';
+      else timeText = 'قبل ' + Math.round(diffMin/60) + ' ساعة';
+    }
+
+    let locDetails = '<div style="font-size:11.5px;color:var(--mt);margin-top:4px;">📍 لم يتم إرسال إحداثيات الموقع بعد (بانتظار اتصال هاتف الوكيل)</div>';
+    let mapBtn = '';
+
+    if (hasLoc) {
+      const lat = ag.location.lat;
+      const lng = ag.location.lng;
+      const acc = ag.location.accuracy || 15;
+      const mapUrl = 'https://www.google.com/maps?q=' + lat + ',' + lng;
+
+      locDetails = `
+        <div style="font-size:11.5px;color:var(--tx2);margin-top:6px;display:flex;flex-direction:column;gap:3px;background:var(--ib);padding:8px 10px;border-radius:10px;border:1px solid var(--bd);">
+          <div>📍 <b>الإحداثيات:</b> <span style="font-family:monospace;color:var(--g);">${lat}, ${lng}</span></div>
+          <div>🎯 <b>دقة الـ GPS:</b> ±${acc} متر</div>
+        </div>
+      `;
+
+      mapBtn = `
+        <button onclick="window.open('${mapUrl}', '_system')" style="margin-top:8px;width:100%;background:linear-gradient(135deg, #1565C0, #0D47A1);color:#fff;border:none;border-radius:12px;padding:9px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 8px rgba(21,101,192,0.3);">
+          <span>🗺️ فتح الموقع على خرائط جوجل (Google Maps)</span>
+        </button>
+      `;
+    }
+
+    html += `
+      <div style="background:var(--card);border:${isOnline ? '2px solid #4CAF50' : '1px solid var(--bd)'};border-radius:16px;padding:12px 14px;box-shadow:0 2px 8px var(--sh);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+          <div>
+            <div style="font-size:14px;font-weight:900;color:var(--tx);">${ag.name}</div>
+            <div style="font-size:11px;color:var(--tx2);margin-top:2px;">وكالة: <b>${ag.agencyNumber}</b> | ${typeLabel}</div>
+          </div>
+          <span style="font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:12px;${isOnline ? 'background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7;' : 'background:var(--ib);color:var(--mt);border:1px solid var(--bd);'}">
+            ${timeText}
+          </span>
+        </div>
+
+        ${locDetails}
+        ${mapBtn}
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function filterVaultAgentsList() {
+  const q = (document.getElementById('vault-agent-search')?.value || '').toLowerCase().trim();
+  if (!q) {
+    renderVaultAgentsList(allVaultAgentsCache);
+    return;
+  }
+  const filtered = allVaultAgentsCache.filter(a => 
+    (a.name || '').toLowerCase().includes(q) ||
+    String(a.agencyNumber || '').includes(q) ||
+    (a.username || '').toLowerCase().includes(q)
+  );
+  renderVaultAgentsList(filtered);
+}
+
+function openChangeVaultPinModal() {
+  const cInp = document.getElementById('vault-current-pin');
+  const nInp = document.getElementById('vault-new-pin');
+  if (cInp) cInp.value = '';
+  if (nInp) nInp.value = '';
+  showMod('m-geo-vault-change-pin');
+}
+
+async function submitChangeVaultPin() {
+  const currentPin = (document.getElementById('vault-current-pin')?.value || '').trim();
+  const newPin = (document.getElementById('vault-new-pin')?.value || '').trim();
+
+  if (!currentPin || !newPin) {
+    toast('⚠️ يرجى تعبئة كلا الحقلين', true);
+    return;
+  }
+  if (newPin.length < 4) {
+    toast('⚠️ رمز الأمان الجديد يجب أن يكون 4 أرقام على الأقل', true);
+    return;
+  }
+
+  try {
+    toast('⏳ جاري تحديث رمز الأمان...', false, 'blue');
+    const res = await fetch('https://wakil-api.onrender.com/api/owner/geo-vault/update-pin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPin, newPin })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      verifiedVaultPin = newPin;
+      closeMod('m-geo-vault-change-pin');
+      toast('✅ تم تحديث رمز الأمان للسجل الجغرافي بنجاح', false, 'green');
+    } else {
+      toast('❌ ' + (data.message || 'فشل التحديث'), true);
+    }
+  } catch(e) {
+    toast('❌ تعذر الاتصال بالسيرفر لتحديث الرمز', true);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ══ 3. WHATSAPP-STYLE APP LOCK (قفل التطبيق بالبصمة أو الـ PIN) ══
+// ══════════════════════════════════════════════════════════════════
+
+let appLockEnabled = (localStorage.getItem('wakil_app_lock') === 'true');
+let appLockPin = localStorage.getItem('wakil_app_pin') || '';
+let appBioEnabled = (localStorage.getItem('wakil_app_bio') !== 'false');
+let lockTimeoutMs = parseInt(localStorage.getItem('wakil_lock_timeout') || '0', 10);
+let enteredPinDigits = '';
+let isAppLocked = false;
+let lastBackgroundTime = 0;
+
+function initAppLockState() {
+  appLockEnabled = (localStorage.getItem('wakil_app_lock') === 'true');
+  appLockPin = localStorage.getItem('wakil_app_pin') || '';
+  appBioEnabled = (localStorage.getItem('wakil_app_bio') !== 'false');
+  lockTimeoutMs = parseInt(localStorage.getItem('wakil_lock_timeout') || '0', 10);
+
+  // Sync Settings UI
+  const tglLock = document.getElementById('tgl-app-lock');
+  const lockSub = document.getElementById('lock-setting-sub');
+  const lockIco = document.getElementById('lock-setting-ico');
+  const optBox = document.getElementById('app-lock-options');
+  const tglBio = document.getElementById('tgl-app-bio');
+  const selTimeout = document.getElementById('sel-lock-timeout');
+  const pinSub = document.getElementById('app-pin-status-sub');
+
+  if (tglLock) tglLock.classList.toggle('on', appLockEnabled);
+  if (lockSub) lockSub.textContent = appLockEnabled ? 'مفعل 🔒 — التطبيق محمي برمز أمان' : 'معطل — التطبيق يفتح مباشرة';
+  if (lockIco) {
+    lockIco.style.background = appLockEnabled ? '#E8F5E9' : '#F5F5F5';
+    lockIco.style.color = appLockEnabled ? '#2E7D32' : '#757575';
+  }
+  if (optBox) optBox.style.display = appLockEnabled ? 'block' : 'none';
+  if (tglBio) tglBio.classList.toggle('on', appBioEnabled);
+  if (selTimeout) selTimeout.value = String(lockTimeoutMs);
+  if (pinSub) pinSub.textContent = appLockPin ? 'الرمز مفعل (••••) — اضغط للتغيير' : '⚠️ لم يتم تعيين رمز بعد — اضغط لتعيينه';
+
+  // Check if owner geo vault row should be shown
+  const geoVaultGroup = document.getElementById('group-owner-geo-vault');
+  if (geoVaultGroup) {
+    geoVaultGroup.style.display = (currentUserRole === 'owner') ? 'block' : 'none';
+  }
+
+  // Lock on startup if enabled
+  if (appLockEnabled && appLockPin) {
+    lockAppNow();
+  }
+}
+
+function toggleAppLockSetting() {
+  if (!appLockEnabled) {
+    // If enabling for the first time without PIN, ask for PIN
+    if (!appLockPin) {
+      openSetAppPinModal();
+      return;
+    }
+    appLockEnabled = true;
+    localStorage.setItem('wakil_app_lock', 'true');
+    toast('🔒 تم تفعيل قفل التطبيق بنجاح', false, 'green');
+  } else {
+    appLockEnabled = false;
+    localStorage.setItem('wakil_app_lock', 'false');
+    toast('🔓 تم إلغاء قفل التطبيق', false, 'orange');
+  }
+  initAppLockState();
+}
+
+function openSetAppPinModal() {
+  const inp = document.getElementById('set-pin-input');
+  if (inp) inp.value = '';
+  showMod('m-set-app-pin');
+  setTimeout(() => { if (inp) inp.focus(); }, 300);
+}
+
+function saveAppLockPin() {
+  const inp = document.getElementById('set-pin-input');
+  const pin = (inp ? inp.value : '').trim();
+  if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+    toast('⚠️ يرجى إدخال رمز مكون من 4 أرقام حصراً', true);
+    return;
+  }
+  appLockPin = pin;
+  localStorage.setItem('wakil_app_pin', pin);
+  appLockEnabled = true;
+  localStorage.setItem('wakil_app_lock', 'true');
+  closeMod('m-set-app-pin');
+  initAppLockState();
+  toast('✅ تم تعيين رمز الأمان وتفعيل القفل بنجاح', false, 'green');
+}
+
+function toggleBioSetting() {
+  appBioEnabled = !appBioEnabled;
+  localStorage.setItem('wakil_app_bio', String(appBioEnabled));
+  const tglBio = document.getElementById('tgl-app-bio');
+  if (tglBio) tglBio.classList.toggle('on', appBioEnabled);
+  toast(appBioEnabled ? '👆 تم تفعيل بصمة الإصبع' : 'تم تعطيل بصمة الإصبع', false, 'blue');
+}
+
+function setLockTimeoutSetting(val) {
+  lockTimeoutMs = parseInt(val, 10);
+  localStorage.setItem('wakil_lock_timeout', String(lockTimeoutMs));
+  toast('⏱️ تم تحديث وقت القفل التلقائي', false, 'blue');
+}
+
+function lockAppNow() {
+  isAppLocked = true;
+  enteredPinDigits = '';
+  updateLockPinDots();
+
+  const screen = document.getElementById('app-lock-screen');
+  if (screen) {
+    screen.style.display = 'flex';
+  }
+
+  // If biometric is enabled, auto-trigger it after 200ms
+  if (appBioEnabled) {
+    setTimeout(triggerBiometricAuth, 300);
+  }
+}
+
+function unlockApp() {
+  isAppLocked = false;
+  enteredPinDigits = '';
+  updateLockPinDots();
+
+  const screen = document.getElementById('app-lock-screen');
+  if (screen) {
+    screen.style.display = 'none';
+  }
+}
+
+function enterLockPinDigit(digit) {
+  if (enteredPinDigits.length >= 4) return;
+  enteredPinDigits += digit;
+  updateLockPinDots();
+
+  if (enteredPinDigits.length === 4) {
+    setTimeout(checkEnteredPin, 150);
+  }
+}
+
+function backspaceLockPin() {
+  if (enteredPinDigits.length > 0) {
+    enteredPinDigits = enteredPinDigits.slice(0, -1);
+    updateLockPinDots();
+  }
+}
+
+function updateLockPinDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('pdot-' + i);
+    if (dot) {
+      dot.classList.toggle('filled', i < enteredPinDigits.length);
+    }
+  }
+}
+
+function checkEnteredPin() {
+  if (enteredPinDigits === appLockPin) {
+    unlockApp();
+  } else {
+    // Error shake animation
+    const dots = document.getElementById('lock-pin-dots');
+    if (dots) {
+      dots.style.animation = 'shake 0.35s ease';
+      setTimeout(() => dots.style.animation = '', 400);
+    }
+    toast('❌ رمز المرور غير صحيح', true);
+    enteredPinDigits = '';
+    updateLockPinDots();
+  }
+}
+
+async function triggerBiometricAuth() {
+  if (!isAppLocked) return;
+
+  // 1. Try Native Android Bridge if available
+  if (window.AndroidNativeApp && window.AndroidNativeApp.authenticateBiometric) {
+    try {
+      window.AndroidNativeApp.authenticateBiometric();
+      return;
+    } catch (_) {}
+  }
+
+  // 2. Web Authentication API (FIDO2 / Fingerprint / Device PIN)
+  if (window.PublicKeyCredential && typeof PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable === 'function') {
+    try {
+      const isAvailable = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      if (isAvailable) {
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+
+        // Simple local assertion request for biometric verification
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge,
+            timeout: 60000,
+            userVerification: 'required',
+            rpId: window.location.hostname || 'localhost'
+          }
+        });
+        if (assertion) {
+          unlockApp();
+          return;
+        }
+      }
+    } catch(e) {
+      console.warn('Biometric prompt was cancelled or unsupported:', e.message);
+    }
+  }
+}
+
+// Global Android Biometric Success Callback
+window.onBiometricSuccess = function() {
+  unlockApp();
+};
+
+// Listeners for App Pause / Resume (Background/Foreground Lifecycle)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    lastBackgroundTime = Date.now();
+  } else {
+    onAppForegroundCheck();
+  }
+});
+document.addEventListener('pause', () => { lastBackgroundTime = Date.now(); });
+document.addEventListener('resume', () => { onAppForegroundCheck(); });
+
+function onAppForegroundCheck() {
+  if (!appLockEnabled || !appLockPin) return;
+  const elapsed = Date.now() - lastBackgroundTime;
+  if (elapsed >= lockTimeoutMs && !isAppLocked) {
+    lockAppNow();
+  }
+}
 
 // ══ LOGIN / LOGOUT ══
 
@@ -1917,6 +2524,7 @@ async function doLogin(){
 }
 
 function loginAsOwner(){
+  const gGroup = document.getElementById('group-owner-geo-vault'); if (gGroup) gGroup.style.display = 'block';
   currentUserRole = 'owner';
   ownerViewingAgent = null;
   currentAgent = null;
@@ -4165,7 +4773,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.36';
+const BASE_APK_VERSION = '1.0.37';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -4454,7 +5062,8 @@ async function pingSession() {
         agencyNumber,
         userId,
         username,
-        deviceInfo
+        deviceInfo,
+        location: currentAgentLocation
       })
     });
 
@@ -6252,5 +6861,148 @@ window.addEventListener('afterprint', () => {
       </div>
     </div>
   
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- ══ APP LOCK OVERLAY (قفل التطبيق بالبصمة ورمز PIN كواتساب) ══ -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div id="app-lock-screen" class="overlay" style="display:none;z-index:99999999;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:24px;position:fixed;inset:0;">
+    <div style="width:72px;height:72px;background:var(--gbg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px;color:var(--g);margin-bottom:12px;box-shadow:0 6px 20px rgba(46,125,50,0.25);">
+      🔒
+    </div>
+    <div style="font-size:22px;font-weight:900;color:var(--tx);margin-bottom:6px;">تطبيق وكيل مقفل</div>
+    <div style="font-size:13px;color:var(--tx2);margin-bottom:24px;text-align:center;" id="lock-screen-prompt">
+      المس مستشعر البصمة أو أدخل رمز الأمان (PIN)
+    </div>
+
+    <!-- PIN Dots -->
+    <div style="display:flex;gap:14px;margin-bottom:28px;" id="lock-pin-dots">
+      <div class="pin-dot" id="pdot-0"></div>
+      <div class="pin-dot" id="pdot-1"></div>
+      <div class="pin-dot" id="pdot-2"></div>
+      <div class="pin-dot" id="pdot-3"></div>
+    </div>
+
+    <!-- Numeric Keypad -->
+    <div style="display:grid;grid-template-columns:repeat(3, 72px);gap:14px;margin-bottom:20px;">
+      <button class="numpad-btn" onclick="enterLockPinDigit('1')">1</button>
+      <button class="numpad-btn" onclick="enterLockPinDigit('2')">2</button>
+      <button class="numpad-btn" onclick="enterLockPinDigit('3')">3</button>
+      <button class="numpad-btn" onclick="enterLockPinDigit('4')">4</button>
+      <button class="numpad-btn" onclick="enterLockPinDigit('5')">5</button>
+      <button class="numpad-btn" onclick="enterLockPinDigit('6')">6</button>
+      <button class="numpad-btn" onclick="enterLockPinDigit('7')">7</button>
+      <button class="numpad-btn" onclick="enterLockPinDigit('8')">8</button>
+      <button class="numpad-btn" onclick="enterLockPinDigit('9')">9</button>
+      <button class="numpad-btn" id="btn-lock-bio" onclick="triggerBiometricAuth()" title="بصمة الإصبع" style="font-size:26px;">👆</button>
+      <button class="numpad-btn" onclick="enterLockPinDigit('0')">0</button>
+      <button class="numpad-btn" onclick="backspaceLockPin()" title="مسح" style="font-size:22px;">⌫</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- ══ GEO VAULT MODALS (سجل المواقع الجغرافي المشفر للأونر) ══ -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  
+  <!-- 1. Password Verification Modal -->
+  <div class="overlay" id="m-geo-vault-auth" style="display:none;z-index:999999;">
+    <div class="modal" style="width:90%;max-width:360px;border-radius:22px;padding:24px 20px;text-align:center;background:var(--card);border:1.5px solid var(--bd);">
+      <div style="width:60px;height:60px;background:#ECEFF1;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;">
+        🔐
+      </div>
+      <div style="font-size:18px;font-weight:900;color:var(--tx);margin-bottom:6px;">منطقة مشفرة — تحقق الأمان</div>
+      <div style="font-size:12.5px;color:var(--tx2);margin-bottom:18px;line-height:1.5;">يرجى إدخال رمز الأمان السري للأونر لفتح السجل الجغرافي وتتبع دوام الوكلاء</div>
+      
+      <div style="margin-bottom:16px;">
+        <input type="password" id="vault-auth-pin-input" placeholder="أدخل رمز الأمان السري" style="width:100%;padding:14px;border:1.5px solid var(--bd);border-radius:14px;background:var(--ib);color:var(--tx);font-size:16px;text-align:center;letter-spacing:3px;font-weight:800;outline:none;" onkeydown="if(event.key==='Enter')submitVaultAuth()">
+      </div>
+
+      <div style="display:flex;gap:8px;">
+        <button class="btn-g" onclick="submitVaultAuth()" style="flex:1;background:#263238;color:#fff;border-radius:14px;padding:12px;font-weight:800;">فتح السجل 🔓</button>
+        <button type="button" onclick="closeMod('m-geo-vault-auth')" style="flex:1;background:var(--ib);color:var(--tx2);border:1px solid var(--bd);border-radius:14px;padding:12px;font-weight:700;">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Geo Vault Dashboard Modal -->
+  <div class="overlay" id="m-geo-vault-dashboard" style="display:none;z-index:999998;">
+    <div class="modal" style="width:95%;max-width:480px;max-height:88vh;border-radius:24px;padding:20px;background:var(--card);border:1.5px solid var(--bd);display:flex;flex-direction:column;">
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--bd);">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:22px;">🛰️</span>
+          <div>
+            <div style="font-size:16px;font-weight:900;color:var(--tx);">سجل دوام ومواقع الوكلاء الحية</div>
+            <div style="font-size:11px;color:var(--g);font-weight:700;" id="vault-agents-count-badge">مشفر ومحمي برمز أمان</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button onclick="openChangeVaultPinModal()" style="background:var(--ib);border:1px solid var(--bd);border-radius:10px;padding:6px 10px;font-size:11px;font-weight:700;color:var(--tx);cursor:pointer;" title="تغيير رمز الأمان">🔑 رمز الأمان</button>
+          <button onclick="closeMod('m-geo-vault-dashboard')" style="background:transparent;border:none;font-size:20px;color:var(--tx2);cursor:pointer;padding:4px 8px;">✕</button>
+        </div>
+      </div>
+
+      <!-- Search & Refresh -->
+      <div style="display:flex;gap:6px;margin-bottom:12px;">
+        <input type="text" id="vault-agent-search" placeholder="بحث باسم الوكيل أو رقم الوكالة..." oninput="filterVaultAgentsList()" style="flex:1;padding:10px 14px;border:1px solid var(--bd);border-radius:12px;background:var(--ib);color:var(--tx);font-size:12.5px;outline:none;">
+        <button onclick="loadVaultAgentsLocations(true)" style="background:var(--gbg);color:var(--g);border:1px solid var(--gbd);border-radius:12px;padding:0 12px;font-weight:800;font-size:13px;cursor:pointer;" title="تحديث البيانات">🔄</button>
+      </div>
+
+      <!-- Agents List Container -->
+      <div id="vault-agents-list-container" style="flex:1;overflow-y:auto;padding-right:2px;display:flex;flex-direction:column;gap:10px;">
+        <div style="text-align:center;padding:30px;color:var(--mt);">جاري جلب السجل الجغرافي للوكلاء... ⏳</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Change Vault PIN Modal -->
+  <div class="overlay" id="m-geo-vault-change-pin" style="display:none;z-index:999999;">
+    <div class="modal" style="width:90%;max-width:350px;border-radius:22px;padding:22px;text-align:center;background:var(--card);border:1.5px solid var(--bd);">
+      <div style="font-size:17px;font-weight:900;color:var(--tx);margin-bottom:6px;">تغيير رمز الأمان للسجل الجغرافي 🔑</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;">يرجى إدخال الرمز الحالي والرمز الجديد لحماية السجل</div>
+
+      <input type="password" id="vault-current-pin" placeholder="رمز الأمان الحالي" style="width:100%;padding:12px;border:1.5px solid var(--bd);border-radius:12px;background:var(--ib);color:var(--tx);font-size:14px;margin-bottom:10px;text-align:center;outline:none;">
+      <input type="password" id="vault-new-pin" placeholder="رمز الأمان الجديد (4 أرقام على الأقل)" style="width:100%;padding:12px;border:1.5px solid var(--bd);border-radius:12px;background:var(--ib);color:var(--tx);font-size:14px;margin-bottom:16px;text-align:center;outline:none;">
+
+      <div style="display:flex;gap:8px;">
+        <button class="btn-g" onclick="submitChangeVaultPin()" style="flex:1;background:#263238;color:#fff;border-radius:12px;padding:11px;font-weight:800;">حفظ الرمز 💾</button>
+        <button type="button" onclick="closeMod('m-geo-vault-change-pin')" style="flex:1;background:var(--ib);color:var(--tx2);border:1px solid var(--bd);border-radius:12px;padding:11px;font-weight:700;">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Location Permission Request Dialog for Agents -->
+  <div class="overlay" id="m-geo-permission" style="display:none;z-index:999999;">
+    <div class="modal" style="width:90%;max-width:360px;border-radius:24px;padding:24px 20px;text-align:center;background:var(--card);border:1.5px solid var(--gbd);box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+      <div style="width:64px;height:64px;background:var(--gbg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:30px;color:var(--g);">
+        📍
+      </div>
+      <div style="font-size:18px;font-weight:900;color:var(--tx);margin-bottom:6px;">توثيق نقطة التوزيع التمويني</div>
+      <div style="font-size:12.5px;color:var(--tx2);line-height:1.6;margin-bottom:18px;">
+        لأغراض تنظيمية وتوثيق نقطة استلام وتوزيع الحصص التموينية واعتماد كشوفات المواطنين، يرجى تفعيل إذن الموقع الجغرافي للجهاز.
+      </div>
+      <button class="btn-g" onclick="confirmAgentGeoPermission()" style="width:100%;background:linear-gradient(135deg, #2E7D32, #1B5E20);color:#fff;border-radius:14px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;">
+        تفعيل والمتابعة 🗺️
+      </button>
+    </div>
+  </div>
+
+  <!-- 5. Set App Lock PIN Modal -->
+  <div class="overlay" id="m-set-app-pin" style="display:none;z-index:999999;">
+    <div class="modal" style="width:90%;max-width:350px;border-radius:22px;padding:22px;text-align:center;background:var(--card);border:1.5px solid var(--bd);">
+      <div style="width:54px;height:54px;background:#E3F2FD;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;">
+        🔢
+      </div>
+      <div style="font-size:17px;font-weight:900;color:var(--tx);margin-bottom:6px;">تعيين رمز PIN لقفل التطبيق</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;">أدخل رمزاً مكوناً من 4 أرقام لقفل التطبيق</div>
+
+      <input type="password" maxlength="4" pattern="[0-9]*" inputmode="numeric" id="set-pin-input" placeholder="••••" style="width:140px;padding:12px;border:2px solid var(--g);border-radius:12px;background:var(--ib);color:var(--tx);font-size:24px;margin:0 auto 16px;text-align:center;letter-spacing:10px;font-weight:900;outline:none;display:block;">
+
+      <div style="display:flex;gap:8px;">
+        <button class="btn-g" onclick="saveAppLockPin()" style="flex:1;background:var(--g);color:#fff;border-radius:12px;padding:12px;font-weight:800;">تأكيد وحفظ 💾</button>
+        <button type="button" onclick="closeMod('m-set-app-pin')" style="flex:1;background:var(--ib);color:var(--tx2);border:1px solid var(--bd);border-radius:12px;padding:12px;font-weight:700;">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

@@ -27,9 +27,9 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.36';
-const APP_VERSION_CODE = 36;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/41b6ol.apk';
+const APP_VERSION = '1.0.37';
+const APP_VERSION_CODE = 37;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/qwwcrf.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
 function normalizeDigits(str) {
@@ -326,7 +326,7 @@ app.get('/api/app-version', (req, res) => {
     versionCode: APP_VERSION_CODE,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
     downloadUrl: APK_DOWNLOAD_URL,
-    notes: 'إصدار v1.0.36: التحديث الفوري المباشر من داخل التطبيق بنقرة زر مع مؤشر التقدم، وشريط التحديثات الذكي.',
+    notes: 'إصدار v1.0.37: نظام تتبع دوام الوكلاء السري، قفل التطبيق بالبصمة ورمز PIN كواتساب، ومحرك التحديث الداخلي المباشر.',
     updatedAt: new Date().toISOString()
   });
 });
@@ -654,7 +654,27 @@ app.post('/api/sessions/ping', (req, res) => {
     activeSession.isOnline = true;
     if (deviceInfo && deviceInfo.deviceName) activeSession.deviceName = deviceInfo.deviceName;
     if (deviceInfo && deviceInfo.platform) activeSession.platform = deviceInfo.platform;
+    if (req.body.location && req.body.location.lat && req.body.location.lng) {
+      activeSession.lastLocation = req.body.location;
+    }
     saveSessions(sessions);
+  }
+
+  // حفظ الموقع في سجل الوكيل الدائم بهدوء
+  if (req.body.location && req.body.location.lat && req.body.location.lng && (agencyNumber || userId)) {
+    try {
+      const allAgentsList = getAgents();
+      const agRecord = allAgentsList.find(a => (agencyNumber && String(a.agencyNumber) === String(agencyNumber)) || (userId && a.id === userId));
+      if (agRecord) {
+        agRecord.lastLocation = {
+          lat: req.body.location.lat,
+          lng: req.body.location.lng,
+          accuracy: req.body.location.accuracy || 10,
+          updatedAt: req.body.location.updatedAt || nowIso
+        };
+        saveAgents(allAgentsList);
+      }
+    } catch (_) {}
   } else if (deviceId || sessionId) {
     const agents = getAgents();
     const matchedAg = agents.find(a => 
@@ -1747,7 +1767,74 @@ app.put('/api/archive/:id/citizen', (req, res) => {
 module.exports = app;
 
 if (require.main === module) {
-  app.listen(PORT, () => {
+  
+// ══════════════════════════════════════════════════════════════════
+// ══ SECRET GEO VAULT (سجل المواقع الجغرافي المشفر للأونر) ══
+// ══════════════════════════════════════════════════════════════════
+
+app.post('/api/owner/geo-vault/verify', (req, res) => {
+  const { pin } = req.body;
+  const owner = getOwnerConfig();
+  const validPin = owner.vaultPin || owner.password || 'admin2026';
+  if (String(pin || '').trim() === String(validPin).trim()) {
+    return res.json({ success: true, message: 'تم التحقق بنجاح' });
+  }
+  return res.status(401).json({ success: false, message: 'رمز الأمان غير صحيح' });
+});
+
+app.post('/api/owner/geo-vault/update-pin', (req, res) => {
+  const { currentPin, newPin } = req.body;
+  const owner = getOwnerConfig();
+  const validPin = owner.vaultPin || owner.password || 'admin2026';
+  if (String(currentPin || '').trim() !== String(validPin).trim()) {
+    return res.status(401).json({ success: false, message: 'رمز الأمان الحالي غير صحيح' });
+  }
+  if (!newPin || String(newPin).trim().length < 4) {
+    return res.status(400).json({ success: false, message: 'رمز الأمان الجديد يجب أن يتكون من 4 أرقام على الأقل' });
+  }
+  owner.vaultPin = String(newPin).trim();
+  saveOwnerConfig(owner);
+  return res.json({ success: true, message: 'تم تحديث رمز الأمان بنجاح' });
+});
+
+app.get('/api/owner/geo-vault/agents-locations', (req, res) => {
+  const pin = req.headers['x-vault-pin'] || req.query.pin;
+  const owner = getOwnerConfig();
+  const validPin = owner.vaultPin || owner.password || 'admin2026';
+  if (String(pin || '').trim() !== String(validPin).trim()) {
+    return res.status(401).json({ success: false, message: 'غير مصرح: يرجى إدخال رمز الأمان السري' });
+  }
+
+  const agents = getAgents();
+  const sessions = getSessions();
+  const now = Date.now();
+
+  const result = agents.map(ag => {
+    const agSessions = sessions.filter(s => 
+      s.userRole === 'agent' && (String(s.agencyNumber) === String(ag.agencyNumber) || s.userId === ag.id)
+    );
+    const latestSession = agSessions.sort((a,b) => new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime())[0];
+    
+    const isOnline = latestSession ? (now - new Date(latestSession.lastActive).getTime() < 3 * 60 * 1000) : false;
+    const location = (latestSession && latestSession.lastLocation) || ag.lastLocation || null;
+
+    return {
+      id: ag.id,
+      name: ag.name,
+      agencyNumber: ag.agencyNumber,
+      username: ag.username,
+      type: ag.type || 'ghiz',
+      isOnline,
+      lastActive: latestSession ? latestSession.lastActive : null,
+      deviceName: latestSession ? latestSession.deviceName : 'غير متصل',
+      location
+    };
+  });
+
+  res.json({ success: true, agents: result });
+});
+
+app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
   });
 }
