@@ -27,9 +27,9 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.48';
-const APP_VERSION_CODE = 48;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/ibsfef.apk';
+const APP_VERSION = '1.0.49';
+const APP_VERSION_CODE = 49;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/433o7p.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
 function normalizeDigits(str) {

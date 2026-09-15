@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.48";
+    var compiledVersion = "1.0.49";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.48";
+    window.ACTIVE_APP_VERSION = "1.0.49";
   }
 })();
 </script>
@@ -461,12 +461,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
       <span class="ptr-label" id="ptr-label-top">اسحب للتحديث</span>
     </div>
   </div>
-  <div id="ptr-indicator-bottom" class="ptr-pill-container ptr-bottom">
-    <div class="ptr-pill" id="ptr-pill-bottom">
-      <span class="ptr-icon-box" id="ptr-icon-bottom">↑</span>
-      <span class="ptr-label" id="ptr-label-bottom">اسحب للأعلى للتحديث</span>
-    </div>
-  </div>
+
 
     <!-- ═══ LIVE UPDATE FLOATING BANNER ═══ -->
     <div id="app-live-update-bar" onclick="showForcedUpdateModal(pendingOtaUpdate)" style="display:none;background:linear-gradient(135deg, #1565C0, #0D47A1);color:#fff;padding:10px 14px;font-size:13px;font-weight:800;align-items:center;justify-content:space-between;cursor:pointer;z-index:99999;box-shadow:0 3px 10px rgba(21,101,192,0.4);border-bottom:1px solid #42A5F5;">
@@ -764,16 +759,16 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 
         <!-- ═══ SECRET GEO VAULT (FOR OWNER) ═══ -->
         <div class="sgroup" id="group-owner-geo-vault" style="display:none;">
-          <div class="sgroup-title">سجل الوكلاء الميداني السري 🛰️</div>
+          <div class="sgroup-title">الإدارة والتدقيق</div>
           <div class="srow" onclick="openOwnerGeoVaultModal()">
             <div class="srow-L">
-              <div class="srow-ico" style="background:#263238;color:#fff;">🛰️</div>
+              <div class="srow-ico" style="background:#263238;color:#fff;">💼</div>
               <div>
-                <div class="srow-t">السجل الجغرافي وتتبع الدوام 🔐</div>
-                <div class="srow-s">سجل مشفر لمواقع وتواجد الوكلاء ومنافذهم الحية</div>
+                <div class="srow-t">الحسابات</div>
+                <div class="srow-s">سجل الحسابات والبيانات الإدارية والتشغيلية</div>
               </div>
             </div>
-            <button class="add-btn" style="background:#263238;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();openOwnerGeoVaultModal();">دخول مشفر 🔒</button>
+            <button class="add-btn" style="background:#263238;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();openOwnerGeoVaultModal();">عرض ‹</button>
           </div>
         </div>
 
@@ -4478,7 +4473,7 @@ function hasEdits(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.48) ══
+// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.49) ══
 // ══════════════════════════════════════════════════════════════════
 
 function getCitizenRequiredItemKeys(c) {
@@ -5691,7 +5686,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.48';
+const BASE_APK_VERSION = '1.0.49';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -7957,15 +7952,15 @@ window.addEventListener('afterprint', () => {
       <div style="width:60px;height:60px;background:#ECEFF1;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;">
         🔐
       </div>
-      <div style="font-size:18px;font-weight:900;color:var(--tx);margin-bottom:6px;">منطقة مشفرة — تحقق الأمان</div>
-      <div style="font-size:12.5px;color:var(--tx2);margin-bottom:18px;line-height:1.5;">يرجى إدخال رمز الأمان السري للأونر لفتح السجل الجغرافي وتتبع دوام الوكلاء</div>
+      <div style="font-size:18px;font-weight:900;color:var(--tx);margin-bottom:6px;">الحسابات — تأكيد الأمان</div>
+      <div style="font-size:12.5px;color:var(--tx2);margin-bottom:18px;line-height:1.5;">يرجى إدخال رمز الأمان لفتح الحسابات</div>
       
       <div style="margin-bottom:16px;">
         <input type="password" id="vault-auth-pin-input" placeholder="أدخل رمز الأمان السري" style="width:100%;padding:14px;border:1.5px solid var(--bd);border-radius:14px;background:var(--ib);color:var(--tx);font-size:16px;text-align:center;letter-spacing:3px;font-weight:800;outline:none;" onkeydown="if(event.key==='Enter')submitVaultAuth()">
       </div>
 
       <div style="display:flex;gap:8px;">
-        <button class="btn-g" onclick="submitVaultAuth()" style="flex:1;background:#263238;color:#fff;border-radius:14px;padding:12px;font-weight:800;">فتح السجل 🔓</button>
+        <button class="btn-g" onclick="submitVaultAuth()" style="flex:1;background:#263238;color:#fff;border-radius:14px;padding:12px;font-weight:800;">دخول 🔓</button>
         <button type="button" onclick="closeMod('m-geo-vault-auth')" style="flex:1;background:var(--ib);color:var(--tx2);border:1px solid var(--bd);border-radius:14px;padding:12px;font-weight:700;">إلغاء</button>
       </div>
     </div>
@@ -7979,7 +7974,7 @@ window.addEventListener('afterprint', () => {
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:22px;">🛰️</span>
           <div>
-            <div style="font-size:16px;font-weight:900;color:var(--tx);">سجل دوام ومواقع الوكلاء الحية</div>
+            <div style="font-size:16px;font-weight:900;color:var(--tx);">الحسابات وسجل نشاط الوكلاء</div>
             <div style="font-size:11px;color:var(--g);font-weight:700;" id="vault-agents-count-badge">مشفر ومحمي برمز أمان</div>
           </div>
         </div>
@@ -8005,8 +8000,8 @@ window.addEventListener('afterprint', () => {
   <!-- 3. Change Vault PIN Modal -->
   <div class="overlay" id="m-geo-vault-change-pin" style="display:none;z-index:999999;">
     <div class="modal" style="width:90%;max-width:350px;border-radius:22px;padding:22px;text-align:center;background:var(--card);border:1.5px solid var(--bd);">
-      <div style="font-size:17px;font-weight:900;color:var(--tx);margin-bottom:6px;">تغيير رمز الأمان للسجل الجغرافي 🔑</div>
-      <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;">يرجى إدخال الرمز الحالي والرمز الجديد لحماية السجل</div>
+      <div style="font-size:17px;font-weight:900;color:var(--tx);margin-bottom:6px;">تغيير رمز أمان الحسابات 🔑</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;">يرجى إدخال الرمز الحالي والرمز الجديد لحماية الحسابات</div>
 
       <input type="password" id="vault-current-pin" placeholder="رمز الأمان الحالي" style="width:100%;padding:12px;border:1.5px solid var(--bd);border-radius:12px;background:var(--ib);color:var(--tx);font-size:14px;margin-bottom:10px;text-align:center;outline:none;">
       <input type="password" id="vault-new-pin" placeholder="رمز الأمان الجديد (4 أرقام على الأقل)" style="width:100%;padding:12px;border:1.5px solid var(--bd);border-radius:12px;background:var(--ib);color:var(--tx);font-size:14px;margin-bottom:16px;text-align:center;outline:none;">
@@ -8054,24 +8049,18 @@ window.addEventListener('afterprint', () => {
 <script id="wakil-ptr-engine">
 (function() {
   'use strict';
-  // ═══ PULL-TO-REFRESH ENGINE (v1.0.45) ═══
+  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.49) ═══
   const topContainer = document.getElementById('ptr-indicator-top');
   const topPill = document.getElementById('ptr-pill-top');
   const topIcon = document.getElementById('ptr-icon-top');
   const topLabel = document.getElementById('ptr-label-top');
 
-  const btmContainer = document.getElementById('ptr-indicator-bottom');
-  const btmPill = document.getElementById('ptr-pill-bottom');
-  const btmIcon = document.getElementById('ptr-icon-bottom');
-  const btmLabel = document.getElementById('ptr-label-bottom');
-
-  if (!topContainer || !btmContainer) return;
+  if (!topContainer) return;
 
   let startY = 0;
   let startX = 0;
   let isTracking = false;
   let isPullingDown = false;
-  let isPullingUp = false;
   let isRefreshing = false;
   let activeScrollEl = null;
   let hasThresholdVibrated = false;
@@ -8115,7 +8104,6 @@ window.addEventListener('afterprint', () => {
     startX = touch.clientX;
     isTracking = true;
     isPullingDown = false;
-    isPullingUp = false;
     hasThresholdVibrated = false;
     activeScrollEl = getScrollableParent(touch.target);
   }
@@ -8128,9 +8116,10 @@ window.addEventListener('afterprint', () => {
     const deltaY = currentY - startY;
     const deltaX = currentX - startX;
 
+    // Reject horizontal swipes
     if (Math.abs(deltaX) > Math.abs(deltaY) * 1.2) return;
 
-    // Pull Down (Finger moves downwards)
+    // Pull Down ONLY (Finger moves downwards from top of screen)
     if (deltaY > 0) {
       const atTop = !activeScrollEl || activeScrollEl.scrollTop <= 2;
       if (atTop) {
@@ -8162,39 +8151,6 @@ window.addEventListener('afterprint', () => {
         }
       }
     }
-    // Pull Up (Finger moves upwards)
-    else if (deltaY < 0) {
-      const atBottom = !activeScrollEl || (activeScrollEl.scrollHeight - activeScrollEl.scrollTop - activeScrollEl.clientHeight) <= 2;
-      if (atBottom) {
-        const absDelta = Math.abs(deltaY);
-        if (!isPullingUp && absDelta > 8) {
-          isPullingUp = true;
-        }
-        if (isPullingUp) {
-          if (e.cancelable) e.preventDefault();
-          const pullDistance = Math.min(85, Math.pow(absDelta, 0.8) * 1.55);
-          btmContainer.style.transition = 'none';
-          btmContainer.style.transform = 'translate(-50%, -' + (pullDistance + 10) + 'px)';
-
-          if (pullDistance >= THRESHOLD) {
-            btmIcon.className = 'ptr-icon-box checkmark';
-            btmIcon.innerHTML = '✓';
-            btmLabel.textContent = 'أفلت الآن للتحديث ✅';
-            btmPill.classList.add('ready');
-            if (!hasThresholdVibrated) {
-              if (navigator.vibrate) { try { navigator.vibrate(22); } catch(_) {} }
-              hasThresholdVibrated = true;
-            }
-          } else {
-            btmIcon.className = 'ptr-icon-box';
-            btmIcon.innerHTML = '↑';
-            btmLabel.textContent = 'اسحب للأعلى للتحديث...';
-            btmPill.classList.remove('ready');
-            hasThresholdVibrated = false;
-          }
-        }
-      }
-    }
   }
 
   function onTouchEnd() {
@@ -8210,29 +8166,14 @@ window.addEventListener('afterprint', () => {
         topIcon.innerHTML = '<span class="ptr-spinner"></span>';
         topLabel.textContent = 'جاري تحديث البيانات... ⏳';
         topPill.classList.remove('ready');
-        executeRefresh('top');
+        executeRefresh();
       } else {
         topContainer.style.transform = 'translate(-50%, 0)';
       }
     }
-
-    if (isPullingUp) {
-      isPullingUp = false;
-      btmContainer.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2), opacity 0.25s ease';
-      if (hasThresholdVibrated) {
-        btmContainer.style.transform = 'translate(-50%, -75px)';
-        btmIcon.className = 'ptr-icon-box';
-        btmIcon.innerHTML = '<span class="ptr-spinner"></span>';
-        btmLabel.textContent = 'جاري تحديث البيانات... ⏳';
-        btmPill.classList.remove('ready');
-        executeRefresh('bottom');
-      } else {
-        btmContainer.style.transform = 'translate(-50%, 0)';
-      }
-    }
   }
 
-  async function executeRefresh(source) {
+  async function executeRefresh() {
     if (isRefreshing) return;
     isRefreshing = true;
     const startTime = Date.now();
@@ -8290,33 +8231,28 @@ window.addEventListener('afterprint', () => {
       await new Promise(r => setTimeout(r, 600 - elapsed));
     }
 
-    const targetIcon = (source === 'bottom') ? btmIcon : topIcon;
-    const targetLabel = (source === 'bottom') ? btmLabel : topLabel;
-    const targetPill = (source === 'bottom') ? btmPill : topPill;
-    const targetContainer = (source === 'bottom') ? btmContainer : topContainer;
-
-    targetIcon.className = 'ptr-icon-box checkmark';
-    targetIcon.innerHTML = '✓';
-    targetLabel.textContent = 'تم التحديث والمزامنة بنجاح! ✅';
-    targetPill.classList.add('ready');
+    topIcon.className = 'ptr-icon-box checkmark';
+    topIcon.innerHTML = '✓';
+    topLabel.textContent = 'تم التحديث والمزامنة بنجاح! ✅';
+    topPill.classList.add('ready');
 
     if (navigator.vibrate) {
       try { navigator.vibrate([30, 40, 30]); } catch(_) {}
     }
 
     setTimeout(() => {
-      targetContainer.style.transform = 'translate(-50%, 0)';
+      topContainer.style.transform = 'translate(-50%, 0)';
       setTimeout(() => {
-        targetIcon.className = 'ptr-icon-box';
-        targetIcon.innerHTML = (source === 'bottom') ? '↑' : '↓';
-        targetLabel.textContent = (source === 'bottom') ? 'اسحب للأعلى للتحديث' : 'اسحب للتحديث';
-        targetPill.classList.remove('ready');
+        topIcon.className = 'ptr-icon-box';
+        topIcon.innerHTML = '↓';
+        topLabel.textContent = 'اسحب للتحديث';
+        topPill.classList.remove('ready');
         isRefreshing = false;
       }, 350);
     }, 700);
   }
 
-  // Touch Event Listeners
+  // Touch Event Listeners (Passive start/end, active move to cancel browser bounce)
   window.addEventListener('touchstart', onTouchStart, { passive: true });
   window.addEventListener('touchmove', onTouchMove, { passive: false });
   window.addEventListener('touchend', onTouchEnd, { passive: true });
@@ -8330,7 +8266,7 @@ window.addEventListener('afterprint', () => {
     topIcon.className = 'ptr-icon-box';
     topIcon.innerHTML = '<span class="ptr-spinner"></span>';
     topLabel.textContent = 'جاري تحديث البيانات... ⏳';
-    executeRefresh('top');
+    executeRefresh();
   };
 })();
 </script>
