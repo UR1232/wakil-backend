@@ -27,8 +27,8 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.38';
-const APP_VERSION_CODE = 38;
+const APP_VERSION = '1.0.39';
+const APP_VERSION_CODE = 39;
 let APK_DOWNLOAD_URL = 'https://files.catbox.moe/ovatdw.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
@@ -196,7 +196,7 @@ function getAgents() {
     list.unshift({
       id: 'agent_868',
       username: 'user_868',
-      password: '00000000',
+      password: '0000',
       name: 'فاضل عباس كريم',
       agencyNumber: '868',
       licenseNumber: '000699',
@@ -277,7 +277,7 @@ function initData() {
       {
         id: 'agent_868',
         username: 'user',
-        password: '00000000',
+        password: '0000',
         name: 'فاضل عباس كريم',
         agencyNumber: '868',
         licenseNumber: '000699',
@@ -326,7 +326,7 @@ app.get('/api/app-version', (req, res) => {
     versionCode: APP_VERSION_CODE,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
     downloadUrl: APK_DOWNLOAD_URL,
-    notes: 'إصدار v1.0.38: إصلاح كامل لتمرير وتحكم الصفحة الرئيسية للوكلاء، دعم بصمة الإصبع وبصمة الوجه المدمجة في نظام أندرويد (طريقة SuperKey ومصرف الرافدين)، وتحديثات استقرار شاملة.',
+    notes: 'إصدار v1.0.39: اعتماد كلمة مرور من 4 أرقام، إظهار كلمة المرور بالكامل عند تعديل معلومات الوكيل، ودعم مستشعر البصمة والوجه المدمج بنظام BiometricPrompt الحديث.',
     updatedAt: new Date().toISOString()
   });
 });

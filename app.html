@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.38";
+    var compiledVersion = "1.0.39";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.38";
+    window.ACTIVE_APP_VERSION = "1.0.39";
   }
 })();
 </script>
@@ -1079,9 +1079,14 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
             <div>
               <div style="display:flex;justify-content:space-between;align-items:center;">
                 <label style="font-size:11px;font-weight:700;color:var(--tx2);">كلمة المرور (Password):</label>
-                <button onclick="generateRandomPassForAdd()" style="background:transparent;border:none;color:var(--g);font-size:11px;font-weight:700;cursor:pointer;">🎲 توليد تلقائي</button>
+                <button onclick="generateRandomPassForAdd()" style="background:transparent;border:none;color:var(--g);font-size:11px;font-weight:700;cursor:pointer;">🎲 توليد 4 أرقام</button>
               </div>
-              <input id="add-ag-pass" class="srch-i" style="width:100%;margin-top:2px;font-family:monospace;" placeholder="مثال: pass955"/>
+              <div style="position:relative;display:flex;align-items:center;">
+                <input id="add-ag-pass" type="text" maxlength="4" pattern="[0-9]*" inputmode="numeric" class="srch-i" placeholder="0000" style="width:100%;font-family:monospace;font-size:18px;font-weight:900;letter-spacing:6px;text-align:center;padding:9px 12px;color:var(--g);background:var(--card);border:1.5px solid var(--g);outline:none;border-radius:10px;"/>
+              </div>
+              <div style="font-size:11px;color:var(--mt);margin-top:4px;">
+                💡 كلمة المرور 4 أرقام حصراً (الافتراضية: 0000 أو اضغط توليد 4 أرقام)
+              </div>
             </div>
           </div>
 
@@ -1119,17 +1124,30 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
             </div>
           </div>
 
-          <div style="background:var(--ib);border:1px solid var(--bd);border-radius:10px;padding:10px;margin-top:4px;">
-            <div style="font-size:12px;font-weight:800;color:var(--g);margin-bottom:6px;">🔐 تعديل بيانات الدخول:</div>
+          <div style="background:var(--ib);border:1.5px solid var(--gbd);border-radius:14px;padding:12px;margin-top:6px;">
+            <div style="font-size:13px;font-weight:900;color:var(--g);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+              <span>🔐</span><span>بيانات الدخول وكلمة المرور:</span>
+            </div>
             
-            <div style="margin-bottom:6px;">
-              <label style="font-size:11px;font-weight:700;color:var(--tx2);">اسم المستخدم:</label>
-              <input id="edit-ag-user" class="srch-i" style="width:100%;margin-top:2px;font-family:monospace;"/>
+            <div style="margin-bottom:10px;">
+              <label style="font-size:11.5px;font-weight:700;color:var(--tx2);">اسم المستخدم للدخول:</label>
+              <input id="edit-ag-user" class="srch-i" style="width:100%;margin-top:3px;font-family:monospace;font-size:14px;font-weight:800;background:var(--card);"/>
             </div>
 
             <div>
-              <label style="font-size:11px;font-weight:700;color:var(--tx2);">كلمة المرور الجديدة:</label>
-              <input id="edit-ag-pass" class="srch-i" style="width:100%;margin-top:2px;font-family:monospace;"/>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+                <label style="font-size:11.5px;font-weight:800;color:var(--tx);">🔑 كلمة مرور الوكيل (4 أرقام):</label>
+                <button type="button" onclick="generateRandomPassForEditAgent()" style="background:var(--gbg);border:1px solid var(--gbd);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:800;color:var(--g);cursor:pointer;">🎲 توليد 4 أرقام</button>
+              </div>
+              <div style="position:relative;display:flex;align-items:center;">
+                <input id="edit-ag-pass" type="text" maxlength="4" pattern="[0-9]*" inputmode="numeric" class="srch-i" placeholder="0000" style="width:100%;font-family:monospace;font-size:20px;font-weight:900;letter-spacing:8px;text-align:center;padding:11px 40px 11px 12px;color:var(--g);background:var(--card);border:2px solid var(--g);outline:none;border-radius:12px;"/>
+                <button type="button" onclick="toggleEditAgentPassVisibility()" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;color:var(--mt);padding:4px;" title="إظهار / إخفاء">
+                  <span id="edit-ag-pass-eye">👁️</span>
+                </button>
+              </div>
+              <div style="font-size:11px;color:var(--mt);margin-top:4px;display:flex;align-items:center;gap:4px;">
+                <span>💡</span><span>كلمة المرور ظاهرة لك مباشرة ويمكنك تغييرها لأي 4 أرقام (مثل: 0000 أو 1234)</span>
+              </div>
             </div>
           </div>
 
@@ -1295,7 +1313,7 @@ let currentAgent = {
   governorate: 'ذي قار',
   branch: 'فرع تموين ذي قار',
   username: 'user',
-  password: '00000000'
+  password: '0000'
 };
 let allAgents = [];
 let ownerViewingAgent = null;
@@ -2071,7 +2089,7 @@ let lastBackgroundTime = 0;
 function initAppLockState() {
   appLockEnabled = (localStorage.getItem('wakil_app_lock') === 'true');
   appLockPin = localStorage.getItem('wakil_app_pin') || '';
-  appBioEnabled = (localStorage.getItem('wakil_app_bio') !== 'false');
+  appBioEnabled = (localStorage.getItem('wakil_app_bio') === 'true');
   lockTimeoutMs = parseInt(localStorage.getItem('wakil_lock_timeout') || '0', 10);
 
   // Sync Settings UI
@@ -2082,17 +2100,27 @@ function initAppLockState() {
   const tglBio = document.getElementById('tgl-app-bio');
   const selTimeout = document.getElementById('sel-lock-timeout');
   const pinSub = document.getElementById('app-pin-status-sub');
+  const bioSub = document.getElementById('bio-status-sub');
 
   if (tglLock) tglLock.classList.toggle('on', appLockEnabled);
-  if (lockSub) lockSub.textContent = appLockEnabled ? 'مفعل 🔒 — التطبيق محمي برمز أمان' : 'معطل — التطبيق يفتح مباشرة';
+  if (lockSub) {
+    if (appLockEnabled) {
+      lockSub.textContent = appBioEnabled ? 'مفعل 🔒 — محمي ببصمة الهاتف / الوجه' : 'مفعل 🔒 — محمي برمز PIN';
+    } else {
+      lockSub.textContent = 'معطل — التطبيق يفتح مباشرة';
+    }
+  }
   if (lockIco) {
     lockIco.style.background = appLockEnabled ? '#E8F5E9' : '#F5F5F5';
     lockIco.style.color = appLockEnabled ? '#2E7D32' : '#757575';
   }
   if (optBox) optBox.style.display = appLockEnabled ? 'block' : 'none';
   if (tglBio) tglBio.classList.toggle('on', appBioEnabled);
+  if (bioSub) {
+    bioSub.textContent = appBioEnabled ? 'مفعلة 👆 — فتح فوري ببصمة الهاتف' : 'معطلة — اضغط لتفعيل بصمة الهاتف';
+  }
   if (selTimeout) selTimeout.value = String(lockTimeoutMs);
-  if (pinSub) pinSub.textContent = appLockPin ? 'الرمز مفعل (••••) — اضغط للتغيير' : '⚠️ لم يتم تعيين رمز بعد — اضغط لتعيينه';
+  if (pinSub) pinSub.textContent = appLockPin ? 'الرمز مفعل (••••) — اضغط للتغيير' : 'لم يتم تعيين رمز (اختياري)';
 
   // Check if owner geo vault row should be shown
   const geoVaultGroup = document.getElementById('group-owner-geo-vault');
@@ -2101,14 +2129,20 @@ function initAppLockState() {
   }
 
   // Lock on startup if enabled
-  if (appLockEnabled && appLockPin) {
+  if (appLockEnabled && (appBioEnabled || (appLockPin && appLockPin.length === 4))) {
     lockAppNow();
   }
 }
 
 function toggleAppLockSetting() {
   if (!appLockEnabled) {
-    // If enabling for the first time without PIN, ask for PIN
+    // If native Android is available and secure, activate biometric directly
+    if (window.AndroidNativeApp && window.AndroidNativeApp.isDeviceSecure && window.AndroidNativeApp.isDeviceSecure()) {
+      window._biometricPendingAction = 'toggle_lock';
+      triggerBiometricAuth(true);
+      return;
+    }
+    // Otherwise, if PIN is set, enable; if not, open PIN modal
     if (!appLockPin) {
       openSetAppPinModal();
       return;
@@ -2116,12 +2150,15 @@ function toggleAppLockSetting() {
     appLockEnabled = true;
     localStorage.setItem('wakil_app_lock', 'true');
     toast('🔒 تم تفعيل قفل التطبيق بنجاح', false, 'green');
+    initAppLockState();
   } else {
     appLockEnabled = false;
+    appBioEnabled = false;
     localStorage.setItem('wakil_app_lock', 'false');
+    localStorage.setItem('wakil_app_bio', 'false');
     toast('🔓 تم إلغاء قفل التطبيق', false, 'orange');
+    initAppLockState();
   }
-  initAppLockState();
 }
 
 function openSetAppPinModal() {
@@ -2133,7 +2170,7 @@ function openSetAppPinModal() {
 
 function saveAppLockPin() {
   const inp = document.getElementById('set-pin-input');
-  const pin = (inp ? inp.value : '').trim();
+  const pin = normalizeArabicDigits((inp ? inp.value : '').trim());
   if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
     toast('⚠️ يرجى إدخال رمز مكون من 4 أرقام حصراً', true);
     return;
@@ -2150,38 +2187,28 @@ function saveAppLockPin() {
 function toggleBioSetting() {
   if (!appBioEnabled) {
     // Attempting to ENABLE Biometric Authentication
-    if (window.AndroidNativeApp && window.AndroidNativeApp.isDeviceSecure && !window.AndroidNativeApp.isDeviceSecure()) {
-      toast('⚠️ يرجى تفعيل بصمة الإصبع أو قفل الشاشة في إعدادات الهاتف أولاً', true);
-      return;
+    if (window.AndroidNativeApp) {
+      if (window.AndroidNativeApp.isDeviceSecure && !window.AndroidNativeApp.isDeviceSecure()) {
+        toast('⚠️ يرجى تفعيل بصمة الإصبع أو قفل الشاشة في إعدادات هاتفك أولاً', true);
+        return;
+      }
+      window._biometricPendingAction = 'toggle_bio';
+      triggerBiometricAuth(true);
+    } else {
+      // In browser / emulator
+      appBioEnabled = true;
+      appLockEnabled = true;
+      localStorage.setItem('wakil_app_bio', 'true');
+      localStorage.setItem('wakil_app_lock', 'true');
+      initAppLockState();
+      toast('✅ تم تفعيل بصمة الجهاز وقفل التطبيق بنجاح 👆', false, 'green');
     }
-    window._biometricPendingAction = 'toggle_bio';
-    triggerBiometricAuth(true);
   } else {
     // Disabling Biometric Authentication
     appBioEnabled = false;
     localStorage.setItem('wakil_app_bio', 'false');
-    const tglBio = document.getElementById('tgl-app-bio');
-    if (tglBio) tglBio.classList.remove('on');
-    toast('تم تعطيل بصمة الإصبع', false, 'orange');
-  }
-}
-
-function toggleAppLockSetting() {
-  if (!appLockEnabled) {
-    // Direct SuperKey Style: Enable device lock using phone fingerprint / face
-    if (window.AndroidNativeApp && window.AndroidNativeApp.isDeviceSecure && !window.AndroidNativeApp.isDeviceSecure()) {
-      toast('⚠️ يرجى تفعيل بصمة الإصبع أو قفل الشاشة في إعدادات الهاتف أولاً', true);
-      return;
-    }
-    window._biometricPendingAction = 'toggle_lock';
-    triggerBiometricAuth(true);
-  } else {
-    appLockEnabled = false;
-    appBioEnabled = false;
-    localStorage.setItem('wakil_app_lock', 'false');
-    localStorage.setItem('wakil_app_bio', 'false');
     initAppLockState();
-    toast('🔓 تم إلغاء قفل التطبيق', false, 'orange');
+    toast('تم تعطيل بصمة الإصبع', false, 'orange');
   }
 }
 
@@ -2201,9 +2228,33 @@ function lockAppNow() {
     screen.style.display = 'flex';
   }
 
-  // If biometric is enabled, auto-trigger it after 200ms
+  const btnBioUnlock = document.getElementById('btn-main-bio-unlock');
+  if (btnBioUnlock) {
+    btnBioUnlock.style.display = appBioEnabled ? 'flex' : 'none';
+  }
+
+  const pinSection = document.getElementById('lock-pin-section');
+  if (pinSection) {
+    // If PIN is set, always show keypad. If no PIN and bio is on, hide keypad or show as fallback
+    pinSection.style.display = (appLockPin && appLockPin.length === 4) ? 'flex' : (appBioEnabled ? 'none' : 'flex');
+  }
+
+  const prompt = document.getElementById('lock-screen-prompt');
+  if (prompt) {
+    if (appBioEnabled && (!appLockPin || appLockPin.length !== 4)) {
+      prompt.textContent = 'المس مستشعر البصمة أو استخدم بصمة الوجه لفتح التطبيق';
+    } else if (appBioEnabled && appLockPin) {
+      prompt.textContent = 'المس مستشعر البصمة أو أدخل رمز PIN للدخول';
+    } else {
+      prompt.textContent = 'أدخل رمز PIN المكون من 4 أرقام لفتح التطبيق';
+    }
+  }
+
+  // If biometric is enabled, auto-trigger it immediately
   if (appBioEnabled) {
-    setTimeout(triggerBiometricAuth, 300);
+    setTimeout(() => {
+      triggerBiometricAuth();
+    }, 350);
   }
 }
 
@@ -2261,28 +2312,25 @@ function checkEnteredPin() {
 }
 
 async function triggerBiometricAuth(force = false) {
-  if (!isAppLocked && !force) return;
+  if (!isAppLocked && !force && !window._biometricPendingAction) return;
 
-  // 1. Native Android Keyguard / Biometric Prompt (SuperKey / Rafidain style)
+  // 1. Modern Native Android BiometricPrompt (SuperKey / Rafidain style)
   if (window.AndroidNativeApp && window.AndroidNativeApp.authenticateBiometric) {
     try {
+      console.log('👆 Triggering native Android BiometricPrompt...');
       window.AndroidNativeApp.authenticateBiometric();
       return;
     } catch (e) {
       console.warn('Native biometric call failed:', e);
+      toast('⚠️ تعذر تشغيل مستشعر البصمة: ' + e.message, true);
     }
   }
 
   // 2. Fallback: Browser WebAuthn / Simulation
-  if (force && window._biometricPendingAction) {
-    const action = window._biometricPendingAction;
-    window._biometricPendingAction = null;
-    appLockEnabled = true;
-    appBioEnabled = true;
-    localStorage.setItem('wakil_app_lock', 'true');
-    localStorage.setItem('wakil_app_bio', 'true');
-    initAppLockState();
-    toast('✅ تم تفعيل قفل التطبيق وبصمة الجهاز بنجاح', false, 'green');
+  if (force || window._biometricPendingAction) {
+    if (window._biometricPendingAction) {
+      window.onBiometricSuccess();
+    }
     return;
   }
 
@@ -2323,7 +2371,15 @@ window.onBiometricFailed = function(reason) {
   }
 };
 
-// Listeners for App Pause / Resume (Background/Foreground Lifecycle)
+function onAppForegroundCheck() {
+  if (!appLockEnabled || (!appBioEnabled && (!appLockPin || appLockPin.length !== 4))) return;
+  const elapsed = Date.now() - lastBackgroundTime;
+  if (elapsed >= lockTimeoutMs && !isAppLocked) {
+    lockAppNow();
+  }
+}
+
+// Background / Foreground listeners
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     lastBackgroundTime = Date.now();
@@ -2333,14 +2389,6 @@ document.addEventListener('visibilitychange', () => {
 });
 document.addEventListener('pause', () => { lastBackgroundTime = Date.now(); });
 document.addEventListener('resume', () => { onAppForegroundCheck(); });
-
-function onAppForegroundCheck() {
-  if (!appLockEnabled || !appLockPin) return;
-  const elapsed = Date.now() - lastBackgroundTime;
-  if (elapsed >= lockTimeoutMs && !isAppLocked) {
-    lockAppNow();
-  }
-}
 
 // ══ LOGIN / LOGOUT ══
 
@@ -2877,7 +2925,7 @@ function renderAgents(filterText = ''){
 
 function agentCardHTML(ag) {
   const isPassVisible = !!showPasswordsMap[ag.id];
-  const passDisplay = isPassVisible ? ag.password : '••••••••';
+  let cleanPass = ag.password || '0000'; if (cleanPass === '00000000') cleanPass = '0000'; const passDisplay = isPassVisible ? cleanPass : '••••';
   const isGhiz = ag.type === 'ghiz';
   const isFrozen = !!ag.isFrozen;
 
@@ -3002,7 +3050,7 @@ function toggleAgentPassword(agId){
   const ag = allAgents.find(a => a.id === agId);
   const el = document.getElementById('pass-' + agId);
   if (el && ag) {
-    el.textContent = showPasswordsMap[agId] ? ag.password : '••••••••';
+    el.textContent = showPasswordsMap[agId] ? (ag.password === '00000000' ? '0000' : ag.password) : '••••';
   }
 }
 
@@ -3018,13 +3066,13 @@ function openAddAgentModal(){
   document.getElementById('add-ag-name').value = '';
   document.getElementById('add-ag-code').value = '';
   document.getElementById('add-ag-user').value = '';
-  document.getElementById('add-ag-pass').value = '';
+  document.getElementById('add-ag-pass').value = '0000';
   showMod('m-add-agent');
 }
 
 function generateRandomPassForAdd(){
-  const randNum = Math.floor(100000 + Math.random() * 900000);
-  document.getElementById('add-ag-pass').value = 'pass' + randNum;
+  const rand4 = String(Math.floor(1000 + Math.random() * 9000));
+  document.getElementById('add-ag-pass').value = rand4;
 }
 
 async function submitNewAgent(){
@@ -3034,10 +3082,16 @@ async function submitNewAgent(){
   const gov = document.getElementById('add-ag-gov').value.trim() || 'ذي قار';
   const branch = document.getElementById('add-ag-branch').value.trim() || 'فرع التموين';
   const username = document.getElementById('add-ag-user').value.trim();
-  const password = document.getElementById('add-ag-pass').value.trim();
+  let rawPass = document.getElementById('add-ag-pass').value.trim();
+  let password = normalizeArabicDigits(rawPass);
 
   if (!name || !agencyNumber || !username || !password) {
-    toast('⚠️ يرجى ملء كافة الحقول (الاسم، الرمز، اليوزر، الباسورد)', false, 'red');
+    toast('⚠️ يرجى ملء كافة الحقول (الاسم، الرمز، اليوزر، كلمة المرور)', false, 'red');
+    return;
+  }
+
+  if (password.length !== 4 || !/^\d{4}$/.test(password)) {
+    toast('⚠️ يجب أن تكون كلمة المرور مكونة من 4 أرقام حصراً (مثال: 0000 أو 1234)', true);
     return;
   }
 
@@ -3090,15 +3144,49 @@ async function submitNewAgent(){
   }
 }
 
+function toggleEditAgentPassVisibility() {
+  const inp = document.getElementById('edit-ag-pass');
+  const eye = document.getElementById('edit-ag-pass-eye');
+  if (!inp) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    if (eye) eye.textContent = '👁️';
+  } else {
+    inp.type = 'password';
+    if (eye) eye.textContent = '🙈';
+  }
+}
+
+function generateRandomPassForEditAgent() {
+  const rand4 = String(Math.floor(1000 + Math.random() * 9000));
+  const inp = document.getElementById('edit-ag-pass');
+  if (inp) {
+    inp.value = rand4;
+    inp.type = 'text';
+    const eye = document.getElementById('edit-ag-pass-eye');
+    if (eye) eye.textContent = '👁️';
+  }
+}
+
 function openEditAgentModal(agId){
   const ag = allAgents.find(a => a.id === agId);
   if (!ag) return;
   document.getElementById('edit-ag-id').value = ag.id;
-  document.getElementById('edit-ag-name').value = ag.name;
-  document.getElementById('edit-ag-code').value = ag.agencyNumber;
+  document.getElementById('edit-ag-name').value = ag.name || '';
+  document.getElementById('edit-ag-code').value = ag.agencyNumber || '';
   document.getElementById('edit-ag-type').value = ag.type || 'ghiz';
-  document.getElementById('edit-ag-user').value = ag.username;
-  document.getElementById('edit-ag-pass').value = ag.password;
+  document.getElementById('edit-ag-user').value = ag.username || '';
+  
+  let pass = normalizeArabicDigits(ag.password || '0000');
+  if (pass === '00000000' || !pass) pass = '0000';
+  const passInp = document.getElementById('edit-ag-pass');
+  if (passInp) {
+    passInp.value = pass;
+    passInp.type = 'text'; // دائماً ظاهرة للمالك كما طلب
+  }
+  const eye = document.getElementById('edit-ag-pass-eye');
+  if (eye) eye.textContent = '👁️';
+
   showMod('m-edit-agent');
 }
 
@@ -3111,10 +3199,16 @@ async function submitEditAgent(){
   const agencyNumber = document.getElementById('edit-ag-code').value.trim();
   const type = document.getElementById('edit-ag-type').value;
   const username = document.getElementById('edit-ag-user').value.trim();
-  const password = document.getElementById('edit-ag-pass').value.trim();
+  let rawPass = document.getElementById('edit-ag-pass').value.trim();
+  let password = normalizeArabicDigits(rawPass);
 
   if (!name || !agencyNumber || !username || !password) {
     toast('⚠️ يرجى ملء كافة الحقول', false, 'red');
+    return;
+  }
+
+  if (password.length !== 4 || !/^\d{4}$/.test(password)) {
+    toast('⚠️ يجب أن تكون كلمة المرور مكونة من 4 أرقام حصراً (مثال: 0000 أو 1234)', true);
     return;
   }
 
@@ -3127,15 +3221,18 @@ async function submitEditAgent(){
   saveLocalState();
   closeMod('m-edit-agent');
   renderAgents();
-  toast(`💾 تم تحديث بيانات الوكيل (${name}) وكلمة المرور بنجاح!`, false);
+  toast(`💾 تم تحديث بيانات الوكيل (${name}) وكلمة المرور (${password}) بنجاح!`, false, 'green');
 
   if (navigator.onLine) {
     try {
-      fetch('https://wakil-api.onrender.com/api/owner/agents/' + id, {
+      const res = await fetch(`https://wakil-api.onrender.com/api/owner/agents/${ag.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(ag)
-      }).catch(()=>{});
+        body: JSON.stringify({ name, agencyNumber, type, username, password })
+      });
+      if (res.ok) {
+        toast(`✅ تم حفظ كلمة المرور (${password}) سحابياً بنجاح!`, false, 'green');
+      }
     } catch(_) {}
   }
 }
@@ -4829,7 +4926,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.38';
+const BASE_APK_VERSION = '1.0.39';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -6349,7 +6446,7 @@ function openQuickResetPassModal(agId, agName) {
 
 function generateRandomPassForReset() {
   const randNum = Math.floor(100000 + Math.random() * 900000);
-  document.getElementById('reset-pwd-new-input').value = 'pass' + randNum;
+  document.getElementById('reset-pwd-new-input').value = String(Math.floor(1000 + Math.random() * 9000));
 }
 
 async function submitQuickResetPassword() {
