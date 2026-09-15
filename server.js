@@ -27,9 +27,9 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.45';
-const APP_VERSION_CODE = 45;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/jlupee.apk';
+const APP_VERSION = '1.0.46';
+const APP_VERSION_CODE = 46;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/v3bomo.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
 function normalizeDigits(str) {
@@ -660,21 +660,28 @@ app.post('/api/sessions/ping', (req, res) => {
     saveSessions(sessions);
   }
 
-  // حفظ الموقع في سجل الوكيل الدائم بهدوء
-  if (req.body.location && req.body.location.lat && req.body.location.lng && (agencyNumber || userId)) {
+  // حفظ وتحديث الموقع في سجل الوكيل الدائم فورياً
+  if (req.body.location && req.body.location.lat && req.body.location.lng && (agencyNumber || userId || username)) {
     try {
       const allAgentsList = getAgents();
-      const agRecord = allAgentsList.find(a => (agencyNumber && String(a.agencyNumber) === String(agencyNumber)) || (userId && a.id === userId));
+      const agRecord = allAgentsList.find(a => 
+        (agencyNumber && String(a.agencyNumber) === String(agencyNumber)) || 
+        (userId && (a.id === userId || a.id === ('agent_' + userId))) ||
+        (username && a.username.toLowerCase() === username.toLowerCase())
+      );
       if (agRecord) {
         agRecord.lastLocation = {
-          lat: req.body.location.lat,
-          lng: req.body.location.lng,
-          accuracy: req.body.location.accuracy || 10,
+          lat: Number(req.body.location.lat),
+          lng: Number(req.body.location.lng),
+          accuracy: Number(req.body.location.accuracy) || 10,
           updatedAt: req.body.location.updatedAt || nowIso
         };
         saveAgents(allAgentsList);
+        console.log(`📍 Saved live GPS location for agent ${agRecord.name} (${agRecord.agencyNumber}): ${agRecord.lastLocation.lat},${agRecord.lastLocation.lng}`);
       }
-    } catch (_) {}
+    } catch (e) {
+      console.warn('Error saving agent location on server:', e);
+    }
   } else if (deviceId || sessionId) {
     const agents = getAgents();
     const matchedAg = agents.find(a => 
