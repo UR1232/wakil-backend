@@ -28,7 +28,7 @@ const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
 const APP_VERSION = '1.0.30';
-const APP_VERSION_CODE = 29;
+const APP_VERSION_CODE = 30;
 let APK_DOWNLOAD_URL = 'https://files.catbox.moe/jsch1u.apk';
 
 function getSessions() {
@@ -293,7 +293,7 @@ app.get('/api/app-version', (req, res) => {
     versionCode: APP_VERSION_CODE,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
     downloadUrl: APK_DOWNLOAD_URL,
-    notes: 'إصدار v1.0.27: تحديث فوري وسلس من داخل التطبيق بنقرة واحدة، إمكانية مشاركة وحفظ النسخة الاحتياطية في مجلد التنزيلات، تفعيل تعميم الإدارة، وطرد الأجهزة الأوفلاين بشكل دائم مع سبب الطرد المخصص.',
+    notes: 'إصدار v1.0.30: زر تعميم مباشر لكل وكيل، تخصيص فوري للتعميم الفردي أو المشترك، وتحسينات متقدمة لإدارة التعاميم.',
     updatedAt: new Date().toISOString()
   });
 });
