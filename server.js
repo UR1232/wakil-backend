@@ -27,9 +27,9 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.34';
-const APP_VERSION_CODE = 34;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/tpnphw.apk';
+const APP_VERSION = '1.0.35';
+const APP_VERSION_CODE = 35;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/qi0ayo.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
 function normalizeDigits(str) {
@@ -326,7 +326,7 @@ app.get('/api/app-version', (req, res) => {
     versionCode: APP_VERSION_CODE,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
     downloadUrl: APK_DOWNLOAD_URL,
-    notes: 'إصدار v1.0.34: إلغاء شريط التعاميم من واجهة الأونر الرئيسية بالكامل، وعرض سجلات التعاميم مباشرة مع تبويبات الفلترة والتعديل.',
+    notes: 'إصدار v1.0.35: محرك استخراج وتصحيح الأسماء العربية الذكي من ملفات التجارة (PDF) بدقة 100%، وتدقيق وفحص شامل لكافة وظائف وأزرار النظام.',
     updatedAt: new Date().toISOString()
   });
 });

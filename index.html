@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.34";
+    var compiledVersion = "1.0.35";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -14,7 +14,7 @@
     sessionStorage.removeItem('wakil_ota_booted');
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.34";
+    window.ACTIVE_APP_VERSION = "1.0.35";
   }
 })();
 </script>
@@ -611,7 +611,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
               <div class="srow-ico" style="background:#E8F5E9;color:#2E7D32;font-size:18px;">⚡</div>
               <div>
                 <div class="srow-t">تحديث هوائي فوري (Live OTA)</div>
-                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.34 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
+                <div class="srow-s" id="ota-ver-sub">الإصدار: v1.0.35 — اضغط للفحص والتحديث فوراً بضغطة زر</div>
               </div>
             </div>
             <button class="add-btn" style="background:#2E7D32;padding:7px 12px;font-size:12px;" onclick="event.stopPropagation();checkOtaUpdate(true);">فحص 🔄</button>
@@ -762,7 +762,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         <div style="display:inline-flex;align-items:center;gap:6px;background:var(--gbg);color:var(--g);border:1px solid var(--gbd);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:14px;" id="forced-ver-badge">
-          الإصدار الجديد: v1.0.34
+          الإصدار الجديد: v1.0.35
         </div>
 
         <div style="font-size:13px;color:var(--tx2);line-height:1.6;margin-bottom:16px;text-align:right;background:var(--ib);padding:12px;border-radius:14px;border:1px solid var(--bd);">
@@ -4127,7 +4127,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.34';
+const BASE_APK_VERSION = '1.0.35';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -4149,6 +4149,89 @@ function syncOtaUiState() {
   }
 }
 
+function dismissUpdateModal() {
+  const m = document.getElementById('m-forced-update');
+  if (m) {
+    m.classList.remove('show');
+    m.style.display = 'none';
+  }
+  sessionStorage.setItem('wakil_update_dismissed', '1');
+}
+
+function showForcedUpdateModal(data) {
+  if (sessionStorage.getItem('wakil_update_dismissed') === '1') return;
+  const m = document.getElementById('m-forced-update');
+  if (!m) return;
+  const b = document.getElementById('forced-ver-badge');
+  if (b) b.textContent = 'الإصدار الجديد: v' + (data.latestVersion || data.version || '1.0.35');
+  const n = document.getElementById('forced-update-notes');
+  if (n && data.notes) n.textContent = data.notes;
+  m.classList.add('show');
+  m.style.setProperty('display', 'flex', 'important');
+}
+
+async function checkOtaUpdate(manual = false) {
+  if (!navigator.onLine) {
+    if (manual) toast('⚠️ لا يوجد اتصال بالإنترنت للتحقق من التحديثات', false, 'orange');
+    return;
+  }
+  try {
+    if (manual) toast('🔍 جاري التحقق من وجود تحديثات...', false, 'blue');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 7000);
+    const res = await fetch('https://wakil-api.onrender.com/api/app-version?t=' + Date.now(), { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      if (manual) toast('⚠️ تعذر جلب معلومات التحديث من السيرفر', false, 'red');
+      return;
+    }
+    const data = await res.json();
+    const serverVer = data.latestVersion || data.version;
+
+    if (serverVer && serverVer !== CURRENT_LIVE_VERSION) {
+      pendingOtaUpdate = data;
+      sessionStorage.removeItem('wakil_update_dismissed');
+      showForcedUpdateModal(data);
+    } else {
+      if (manual) toast('✅ أنت تستخدم أحدث إصدار من تطبيق وكيل (v' + CURRENT_LIVE_VERSION + ')', false, 'green');
+    }
+  } catch(e) {
+    console.error('OTA Update check error:', e);
+    if (manual) toast('⚠️ خطأ في الاتصال أثناء فحص التحديثات: ' + (e.message || e), false, 'red');
+  }
+}
+
+async function applyForcedOtaUpdate() {
+  const btn = document.getElementById('btn-apply-forced-update');
+  const apkUrl = (pendingOtaUpdate && pendingOtaUpdate.downloadUrl) ? pendingOtaUpdate.downloadUrl : 'https://wakil-api.onrender.com/wakil.apk';
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>جاري فتح رابط تنزيل التحديث... 📥</span>';
+    btn.style.opacity = '0.85';
+  }
+
+  // تنظيف أي قيود مؤقتة
+  sessionStorage.removeItem('wakil_update_dismissed');
+
+  setTimeout(() => {
+    try {
+      if (window.cordova && window.cordova.InAppBrowser) {
+        window.cordova.InAppBrowser.open(apkUrl, '_system');
+      } else {
+        window.open(apkUrl, '_system') || (window.location.href = apkUrl);
+      }
+    } catch(_) {
+      window.location.href = apkUrl;
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>✅ بدأ التنزيل! اضغط هنا لإعادة التنزيل 📥</span>';
+      btn.style.opacity = '1';
+    }
+  }, 400);
+}
+
 async function checkForcedUpdateOnStartup() {
   if (!navigator.onLine) return;
   if (sessionStorage.getItem('wakil_update_dismissed') === '1') return;
@@ -4166,8 +4249,7 @@ async function checkForcedUpdateOnStartup() {
       showForcedUpdateModal(data);
     }
   } catch(e) {
-    console.error('OTA Update check error:', e);
-    if (manual) toast('⚠️ حدث خطأ أثناء فحص التحديثات: ' + (e.message || e), false, 'red');
+    console.warn('OTA Startup check skipped:', e);
   }
 }
 
