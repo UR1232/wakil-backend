@@ -29,7 +29,7 @@ const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
 const APP_VERSION = '1.0.35';
 const APP_VERSION_CODE = 35;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/qi0ayo.apk';
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/thqwg8.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
 function normalizeDigits(str) {
