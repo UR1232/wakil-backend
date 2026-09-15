@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.33";
+    var compiledVersion = "1.0.34";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -14,7 +14,7 @@
     sessionStorage.removeItem('wakil_ota_booted');
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.33";
+    window.ACTIVE_APP_VERSION = "1.0.34";
   }
 })();
 </script>
@@ -667,8 +667,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
       </div>
 
       <div class="scroll" id="agents-scroll-wrap" style="padding:12px 14px 80px;">
-        <!-- OWNER LIVE BROADCAST BANNER -->
-        <div id="owner-broadcast-banner" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:14px;box-shadow:0 3px 12px rgba(0,0,0,0.06);transition:all .3s;"></div>
+        <!-- OWNER DASHBOARD (No broadcast banner displayed for owner - managed via broadcast records modal) -->
         <!-- Top Metrics Grid -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
           <div style="background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;box-shadow:0 2px 8px var(--sh);">
@@ -694,7 +693,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
           <button class="btn-g" onclick="openBroadcastModal()" style="margin:0;padding:11px 8px;font-size:12px;font-weight:800;background:linear-gradient(135deg,#1565C0,#0D47A1);display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px rgba(21,101,192,0.3);">
             <span style="font-size:16px;">📢</span>
-            <span>بث تعميم إداري</span>
+            <span>بث تعميم وسجلاته</span>
           </button>
           <button class="btn-g" onclick="downloadFullSystemBackup()" style="margin:0;padding:11px 8px;font-size:12px;font-weight:800;background:linear-gradient(135deg,#4A148C,#6A1B9A);display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px rgba(106,27,154,0.3);">
             <span style="font-size:16px;">💾</span>
@@ -4846,19 +4845,55 @@ function populateBroadcastAgentsChecklist() {
   }).join('');
 }
 
+let currentBroadcastFilter = 'all';
+
+function filterOwnerBroadcasts(filterType, btn) {
+  currentBroadcastFilter = filterType;
+  document.querySelectorAll('.broadcast-filter-tab').forEach(b => {
+    b.style.background = 'var(--card)';
+    b.style.color = 'var(--tx)';
+    b.style.borderColor = 'var(--bd)';
+  });
+  if (btn) {
+    btn.style.background = '#1565C0';
+    btn.style.color = '#fff';
+    btn.style.borderColor = '#1565C0';
+  }
+  renderOwnerBroadcastsList(ownerBroadcastsCache);
+}
+
 async function loadOwnerBroadcastsList() {
   const container = document.getElementById('owner-broadcasts-container');
   if (!container) return;
-  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--mt);">⏳ جاري جلب قائمة التعاميم...</div>';
+
+  // عرض فوري من الكاش المحلي بدون أي تأخير (0 ثانية)
+  if (ownerBroadcastsCache && ownerBroadcastsCache.length > 0) {
+    renderOwnerBroadcastsList(ownerBroadcastsCache);
+  } else {
+    try {
+      const cached = JSON.parse(localStorage.getItem('wakil_owner_broadcasts') || '[]');
+      if (cached && cached.length) {
+        ownerBroadcastsCache = cached;
+        renderOwnerBroadcastsList(ownerBroadcastsCache);
+      } else {
+        container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--mt);font-size:12px;">⏳ جاري جلب سجل التعاميم...</div>';
+      }
+    } catch(_) {
+      container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--mt);font-size:12px;">⏳ جاري جلب سجل التعاميم...</div>';
+    }
+  }
 
   try {
     const res = await fetch('https://wakil-api.onrender.com/api/owner/announcements');
     if (!res.ok) throw new Error('فشل جلب التعاميم');
     const data = await res.json();
     ownerBroadcastsCache = data.announcements || [];
+    try { localStorage.setItem('wakil_owner_broadcasts', JSON.stringify(ownerBroadcastsCache)); } catch(_) {}
     renderOwnerBroadcastsList(ownerBroadcastsCache);
   } catch(err) {
-    container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--r);font-size:12px;">تعذر الاتصال بالسيرفر لجلب التعاميم</div>';
+    if (!ownerBroadcastsCache || !ownerBroadcastsCache.length) {
+      container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--r);font-size:12px;">تعذر الاتصال بالسيرفر لجلب سجل التعاميم</div>';
+    }
   }
 }
 
@@ -4866,23 +4901,41 @@ function renderOwnerBroadcastsList(list) {
   const container = document.getElementById('owner-broadcasts-container');
   if (!container) return;
 
-  if (!list || !list.length) {
+  const fullList = Array.isArray(list) ? list : [];
+  const now = Date.now();
+
+  let filtered = fullList;
+  if (currentBroadcastFilter === 'active') {
+    filtered = fullList.filter(a => a.active !== false && (!a.scheduleType || a.scheduleType === 'now' || (a.scheduledAt && new Date(a.scheduledAt).getTime() <= now)));
+  } else if (currentBroadcastFilter === 'all_agents') {
+    filtered = fullList.filter(a => !a.targetType || a.targetType === 'all');
+  } else if (currentBroadcastFilter === 'specific') {
+    filtered = fullList.filter(a => a.targetType === 'specific');
+  } else if (currentBroadcastFilter === 'scheduled') {
+    filtered = fullList.filter(a => a.scheduleType === 'scheduled' && a.scheduledAt && new Date(a.scheduledAt).getTime() > now);
+  }
+
+  if (!filtered.length) {
+    let emptyMsg = 'لا توجد تعاميم في هذا السجل حالياً';
+    if (currentBroadcastFilter === 'active') emptyMsg = 'لا توجد تعاميم نشطة معروضة حالياً';
+    else if (currentBroadcastFilter === 'scheduled') emptyMsg = 'لا توجد تعاميم مجدولة للنشر المستقبلي';
+    else if (currentBroadcastFilter === 'specific') emptyMsg = 'لا توجد توجيهات فردية لوكلاء محددين';
+    else if (currentBroadcastFilter === 'all_agents') emptyMsg = 'لا توجد تعاميم عامة لكافة الوكلاء';
+
     container.innerHTML = `
-      <div style="text-align:center;padding:30px 14px;background:var(--ib);border:1.5px dashed var(--bd);border-radius:14px;color:var(--mt);">
-        <div style="font-size:32px;margin-bottom:8px;">📢</div>
-        <div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:4px;">لا توجد تعاميم منشورة حالياً</div>
-        <div style="font-size:11.5px;color:var(--mt);margin-bottom:12px;">يمكنك إنشاء تعميم جديد الآن وبثه فوراً أو جدولته للوكلاء</div>
-        <button class="btn-g" onclick="switchToBroadcastFormView()" style="display:inline-block;padding:8px 16px;font-size:12px;background:#1565C0;">
-          ➕ إنشاء أول تعميم
+      <div style="text-align:center;padding:26px 14px;background:var(--ib);border:1.5px dashed var(--bd);border-radius:14px;color:var(--mt);">
+        <div style="font-size:30px;margin-bottom:6px;">📋</div>
+        <div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:4px;">${emptyMsg}</div>
+        <div style="font-size:11px;color:var(--mt);margin-bottom:12px;">يمكنك إنشاء تعميم جديد الآن وبثه فوراً أو جدولته للوكلاء</div>
+        <button type="button" class="btn-g" onclick="switchToBroadcastFormView()" style="display:inline-block;padding:8px 16px;font-size:12px;background:#1565C0;border-radius:8px;">
+          ➕ إنشاء تعميم جديد
         </button>
       </div>
     `;
     return;
   }
 
-  const now = Date.now();
-
-  container.innerHTML = list.map(ann => {
+  container.innerHTML = filtered.map(ann => {
     const isUrgent = (ann.priority === 'urgent');
     const isActive = (ann.active !== false);
     const isScheduledFuture = (ann.scheduleType === 'scheduled' && ann.scheduledAt && new Date(ann.scheduledAt).getTime() > now);
@@ -4892,21 +4945,21 @@ function renderOwnerBroadcastsList(list) {
       statusBadge = '<span style="background:#ECEFF1;color:#546E7A;border:1px solid #CFD8DC;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;">⏸️ موقوف</span>';
     } else if (isScheduledFuture) {
       const schDate = new Date(ann.scheduledAt).toLocaleString('ar-IQ', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
-      statusBadge = `<span style="background:#FFF3E0;color:#E65100;border:1px solid #FFE0B2;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:10px;">⏰ مجدول: ${schDate}</span>`;
+      statusBadge = `<span style="background:#FFF3E0;color:#E65100;border:1px solid #FFE0B2;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;">⏰ مجدول: ${schDate}</span>`;
     } else {
-      statusBadge = '<span style="background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:10px;">🟢 معروض الآن للوكلاء</span>';
+      statusBadge = '<span style="background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;">🟢 معروض الآن للوكلاء</span>';
     }
 
     const targetBadge = (ann.targetType === 'specific')
-      ? `<span style="background:#E1F5FE;color:#0277BD;border:1px solid #B3E5FC;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;">🎯 ${ann.targetNames || 'وكلاء محددون'}</span>`
+      ? `<span style="background:#E1F5FE;color:#0277BD;border:1px solid #B3E5FC;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;">🎯 ${escapeHtml(ann.targetNames || 'وكلاء محددون')}</span>`
       : '<span style="background:#F3E5F5;color:#6A1B9A;border:1px solid #E1BEE7;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;">👥 كافة الوكلاء</span>';
 
     return `
-      <div style="background:var(--card);border:1.5px solid ${isUrgent ? 'rgba(239,83,80,0.5)' : 'var(--bd)'};border-radius:14px;padding:12px;box-shadow:0 2px 8px var(--sh);display:flex;flex-direction:column;gap:8px;">
+      <div style="background:var(--card);border:1.5px solid ${isUrgent ? 'rgba(239,83,80,0.5)' : 'var(--bd)'};border-radius:14px;padding:12px;box-shadow:0 2px 8px var(--sh);display:flex;flex-direction:column;gap:8px;text-align:right;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;">
           <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:${isUrgent ? '#C62828' : 'var(--tx)'};">
             <span>${isUrgent ? '🚨' : '📢'}</span>
-            <span>${ann.title || 'تعميم إداري'}</span>
+            <span>${escapeHtml(ann.title || 'تعميم إداري')}</span>
           </div>
           <div style="display:flex;align-items:center;gap:4px;">
             ${statusBadge}
@@ -4914,22 +4967,22 @@ function renderOwnerBroadcastsList(list) {
           </div>
         </div>
 
-        <div style="font-size:12px;color:var(--tx2);line-height:1.5;background:var(--ib);padding:8px 10px;border-radius:10px;white-space:pre-wrap;">
+        <div style="font-size:12px;color:var(--tx2);line-height:1.55;background:var(--ib);padding:8px 10px;border-radius:10px;white-space:pre-wrap;">
           ${escapeHtml(ann.text || '')}
         </div>
 
-        <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--bd);padding-top:8px;margin-top:2px;">
-          <span style="font-size:10.5px;color:var(--mt);">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--bd);padding-top:8px;margin-top:2px;flex-wrap:wrap;gap:6px;">
+          <span style="font-size:10px;color:var(--mt);font-weight:700;">
             نُشر: ${formatTimeAgo(ann.createdAt)}
           </span>
           <div style="display:flex;gap:6px;">
-            <button class="btn-close" onclick="switchToBroadcastFormView('${ann.id}')" style="margin:0;padding:5px 10px;font-size:11px;font-weight:800;background:var(--ib);color:var(--tx);border-color:var(--bd);">
+            <button type="button" class="btn-close" onclick="switchToBroadcastFormView('${ann.id}')" style="margin:0;padding:5px 10px;font-size:11px;font-weight:800;background:var(--ib);color:var(--tx);border-color:var(--bd);border-radius:8px;cursor:pointer;">
               ✏️ تعديل
             </button>
-            <button class="btn-close" onclick="toggleBroadcastActiveStatus('${ann.id}')" style="margin:0;padding:5px 10px;font-size:11px;font-weight:800;background:var(--ib);color:var(--tx);border-color:var(--bd);">
+            <button type="button" class="btn-close" onclick="toggleBroadcastActiveStatus('${ann.id}')" style="margin:0;padding:5px 10px;font-size:11px;font-weight:800;background:var(--ib);color:var(--tx);border-color:var(--bd);border-radius:8px;cursor:pointer;">
               ${isActive ? '⏸️ إيقاف' : '▶️ تفعيل'}
             </button>
-            <button class="btn-close" onclick="deleteOwnerBroadcast('${ann.id}')" style="margin:0;padding:5px 10px;font-size:11px;font-weight:800;background:var(--rbg);color:var(--r);border-color:#FFCDD2;">
+            <button type="button" class="btn-close" onclick="deleteOwnerBroadcast('${ann.id}')" style="margin:0;padding:5px 10px;font-size:11px;font-weight:800;background:var(--rbg);color:var(--r);border-color:#FFCDD2;border-radius:8px;cursor:pointer;">
               🗑️ حذف
             </button>
           </div>
@@ -4996,10 +5049,11 @@ async function saveBroadcastAnnouncement() {
       toast('📢 تم نشر وبث التعميم الإداري بنجاح لكافة الوكلاء!', false);
       if (data.announcements) {
         ownerBroadcastsCache = data.announcements;
+        try { localStorage.setItem('wakil_owner_broadcasts', JSON.stringify(ownerBroadcastsCache)); } catch(_) {}
       }
       switchToBroadcastListView();
       loadOwnerBroadcastsList();
-      // Immediate ping to update live banner on screen
+      // Immediate ping to update
       pingSession();
     } else {
       toast('❌ ' + (data.message || 'فشل حفظ التعميم'), true);
@@ -5024,34 +5078,61 @@ async function deleteOwnerBroadcast(id) {
     const data = await res.json();
     if (data.success) {
       toast('🗑️ تم حذف التعميم بنجاح', false);
-      loadOwnerBroadcastsList();
+      if (data.announcements) {
+        ownerBroadcastsCache = data.announcements;
+        try { localStorage.setItem('wakil_owner_broadcasts', JSON.stringify(ownerBroadcastsCache)); } catch(_) {}
+      } else {
+        ownerBroadcastsCache = ownerBroadcastsCache.filter(a => a.id !== id);
+      }
+      renderOwnerBroadcastsList(ownerBroadcastsCache);
     } else {
       toast('❌ تعذر حذف التعميم', true);
     }
   } catch(_) {
-    toast('❌ تعذر الاتصال بالسيرفر', true);
+    toast('❌ تعذر الاتصال بالسيرفر لحذف التعميم', true);
   }
 }
 
 async function toggleBroadcastActiveStatus(id) {
   try {
+    toast('⏳ جاري تحديث حالة التعميم...', false, 'blue');
     const res = await fetch(`https://wakil-api.onrender.com/api/owner/announcements/${id}/toggle`, {
       method: 'POST'
     });
     const data = await res.json();
     if (data.success) {
       toast(data.message, false);
-      loadOwnerBroadcastsList();
+      if (data.announcements) {
+        ownerBroadcastsCache = data.announcements;
+        try { localStorage.setItem('wakil_owner_broadcasts', JSON.stringify(ownerBroadcastsCache)); } catch(_) {}
+      }
+      renderOwnerBroadcastsList(ownerBroadcastsCache);
     }
   } catch(_) {
     toast('❌ تعذر الاتصال بالسيرفر', true);
   }
 }
 
-// ── عرض التعاميم الحية للوكلاء على الشاشة الرئيسية ──
+// ── عرض التعاميم الحية للوكلاء فقط على الشاشة الرئيسية ──
 function renderBroadcastBanner(announcements) {
   const agentBanner = document.getElementById('home-broadcast-banner');
   const ownerBanner = document.getElementById('owner-broadcast-banner');
+
+  // حساب الأونر محمي تماماً: لا يظهر له أي شريط تعميم بالواجهة الرئيسية إطلاقاً
+  if (ownerBanner) {
+    ownerBanner.style.display = 'none';
+    ownerBanner.innerHTML = '';
+  }
+
+  // إذا كان الحساب الحالي مالك (Owner)، لا نعرض له شريط التعميم أبداً في الواجهة
+  const currentUserRole = localStorage.getItem('wakil_user_role');
+  if (currentUserRole === 'owner') {
+    if (agentBanner) {
+      agentBanner.style.display = 'none';
+      agentBanner.innerHTML = '';
+    }
+    return;
+  }
 
   const list = Array.isArray(announcements) ? announcements : (announcements && announcements.active && announcements.text ? [announcements] : []);
 
@@ -5086,24 +5167,6 @@ function renderBroadcastBanner(announcements) {
     } else {
       agentBanner.style.display = 'block';
       agentBanner.innerHTML = html;
-    }
-  }
-
-  if (ownerBanner) {
-    if (!list.length) {
-      ownerBanner.style.display = 'none';
-      ownerBanner.innerHTML = '';
-    } else {
-      ownerBanner.style.display = 'block';
-      ownerBanner.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <span style="font-size:11.5px;font-weight:900;color:#1565C0;display:flex;align-items:center;gap:4px;">
-            <span>📢</span><span>التعاميم النشطة المعروضة حالياً للوكلاء:</span>
-          </span>
-          <button onclick="openBroadcastModal()" style="background:#E3F2FD;border:1px solid #90CAF9;color:#1565C0;border-radius:6px;padding:2px 8px;font-size:10.5px;font-weight:800;cursor:pointer;">إدارة ‹</button>
-        </div>
-        ${html}
-      `;
     }
   }
 }
@@ -5796,19 +5859,28 @@ window.addEventListener('afterprint', () => {
         <!-- Header -->
         <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--bd);padding-bottom:12px;margin-bottom:12px;">
           <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:22px;">📢</span>
-            <span style="font-size:16px;font-weight:900;color:#1565C0;">إدارة وبث التعاميم الإدارية</span>
+            <span style="font-size:24px;">📋</span>
+            <div>
+              <div style="font-size:16px;font-weight:900;color:#1565C0;">سجلات التعاميم الإدارية</div>
+              <div style="font-size:10.5px;color:var(--mt);font-weight:700;">سجل كافة التعاميم العامة والخاصة الصادرة</div>
+            </div>
           </div>
-          <button id="btn-broadcast-view-toggle" class="btn-g" onclick="toggleBroadcastDashboardView()" style="margin:0;padding:6px 12px;font-size:11.5px;font-weight:800;background:#2E7D32;">
+          <button id="btn-broadcast-view-toggle" class="btn-g" onclick="toggleBroadcastDashboardView()" style="margin:0;padding:7px 14px;font-size:12px;font-weight:800;background:#2E7D32;border-radius:10px;display:flex;align-items:center;gap:5px;box-shadow:0 3px 8px rgba(46,125,50,0.3);">
             ➕ تعميم جديد
           </button>
         </div>
 
-        <!-- ── SUB-VIEW 1: ANNOUNCEMENTS LIST (قائمة التعاميم الحالية والمجدولة) ── -->
+        <!-- ── SUB-VIEW 1: ANNOUNCEMENTS LIST (قائمة وسجلات التعاميم) ── -->
         <div id="broadcast-subview-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:2px;">
-          <div style="font-size:12px;color:var(--mt);margin-bottom:2px;">
-            التعاميم الصادرة المنشورة حالياً أو المجدولة للنشر:
+          <!-- Filter Tabs -->
+          <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;">
+            <button type="button" class="broadcast-filter-tab active" data-filter="all" onclick="filterOwnerBroadcasts('all', this)" style="padding:5px 12px;font-size:11px;font-weight:800;border-radius:20px;border:1px solid #1565C0;background:#1565C0;color:#fff;cursor:pointer;white-space:nowrap;">📋 كافة السجلات</button>
+            <button type="button" class="broadcast-filter-tab" data-filter="active" onclick="filterOwnerBroadcasts('active', this)" style="padding:5px 12px;font-size:11px;font-weight:800;border-radius:20px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;white-space:nowrap;">🟢 معروض حالياً</button>
+            <button type="button" class="broadcast-filter-tab" data-filter="all_agents" onclick="filterOwnerBroadcasts('all_agents', this)" style="padding:5px 12px;font-size:11px;font-weight:800;border-radius:20px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;white-space:nowrap;">👥 تعاميم عامة</button>
+            <button type="button" class="broadcast-filter-tab" data-filter="specific" onclick="filterOwnerBroadcasts('specific', this)" style="padding:5px 12px;font-size:11px;font-weight:800;border-radius:20px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;white-space:nowrap;">🎯 توجيهات خاصة</button>
+            <button type="button" class="broadcast-filter-tab" data-filter="scheduled" onclick="filterOwnerBroadcasts('scheduled', this)" style="padding:5px 12px;font-size:11px;font-weight:800;border-radius:20px;border:1px solid var(--bd);background:var(--card);color:var(--tx);cursor:pointer;white-space:nowrap;">⏰ مجدول</button>
           </div>
+
           <div id="owner-broadcasts-container" style="display:flex;flex-direction:column;gap:10px;">
             <!-- Dynamically populated -->
           </div>
