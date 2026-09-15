@@ -27,8 +27,8 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.47';
-const APP_VERSION_CODE = 47;
+const APP_VERSION = '1.0.48';
+const APP_VERSION_CODE = 48;
 let APK_DOWNLOAD_URL = 'https://files.catbox.moe/36b8bb.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
@@ -1611,7 +1611,12 @@ app.put('/api/citizens/:id', (req, res) => {
     isReceived,
     items,
     customItems,
-    notes
+    notes,
+    done,
+    doneAt,
+    isPartial,
+    recipientName,
+    deliveries
   } = req.body;
 
   const updatedCard = cardNumber !== undefined ? cardNumber : (card !== undefined ? card : current.cardNumber);
@@ -1627,7 +1632,12 @@ app.put('/api/citizens/:id', (req, res) => {
     blockedCount: blockedCount !== undefined ? parseInt(blockedCount) : (blk !== undefined ? parseInt(blk) : current.blockedCount),
     isWelfare: isWelfare !== undefined ? !!isWelfare : (welfare !== undefined ? !!welfare : current.isWelfare),
     isReceived: isReceived !== undefined ? !!isReceived : current.isReceived,
-    receivedAt: isReceived ? (current.receivedAt || new Date().toISOString()) : (isReceived === false ? null : current.receivedAt),
+    done: done !== undefined ? !!done : (isReceived !== undefined ? !!isReceived : current.done),
+    doneAt: doneAt !== undefined ? doneAt : (isReceived ? (current.doneAt || new Date().toISOString()) : null),
+    receivedAt: doneAt !== undefined ? doneAt : (isReceived ? (current.receivedAt || new Date().toISOString()) : (isReceived === false ? null : current.receivedAt)),
+    isPartial: isPartial !== undefined ? !!isPartial : (current.isPartial || false),
+    recipientName: recipientName !== undefined ? String(recipientName).trim() : (current.recipientName || ''),
+    deliveries: Array.isArray(deliveries) ? deliveries : (current.deliveries || []),
     items: items !== undefined ? items : current.items,
     customItems: customItems !== undefined ? customItems : current.customItems,
     notes: notes !== undefined ? notes : current.notes
@@ -1651,7 +1661,12 @@ app.post('/api/citizens/:id/cancel', (req, res) => {
   list[idx] = {
     ...list[idx],
     isReceived: false,
+    done: false,
+    isPartial: false,
     receivedAt: null,
+    doneAt: null,
+    recipientName: '',
+    deliveries: [],
     items: { oil: false, flour: false, rice: false, sugar: false, paste: false, milk: false },
     customItems: []
   };
@@ -1736,7 +1751,7 @@ app.put('/api/archive/:id', (req, res) => {
 app.put('/api/archive/:id/citizen', (req, res) => {
   const agency = req.body.agencyNumber || req.query.agencyNumber || '868';
   const monthId = req.params.id;
-  const { citizenId, items, customItems, isReceived, done, doneAt, name, card, oldCard, familyCount, eligibleCount, blockedCount, isWelfare, notes } = req.body;
+  const { citizenId, items, customItems, isReceived, done, doneAt, isPartial, recipientName, deliveries, name, card, oldCard, familyCount, eligibleCount, blockedCount, isWelfare, notes } = req.body;
 
   let archive = getArchiveByAgency(agency);
   const month = archive.find(m => m.id === monthId);
@@ -1751,6 +1766,9 @@ app.put('/api/archive/:id/citizen', (req, res) => {
       if (done !== undefined) cit.done = !!done;
       if (isReceived !== undefined) cit.done = !!isReceived;
       if (doneAt !== undefined) cit.doneAt = doneAt;
+      if (isPartial !== undefined) cit.isPartial = !!isPartial;
+      if (recipientName !== undefined) cit.recipientName = recipientName;
+      if (Array.isArray(deliveries)) cit.deliveries = deliveries;
       if (items !== undefined) cit.items = items;
       if (customItems !== undefined) cit.custom = customItems;
       if (name !== undefined) cit.name = name;

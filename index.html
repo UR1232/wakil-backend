@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.47";
+    var compiledVersion = "1.0.48";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.47";
+    window.ACTIVE_APP_VERSION = "1.0.48";
   }
 })();
 </script>
@@ -1083,6 +1083,61 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         <p style="font-size:12px;color:var(--mt);">ستحتاج لإدخال اسم المستخدم وكلمة المرور مجدداً.</p>
         <button class="btn-r" onclick="doLogout()">نعم، تسجيل الخروج</button>
         <button class="btn-close" onclick="closeMod('m-logout')">إلغاء</button>
+      </div>
+    </div>
+
+        <!-- MODAL: CONFIRM DELIVERY & RECORD RECIPIENT -->
+    <div class="overlay" id="m-confirm-recipient" onclick="closeMod('m-confirm-recipient',event)">
+      <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;width:92%;padding:18px;">
+        <div class="modal-t" style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;">
+          <span>📦</span><span>تأكيد الاستلام وتسجيل المستلم</span>
+        </div>
+        
+        <!-- Citizen Info Summary -->
+        <div style="background:var(--ib);border:1.5px solid var(--bd);border-radius:12px;padding:10px 12px;margin:12px 0 10px;">
+          <div style="font-size:14px;font-weight:900;color:var(--tx);" id="rcv-modal-cit-name">—</div>
+          <div style="font-size:11px;color:var(--tx2);margin-top:3px;display:flex;justify-content:space-between;align-items:center;">
+            <span>رقم البطاقة: <b id="rcv-modal-cit-card" style="color:var(--g);">—</b></span>
+            <span id="rcv-modal-batch-num" style="background:#E3F2FD;color:#0277BD;padding:2px 8px;border-radius:6px;font-weight:800;font-size:10.5px;">الدفعة 1</span>
+          </div>
+        </div>
+
+        <!-- Items to be delivered in this batch -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11.5px;font-weight:800;color:var(--tx2);margin-bottom:6px;">المواد المسلمة في هذه الدفعة:</div>
+          <div id="rcv-modal-items-chips" style="display:flex;flex-wrap:wrap;gap:5px;max-height:85px;overflow-y:auto;padding:2px 0;">
+            <!-- Chips inserted dynamically -->
+          </div>
+        </div>
+
+        <!-- Recipient Name Input -->
+        <div style="margin-bottom:10px;">
+          <div class="flbl" style="display:flex;justify-content:space-between;align-items:center;">
+            <span>اسم المستلم الفعلي <span style="color:var(--r);">*</span></span>
+            <span style="font-size:10.5px;color:var(--mt);font-weight:normal;">(من استلم الحصة اليوم)</span>
+          </div>
+          <input class="field" id="rcv-recipient-name" type="text" placeholder="اكتب اسم الشخص المستلم..." style="font-size:13.5px;font-weight:800;padding:10px 12px;" />
+        </div>
+
+        <!-- Quick select buttons -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;color:var(--mt);margin-bottom:6px;">أزرار سريعة لتحديد المستلم:</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            <button type="button" onclick="fillQuickRecipient('self')" style="background:var(--ib);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;">👤 نفس رب الأسرة</button>
+            <button type="button" onclick="fillQuickRecipient('son')" style="background:var(--ib);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;">👦 الابن</button>
+            <button type="button" onclick="fillQuickRecipient('brother')" style="background:var(--ib);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;">👨 الأخ</button>
+            <button type="button" onclick="fillQuickRecipient('wife')" style="background:var(--ib);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;">👩 الزوجة</button>
+            <button type="button" onclick="fillQuickRecipient('daughter')" style="background:var(--ib);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;">👧 البنت</button>
+            <button type="button" onclick="fillQuickRecipient('mother')" style="background:var(--ib);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;">🧕 الأم</button>
+            <button type="button" onclick="fillQuickRecipient('father')" style="background:var(--ib);border:1px solid var(--bd);color:var(--tx);border-radius:8px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;">👴 الأب</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <button class="btn-g" id="btn-submit-recipient" onclick="executeConfirmReceipt()" style="padding:11px;font-size:13.5px;font-weight:900;margin-bottom:6px;">
+          ✓ حفظ وتأكيد استلام الدفعة
+        </button>
+        <button class="btn-close" onclick="closeMod('m-confirm-recipient')">إلغاء وتراجع</button>
       </div>
     </div>
 
@@ -3332,9 +3387,6 @@ function agentCardHTML(ag) {
       <button class="btn-g" onclick="openAgentRosterView('${ag.id}')" style="margin:0;padding:8px 6px;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:4px;">
         <span>👥 تصفح الكشف</span>
       </button>
-      <button class="btn-g" onclick="openSingleAgentDirectLocation('${ag.id}', '${safeName}', '${ag.agencyNumber}')" style="margin:0;padding:8px 6px;font-size:11.5px;font-weight:800;background:#0277BD;display:flex;align-items:center;justify-content:center;gap:4px;" title="عرض موقع وتواجد الوكيل">
-        <span>📍 موقع الوكيل</span>
-      </button>
       <button class="btn-g" onclick="generateAndPrintAgentPDF('${ag.id}')" style="margin:0;padding:8px 6px;font-size:11.5px;font-weight:800;background:#1B5E20;display:flex;align-items:center;justify-content:center;gap:4px;">
         <span>📄 طباعة PDF</span>
       </button>
@@ -3805,6 +3857,23 @@ function appendMoreHomeCards() {
 function doSearch(q){ renderList(q); }
 
 function citizenCardHTML(c,onclick='openDetail'){
+  const isDone = !!c.done;
+  const isPartial = !isDone && (c.isPartial || (Array.isArray(c.deliveries) && c.deliveries.length > 0));
+  let statusBadge = '';
+  if (isDone) {
+    statusBadge = '<div class="badge b-done">✓ تم</div>';
+  } else if (isPartial) {
+    const delCount = (c.deliveries && c.deliveries.length) ? c.deliveries.length : 1;
+    statusBadge = `<div class="badge" style="background:#FFF8E1;color:#E65100;border:1px solid #FFE082;font-size:10px;font-weight:800;">🟡 جزئي (${delCount})</div>`;
+  } else {
+    statusBadge = '<div class="badge b-pend">⏳ لم يستلم</div>';
+  }
+
+  let recipientInfo = '';
+  if (c.recipientName) {
+    recipientInfo = `<div style="font-size:10.5px;color:var(--tx2);font-weight:700;margin-top:2px;display:flex;align-items:center;gap:4px;"><span>👤 آخر مستلم:</span> <span style="color:var(--g);font-weight:800;">${c.recipientName}</span></div>`;
+  }
+
   return `<div class="ccard ${c.welfare?'wc':''}" onclick="${onclick}(${c.id})">
     <div class="ava ${c.welfare?'wa':''}">👤</div>
     <div style="flex:1;min-width:0;">
@@ -3814,9 +3883,10 @@ function citizenCardHTML(c,onclick='openDetail'){
       </div>
       <div class="cnum" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"><span style="color:var(--g);font-weight:800;">🪪 ${c.card}</span>${c.oldCard ? `<span style="font-size:10px;color:var(--mt);font-weight:normal;">(قديمة: ${c.oldCard})</span>` : ''}</div>
       <div class="cfam">كلي: ${c.fam} | مستحق: ${c.elig} | محجوب: ${c.blk}</div>
+      ${recipientInfo}
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
-      <div class="badge ${c.done?'b-done':'b-pend'}">${c.done?'✓ تم':'⏳ لم يستلم'}</div>
+      ${statusBadge}
       <span class="arr">‹</span>
     </div>
   </div>`;
@@ -4407,20 +4477,168 @@ function hasEdits(){
   return false;
 }
 
+// ══════════════════════════════════════════════════════════════════
+// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.48) ══
+// ══════════════════════════════════════════════════════════════════
+
+function getCitizenRequiredItemKeys(c) {
+  if (!c) return [];
+  const allItems = getItems();
+  const keys = [];
+  allItems.forEach(it => {
+    if (!it.welfare) {
+      keys.push(it.key);
+    } else if (c.welfare) {
+      keys.push(it.key);
+    }
+  });
+  const customs = Array.isArray(c.custom) ? c.custom : (Array.isArray(c.customItems) ? c.customItems : (curCustom || []));
+  customs.forEach((_, idx) => {
+    keys.push('cx_' + idx);
+  });
+  return keys;
+}
+
+function getItemDisplayName(key, c) {
+  const allItems = getItems();
+  const found = allItems.find(it => it.key === key);
+  if (found) return (found.icon ? found.icon + ' ' : '') + found.label;
+  if (key.startsWith('cx_')) {
+    const idx = parseInt(key.replace('cx_', ''));
+    const customs = (c && Array.isArray(c.custom)) ? c.custom : (curCustom || []);
+    if (customs[idx]) return '📦 ' + customs[idx];
+  }
+  return key;
+}
+
+function selectAllRemainingItems() {
+  if (!isConnected) {
+    toast('⚠️ التعديل والتحديد ممنوع في وضع الأوفلاين', false, 'red');
+    return;
+  }
+  const c = cur;
+  if (!c) return;
+  const deliveredKeys = new Set();
+  if (Array.isArray(c.deliveries)) {
+    c.deliveries.forEach(d => (d.itemKeys || []).forEach(k => deliveredKeys.add(k)));
+  }
+  const allKeys = getCitizenRequiredItemKeys(c);
+  allKeys.forEach(k => {
+    if (!deliveredKeys.has(k)) {
+      chk[k] = true;
+    }
+  });
+  renderDetail();
+}
+
+function clearSelectedItems() {
+  if (!isConnected) {
+    toast('⚠️ التعديل والتحديد ممنوع في وضع الأوفلاين', false, 'red');
+    return;
+  }
+  const c = cur;
+  if (!c) return;
+  const deliveredKeys = new Set();
+  if (Array.isArray(c.deliveries)) {
+    c.deliveries.forEach(d => (d.itemKeys || []).forEach(k => deliveredKeys.add(k)));
+  }
+  Object.keys(chk).forEach(k => {
+    if (!deliveredKeys.has(k)) {
+      chk[k] = false;
+    }
+  });
+  renderDetail();
+}
+
+function fillQuickRecipient(type) {
+  const inp = document.getElementById('rcv-recipient-name');
+  if (!inp || !cur) return;
+  const citName = (cur.name || '').trim();
+  if (type === 'self') {
+    inp.value = citName;
+  } else if (type === 'son') {
+    inp.value = citName ? (citName + ' (الابن)') : 'الابن';
+  } else if (type === 'brother') {
+    inp.value = citName ? (citName + ' (الأخ)') : 'الأخ';
+  } else if (type === 'wife') {
+    inp.value = 'الزوجة';
+  } else if (type === 'daughter') {
+    inp.value = citName ? (citName + ' (البنت)') : 'البنت';
+  } else if (type === 'mother') {
+    inp.value = 'الأم';
+  } else if (type === 'father') {
+    inp.value = citName ? (citName + ' (الأب)') : 'الأب';
+  }
+  inp.focus();
+}
+
 function renderDetail(){
-  const c=cur;
-  const allItems=getItems();
-  const base=allItems.filter(i=>!i.welfare),welf=allItems.filter(i=>i.welfare);
-  const now=c.doneAt?new Date(c.doneAt).toLocaleString('ar-IQ'):'';
+  const c = cur;
+  if (!c) return;
+  const allItems = getItems();
+  const base = allItems.filter(i => !i.welfare);
+  const welf = allItems.filter(i => i.welfare);
+  const now = c.doneAt ? new Date(c.doneAt).toLocaleString('ar-IQ') : '';
   const isEdited = hasEdits();
+
+  const isDone = !!c.done;
+  const isPartial = !isDone && (c.isPartial || (Array.isArray(c.deliveries) && c.deliveries.length > 0));
+  let detailStatusBadge = '';
+  if (isDone) {
+    detailStatusBadge = '<div class="badge b-done">✓ تم الاستلام بالكامل</div>';
+  } else if (isPartial) {
+    const delCount = (c.deliveries && c.deliveries.length) ? c.deliveries.length : 1;
+    detailStatusBadge = `<div class="badge" style="background:#FFF8E1;color:#E65100;border:1.5px solid #FFE082;font-weight:900;">🟡 استلام جزئي (${delCount} دفعة)</div>`;
+  } else {
+    detailStatusBadge = '<div class="badge b-pend">⏳ لم يستلم</div>';
+  }
+
+  const recipientBanner = c.recipientName ? `
+    <div style="margin-top:8px;background:var(--ib);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:11.5px;color:var(--tx2);">👤 <b>آخر مستلم مسجل:</b></div>
+      <div style="font-size:13px;font-weight:900;color:var(--g);">${c.recipientName}</div>
+    </div>
+  ` : '';
+
+  let deliveriesCard = '';
+  if (Array.isArray(c.deliveries) && c.deliveries.length > 0) {
+    deliveriesCard = `
+      <div class="icard" style="border:1.5px solid #0288D1;background:linear-gradient(135deg,rgba(2,136,209,0.06),rgba(2,136,209,0.01));margin-top:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:900;color:#0277BD;display:flex;align-items:center;gap:6px;">
+            <span>📋</span> سجل دفعات الاستلام والمستلمين (${c.deliveries.length})
+          </div>
+          <span style="font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:8px;${c.done ? 'background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7;' : 'background:#FFF8E1;color:#E65100;border:1px solid #FFE082;'}">
+            ${c.done ? '✓ مكتمل' : '🟡 دفعات جارية'}
+          </span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${c.deliveries.map((del, idx) => `
+            <div style="background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:9px 12px;box-shadow:0 1px 4px var(--sh);">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                <div style="font-weight:900;font-size:13px;color:var(--tx);">
+                  <span style="color:#0277BD;">الدفعة ${del.batchNum || (idx+1)}:</span> 👤 ${del.recipient || c.name}
+                </div>
+                <span style="font-size:10px;color:var(--mt);direction:ltr;font-weight:700;">🕒 ${del.timeFormatted || ''}</span>
+              </div>
+              <div style="font-size:11px;color:var(--tx2);margin-top:5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                <span style="font-weight:700;">المواد المسلمة:</span>
+                ${(del.itemNames || []).map(nm => `<span style="background:var(--ib);padding:2px 7px;border-radius:6px;font-weight:800;border:1px solid var(--bd);font-size:10.5px;color:var(--tx);">${nm}</span>`).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
   
-  document.getElementById('dbody').innerHTML=`
+  document.getElementById('dbody').innerHTML = `
     ${!isConnected ? `<div class="readonly-banner">🔒 التعديل ممنوع في وضع الأوفلاين. يرجى الاتصال بالإنترنت للتعديل والمزامنة.</div>` : ''}
 
     <div class="icard ${c.welfare?'wcard':''}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;">
         <div style="display:flex;flex-direction:column;gap:5px;">
-          <div class="badge ${c.done?'b-done':'b-pend'}">${c.done?'✓ تم الاستلام':'⏳ لم يستلم'}</div>
+          ${detailStatusBadge}
           ${c.welfare?'<div class="badge b-welf">🏛️ رعاية اجتماعية</div>':''}
         </div>
         <div style="font-size:11px;color:var(--mt);">بيانات المواطن</div>
@@ -4451,14 +4669,14 @@ function renderDetail(){
           ${c.oldCard ? `<button onclick="event.stopPropagation();copyToClipboard('${c.oldCard}','رقم البطاقة القديمة')" style="background:var(--card);border:1px solid var(--bd);color:var(--tx2);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;" title="نسخ الرقم القديم">نسخ 📋</button>` : ''}
         </div>
       </div>
-      </div>
       <div style="display:flex;gap:8px;margin-top:10px;">
         <div style="flex:1;background:var(--ib);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:10px;color:var(--mt);">الكلي</div><div style="font-weight:800;font-size:15px;color:var(--tx);">${c.fam}</div></div>
         <div style="flex:1;background:var(--gbg);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:10px;color:var(--g);">المستحقون</div><div style="font-weight:800;font-size:15px;color:var(--g);">${c.elig}</div></div>
         <div style="flex:1;background:var(--rbg);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:10px;color:var(--r);">المحجوبون</div><div style="font-weight:800;font-size:15px;color:var(--r);">${c.blk}</div></div>
       </div>
+      ${recipientBanner}
       ${c.welfare?`<div class="wbanner"><span style="font-size:22px;">🏛️</span><div><div style="font-size:13px;font-weight:700;color:var(--pur);">مستفيد من الرعاية الاجتماعية</div><div style="font-size:11px;color:var(--pur);opacity:.7;">يستحق حصة إضافية</div></div></div>`:''}
-      ${c.done?`<div class="ts-bar"><span style="font-size:12px;color:var(--g);">📅 ${now}</span><span style="font-size:11px;color:var(--mt);">تاريخ الاستلام:</span></div>`:''}
+      ${c.done?`<div class="ts-bar"><span style="font-size:12px;color:var(--g);">📅 ${now}</span><span style="font-size:11px;color:var(--mt);">تاريخ اكتمال الاستلام:</span></div>`:''}
       
       <!-- BUTTON TO GENERATE INDIVIDUAL CITIZEN AUDIT PDF (WORKS OFFLINE) -->
       <button class="pdf-export-btn" onclick="generateCitizenAuditPDF(${c.id})">
@@ -4472,9 +4690,20 @@ function renderDetail(){
       </button>
     </div>
 
+    <!-- DELIVERIES HISTORY CARD -->
+    ${deliveriesCard}
+
     <!-- RATIONS & CUSTOM ITEMS -->
     <div class="icard">
-      <div class="sec-t">المواد التموينية</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="sec-t" style="margin:0;">المواد التموينية</div>
+        ${!c.done ? `
+          <div style="display:flex;gap:6px;">
+            <button type="button" onclick="selectAllRemainingItems()" style="background:var(--gbg);color:var(--g);border:1px solid var(--gbd);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:800;cursor:pointer;">✓ تحديد الكل</button>
+            <button type="button" onclick="clearSelectedItems()" style="background:var(--ib);color:var(--tx2);border:1px solid var(--bd);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;">إلغاء التحديد</button>
+          </div>
+        ` : ''}
+      </div>
       <div class="sec-s">الحصة الأساسية — ${c.elig} أفراد مستحقون</div>
       ${base.map(it=>rationRow(it,false)).join('')}
       ${c.welfare&&welf.length?`<div class="sdiv"><div class="sdiv-line"></div><div class="sdiv-lbl" style="background:var(--purbg);color:var(--pur);border:1px solid var(--purbd);">🏛️ حصة الرعاية</div><div class="sdiv-line"></div></div>${welf.map(it=>rationRow(it,true)).join('')}`:''}
@@ -4495,11 +4724,14 @@ function renderDetail(){
     <!-- ACTION BUTTONS -->
     <div style="padding:4px 12px 16px;">
       ${!c.done
-        ? `<button class="btn-cf ${!isConnected?'btn-disabled':''}" onclick="confirmRcv()">✓ تأكيد الاستلام وتسجيل الوقت</button>`
+        ? `<button class="btn-cf ${!isConnected?'btn-disabled':''}" onclick="confirmRcv()">
+             ${(c.deliveries && c.deliveries.length > 0) ? '➕ تسجيل دفعة استلام جديدة للمواد المتبقية' : '✓ تأكيد الاستلام وتسجيل الوقت'}
+           </button>
+           ${(c.deliveries && c.deliveries.length > 0 || c.isPartial) ? `<button class="btn-cn ${!isConnected?'btn-disabled':''}" onclick="openCancelRcvModal()" style="margin-top:8px;">↩ إلغاء كافة الاستلامات وتصفير الدفعات</button>` : ''}`
         : (isEdited
             ? `<button class="btn-save ${!isConnected?'btn-disabled':''}" onclick="saveEditedChanges()">💾 حفظ التغييرات المعدلة</button>
-               <button class="btn-cn ${!isConnected?'btn-disabled':''}" onclick="openCancelRcvModal()">↩ إلغاء الاستلام</button>`
-            : `<button class="btn-cn ${!isConnected?'btn-disabled':''}" onclick="openCancelRcvModal()">↩ إلغاء الاستلام</button>`
+               <button class="btn-cn ${!isConnected?'btn-disabled':''}" onclick="openCancelRcvModal()" style="margin-top:8px;">↩ إلغاء كافة الاستلامات وتصفير الدفعات</button>`
+            : `<button class="btn-cn ${!isConnected?'btn-disabled':''}" onclick="openCancelRcvModal()">↩ إلغاء كافة الاستلامات وتصفير الدفعات</button>`
           )
       }
     </div>`;
@@ -4507,8 +4739,24 @@ function renderDetail(){
   setTimeout(()=>{const f=document.getElementById('nif');if(f)f.addEventListener('keydown',e=>{if(e.key==='Enter')addCustom();});},100);
 }
 
-function rationRow(it,isW){
-  const on=!!chk[it.key];
+function rationRow(it, isW){
+  const prevDel = (cur && Array.isArray(cur.deliveries)) ? cur.deliveries.find(d => (d.itemKeys || []).includes(it.key)) : null;
+  if (prevDel) {
+    return `<div class="ration on" style="border-color:rgba(46,125,50,0.35);background:rgba(46,125,50,0.06);cursor:default;" onclick="toast('ℹ️ تم تسليم (${it.label}) في الدفعة ${prevDel.batchNum} للمستلم (${prevDel.recipient})', false, 'blue')">
+      <div class="chk on">✓</div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-right:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="rlbl" style="color:var(--g);font-weight:800;">${it.label}</span>
+          <span style="font-size:18px;">${it.icon}</span>
+        </div>
+        <span style="font-size:10px;font-weight:800;background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7;padding:2px 7px;border-radius:6px;">
+          ✓ مستلم (دفعة ${prevDel.batchNum})
+        </span>
+      </div>
+    </div>`;
+  }
+
+  const on = !!chk[it.key];
   return `<div class="ration ${on?'on':''} ${isW?'wi':''}" onclick="tog('${it.key}')">
     <div class="chk ${on?(isW?'pon':'on'):''}">${on?'✓':''}</div>
     <div style="display:flex;align-items:center;gap:8px;">
@@ -4518,8 +4766,25 @@ function rationRow(it,isW){
   </div>`;
 }
 
-function customRow(item,idx){
-  const key='cx_'+idx,on=!!chk[key];
+function customRow(item, idx){
+  const key = 'cx_' + idx;
+  const prevDel = (cur && Array.isArray(cur.deliveries)) ? cur.deliveries.find(d => (d.itemKeys || []).includes(key)) : null;
+  if (prevDel) {
+    return `<div class="ration on" style="border-color:rgba(46,125,50,0.35);background:rgba(46,125,50,0.06);cursor:default;" onclick="toast('ℹ️ تم تسليم (${item}) في الدفعة ${prevDel.batchNum} للمستلم (${prevDel.recipient})', false, 'blue')">
+      <div class="chk on">✓</div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding-right:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="rlbl" style="color:var(--g);font-weight:800;">${item}</span>
+          <span style="font-size:16px;">📦</span>
+        </div>
+        <span style="font-size:10px;font-weight:800;background:#E8F5E9;color:#1B5E20;border:1px solid #A5D6A7;padding:2px 7px;border-radius:6px;">
+          ✓ مستلم (دفعة ${prevDel.batchNum})
+        </span>
+      </div>
+    </div>`;
+  }
+
+  const on = !!chk[key];
   return `<div class="ration ${on?'on':''}" style="border-color:rgba(46,125,50,.25);" onclick="tog('${key}')">
     <div style="display:flex;align-items:center;gap:6px;">
       <div class="chk ${on?'on':''}">${on?'✓':''}</div>
@@ -4534,7 +4799,7 @@ function tog(key){
     toast('⚠️ التعديل والتحديد ممنوع في وضع الأوفلاين (قراءة وتصدير PDF فقط)', false, 'red');
     return;
   }
-  chk[key]=!chk[key];
+  chk[key] = !chk[key];
   renderDetail();
 }
 
@@ -4543,13 +4808,13 @@ function addCustom(){
     toast('⚠️ إضافة المواد يتطلب إنترنت للمزامنة السحابية', false, 'red');
     return;
   }
-  const f=document.getElementById('nif');if(!f)return;
-  const v=f.value.trim();if(!v){toast('اكتب اسم المادة أولاً',false,'red');return;}
+  const f = document.getElementById('nif'); if(!f) return;
+  const v = f.value.trim(); if(!v){ toast('اكتب اسم المادة أولاً', false, 'red'); return; }
   curCustom.push(v);
   chk['cx_' + (curCustom.length - 1)] = true;
-  f.value='';
+  f.value = '';
   renderDetail();
-  toast(`✅ تمت إضافة "${v}"`,false);
+  toast(`✅ تمت إضافة "${v}"`, false);
 }
 
 function removeCustom(idx){
@@ -4557,40 +4822,146 @@ function removeCustom(idx){
     toast('⚠️ حذف المواد يتطلب إنترنت للمزامنة السحابية', false, 'red');
     return;
   }
-  curCustom.splice(idx,1);
-  const newChk={};
-  Object.keys(chk).forEach(k=>{
-    if(!k.startsWith('cx_')) newChk[k]=chk[k];
+  curCustom.splice(idx, 1);
+  const newChk = {};
+  Object.keys(chk).forEach(k => {
+    if(!k.startsWith('cx_')) newChk[k] = chk[k];
   });
-  chk=newChk;
+  chk = newChk;
   renderDetail();
-  toast('تم حذف المادة المخصصة',false);
+  toast('تم حذف المادة المخصصة', false);
 }
+
+let currentBatchDeliveryInfo = null;
 
 function confirmRcv(){
   if(!isConnected){
     toast('⚠️ تأكيد الاستلام يتطلب إنترنت لرفع الوقت والتأكيد سحابياً', false, 'red');
     return;
   }
+  const c = cur;
+  if (!c) return;
 
-  // 1. معالجة تأكيد الاستلام في الأرشيف
-  if (isArchiveCitizenView && archiveMonth && Array.isArray(archiveMonth.citizens)) {
-    const c = archiveMonth.citizens.find(x => x.id === cur.id);
-    if (!c) return;
-    c.items = { ...chk };
-    c.custom = [ ...curCustom ];
+  const deliveredKeys = new Set();
+  if (Array.isArray(c.deliveries)) {
+    c.deliveries.forEach(d => (d.itemKeys || []).forEach(k => deliveredKeys.add(k)));
+  }
+
+  let newlyCheckedKeys = Object.keys(chk).filter(k => !!chk[k] && !deliveredKeys.has(k));
+
+  // إذا لم يقم بتحديد مواد محددة، نحدد تلقائياً كافة المواد المتبقية
+  if (newlyCheckedKeys.length === 0) {
+    const allReq = getCitizenRequiredItemKeys(c);
+    const remaining = allReq.filter(k => !deliveredKeys.has(k));
+    if (remaining.length === 0) {
+      toast('⚠️ كافة المواد التموينية لهذا المواطن تم تسليمها بالكامل مسبقاً', false, 'blue');
+      return;
+    }
+    remaining.forEach(k => { chk[k] = true; });
+    newlyCheckedKeys = remaining;
+    renderDetail();
+  }
+
+  const newlyCheckedNames = newlyCheckedKeys.map(k => getItemDisplayName(k, c));
+
+  currentBatchDeliveryInfo = {
+    keys: newlyCheckedKeys,
+    names: newlyCheckedNames
+  };
+
+  // ملء المودال
+  const citNameEl = document.getElementById('rcv-modal-cit-name');
+  const citCardEl = document.getElementById('rcv-modal-cit-card');
+  const batchNumEl = document.getElementById('rcv-modal-batch-num');
+  const chipsEl = document.getElementById('rcv-modal-items-chips');
+  const recInp = document.getElementById('rcv-recipient-name');
+
+  if (citNameEl) citNameEl.textContent = c.name;
+  if (citCardEl) citCardEl.textContent = c.card || c.cardNumber || '-';
+  const nextBatchNum = (c.deliveries ? c.deliveries.length : 0) + 1;
+  if (batchNumEl) batchNumEl.textContent = 'الدفعة ' + nextBatchNum;
+
+  if (chipsEl) {
+    chipsEl.innerHTML = newlyCheckedNames.map(nm => `
+      <span style="background:var(--ib);border:1px solid var(--bd);padding:3px 8px;border-radius:8px;font-size:11px;font-weight:800;color:var(--tx);">
+        ${nm}
+      </span>
+    `).join('');
+  }
+
+  if (recInp) {
+    recInp.value = '';
+  }
+
+  showMod('m-confirm-recipient');
+  setTimeout(() => { if (recInp) recInp.focus(); }, 150);
+}
+
+function executeConfirmReceipt(){
+  const recInp = document.getElementById('rcv-recipient-name');
+  const recipient = (recInp ? recInp.value : '').trim();
+  if (!recipient) {
+    toast('⚠️ يرجى كتابة أو تحديد اسم المستلم أولاً', false, 'red');
+    if (recInp) recInp.focus();
+    return;
+  }
+
+  if (!currentBatchDeliveryInfo || !currentBatchDeliveryInfo.keys.length) {
+    toast('⚠️ لا توجد مواد محددة للتسليم في هذه الدفعة', false, 'red');
+    closeMod('m-confirm-recipient');
+    return;
+  }
+
+  const nowIso = new Date().toISOString();
+  const timeFormatted = new Date().toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' }) + ' - ' + new Date().toLocaleDateString('ar-IQ');
+  const c = cur;
+  if (!c.deliveries) c.deliveries = [];
+  const batchNum = c.deliveries.length + 1;
+
+  const newDelivery = {
+    id: 'del_' + Date.now(),
+    batchNum: batchNum,
+    recipient: recipient,
+    itemKeys: [...currentBatchDeliveryInfo.keys],
+    itemNames: [...currentBatchDeliveryInfo.names],
+    timestamp: nowIso,
+    timeFormatted: timeFormatted
+  };
+
+  c.deliveries.push(newDelivery);
+  c.recipientName = recipient;
+  c.doneAt = nowIso;
+  c.isReceived = true;
+
+  if (!c.items) c.items = {};
+  currentBatchDeliveryInfo.keys.forEach(k => {
+    c.items[k] = true;
+    chk[k] = true;
+  });
+  c.custom = [...curCustom];
+
+  // فحص هل اكتملت كافة المواد التموينية للمواطن
+  const allReqKeys = getCitizenRequiredItemKeys(c);
+  const isFullyDelivered = allReqKeys.length > 0 && allReqKeys.every(k => !!c.items[k]);
+
+  if (isFullyDelivered) {
     c.done = true;
-    c.isReceived = true;
-    c.doneAt = new Date().toISOString();
-    cur = c;
+    c.isPartial = false;
+  } else {
+    c.done = false;
+    c.isPartial = true;
+  }
 
+  closeMod('m-confirm-recipient');
+
+  // معالجة الأرشيف vs الكشف الحالي
+  if (isArchiveCitizenView && archiveMonth && Array.isArray(archiveMonth.citizens)) {
     const mIdx = archive.findIndex(m => m.id === archiveMonth.id);
     if (mIdx !== -1) archive[mIdx] = archiveMonth;
-
     saveLocalState();
     updateArchiveMonthStats();
     renderDetail();
-    toast('✅ تم تأكيد استلام التموينية في الأرشيف بنجاح!', false);
+    toast(`✅ تم تسجيل الدفعة (${batchNum}) للمستلم: ${recipient}`, false);
 
     if (navigator.onLine) {
       const agency = currentAgent ? currentAgent.agencyNumber : '868';
@@ -4601,8 +4972,11 @@ function confirmRcv(){
           agencyNumber: agency,
           citizenId: c.id,
           isReceived: true,
-          done: true,
+          done: c.done,
+          isPartial: c.isPartial,
           doneAt: c.doneAt,
+          recipientName: c.recipientName,
+          deliveries: c.deliveries,
           items: c.items,
           customItems: c.custom
         })
@@ -4611,24 +4985,29 @@ function confirmRcv(){
     return;
   }
 
-  // 2. معالجة تأكيد الاستلام في الكشف الرئيسي الحالي
-  const c = citizens.find(x => x.id === cur.id);
-  if (!c) return;
-  c.items = { ...chk };
-  c.custom = [ ...curCustom ];
-  c.done = true;
-  c.isReceived = true;
-  c.doneAt = new Date().toISOString();
-  cur = c;
+  // الكشف الرئيسي
+  const cIdx = citizens.findIndex(x => x.id === c.id);
+  if (cIdx !== -1) citizens[cIdx] = c;
   saveLocalState();
-  renderDetail();
-  toast('✅ تم تأكيد الاستلام بنجاح ونشره سحابياً', false);
   updateStats();
+  renderDetail();
+  renderList(document.getElementById('sbx') ? document.getElementById('sbx').value : '');
+  toast(`✅ تم تسجيل استلام الدفعة (${batchNum}) للمستلم: ${recipient}`, false);
+
   if (navigator.onLine) {
     fetch('https://wakil-api.onrender.com/api/citizens/' + c.id, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isReceived: true, items: c.items, customItems: c.custom })
+      body: JSON.stringify({
+        isReceived: true,
+        done: c.done,
+        isPartial: c.isPartial,
+        doneAt: c.doneAt,
+        recipientName: c.recipientName,
+        deliveries: c.deliveries,
+        items: c.items,
+        customItems: c.custom
+      })
     }).catch(()=>{});
   }
 }
@@ -4639,18 +5018,25 @@ function saveEditedChanges(){
     return;
   }
 
-  // 1. معالجة حفظ التغييرات في الأرشيف
-  if (isArchiveCitizenView && archiveMonth && Array.isArray(archiveMonth.citizens)) {
-    const c = archiveMonth.citizens.find(x => x.id === cur.id);
-    if (!c) return;
-    c.items = { ...chk };
-    c.custom = [ ...curCustom ];
-    c.doneAt = new Date().toISOString();
-    cur = c;
+  const c = cur;
+  if (!c) return;
+  c.items = { ...chk };
+  c.custom = [ ...curCustom ];
+  c.doneAt = new Date().toISOString();
 
+  const allReqKeys = getCitizenRequiredItemKeys(c);
+  const isFullyDelivered = allReqKeys.length > 0 && allReqKeys.every(k => !!c.items[k]);
+  if (isFullyDelivered) {
+    c.done = true;
+    c.isPartial = false;
+  } else {
+    c.isPartial = Object.values(c.items).some(Boolean);
+  }
+
+  // 1. الأرشيف
+  if (isArchiveCitizenView && archiveMonth && Array.isArray(archiveMonth.citizens)) {
     const mIdx = archive.findIndex(m => m.id === archiveMonth.id);
     if (mIdx !== -1) archive[mIdx] = archiveMonth;
-
     saveLocalState();
     updateArchiveMonthStats();
     renderDetail();
@@ -4664,8 +5050,11 @@ function saveEditedChanges(){
         body: JSON.stringify({
           agencyNumber: agency,
           citizenId: c.id,
-          isReceived: c.done || c.isReceived,
+          isReceived: c.done || c.isReceived || c.isPartial,
           done: c.done,
+          isPartial: c.isPartial,
+          recipientName: c.recipientName,
+          deliveries: c.deliveries,
           items: c.items,
           customItems: c.custom
         })
@@ -4674,13 +5063,7 @@ function saveEditedChanges(){
     return;
   }
 
-  // 2. معالجة حفظ التغييرات في الكشف الرئيسي الحالي
-  const c = citizens.find(x => x.id === cur.id);
-  if (!c) return;
-  c.items = { ...chk };
-  c.custom = [ ...curCustom ];
-  c.doneAt = new Date().toISOString();
-  cur = c;
+  // 2. الكشف الرئيسي
   saveLocalState();
   renderDetail();
   toast('💾 تم حفظ التغييرات المعدلة سحابياً بنجاح', false, 'blue');
@@ -4689,7 +5072,15 @@ function saveEditedChanges(){
     fetch('https://wakil-api.onrender.com/api/citizens/' + c.id, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ isReceived: c.done, items: c.items, customItems: c.custom })
+      body: JSON.stringify({
+        isReceived: c.done || c.isPartial,
+        done: c.done,
+        isPartial: c.isPartial,
+        recipientName: c.recipientName,
+        deliveries: c.deliveries,
+        items: c.items,
+        customItems: c.custom
+      })
     }).catch(()=>{});
   }
 }
@@ -4699,7 +5090,7 @@ function openCancelRcvModal(){
     toast('⚠️ إلغاء الاستلام يتطلب إنترنت للتعديل السحابي', false, 'red');
     return;
   }
-  document.getElementById('cancel-rcv-text').textContent = `هل أنت متأكد من إلغاء حالة الاستلام للمواطن (${cur.name})؟`;
+  document.getElementById('cancel-rcv-text').textContent = `هل أنت متأكد من إلغاء الاستلام وتصفير الدفعات للمواطن (${cur.name})؟`;
   showMod('m-cancel-rcv');
 }
 
@@ -4714,6 +5105,9 @@ function confirmCancelRcvAction(){
     c.custom = [];
     c.done = false;
     c.isReceived = false;
+    c.isPartial = false;
+    c.recipientName = '';
+    c.deliveries = [];
     c.doneAt = null;
     chk = {};
     curCustom = [];
@@ -4725,7 +5119,7 @@ function confirmCancelRcvAction(){
     saveLocalState();
     updateArchiveMonthStats();
     renderDetail();
-    toast('↩️ تم إلغاء الاستلام لهذا المواطن في الأرشيف بنجاح', false, 'red');
+    toast('↩️ تم إلغاء كافة الاستلامات وتصفير الدفعات بنجاح', false, 'red');
 
     if (navigator.onLine) {
       const agency = currentAgent ? currentAgent.agencyNumber : '868';
@@ -4737,7 +5131,10 @@ function confirmCancelRcvAction(){
           citizenId: c.id,
           isReceived: false,
           done: false,
+          isPartial: false,
           doneAt: null,
+          recipientName: '',
+          deliveries: [],
           items: {},
           customItems: []
         })
@@ -4753,16 +5150,36 @@ function confirmCancelRcvAction(){
   c.custom = [];
   c.done = false;
   c.isReceived = false;
+  c.isPartial = false;
+  c.recipientName = '';
+  c.deliveries = [];
   c.doneAt = null;
   chk = {};
   curCustom = [];
   cur = c;
+
   saveLocalState();
-  renderDetail();
-  toast('تم إلغاء الاستلام بنجاح', false, 'red');
   updateStats();
+  renderDetail();
+  renderList(document.getElementById('sbx') ? document.getElementById('sbx').value : '');
+  toast('↩️ تم إلغاء كافة الاستلامات وتصفير الدفعات بنجاح', false, 'red');
+
   if (navigator.onLine) {
     fetch('https://wakil-api.onrender.com/api/citizens/' + c.id + '/cancel', { method: 'POST' }).catch(()=>{});
+    fetch('https://wakil-api.onrender.com/api/citizens/' + c.id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        isReceived: false,
+        done: false,
+        isPartial: false,
+        doneAt: null,
+        recipientName: '',
+        deliveries: [],
+        items: {},
+        customItems: []
+      })
+    }).catch(()=>{});
   }
 }
 
@@ -5274,7 +5691,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.47';
+const BASE_APK_VERSION = '1.0.48';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
