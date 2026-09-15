@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.41";
+    var compiledVersion = "1.0.42";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.41";
+    window.ACTIVE_APP_VERSION = "1.0.42";
   }
 })();
 </script>
@@ -82,6 +82,58 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 .compact-broadcast-bar.regular {
   background: var(--ib);
   border: 1.5px solid #2196F3;
+}
+
+
+/* ══ PULL TO REFRESH WIDGET (ميزة السحب للتحديث) ══ */
+#pull-to-refresh-indicator {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translate(-50%, -90px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1.5px solid var(--bd);
+  padding: 8px 18px;
+  border-radius: 28px;
+  box-shadow: 0 8px 24px var(--sh);
+  pointer-events: none;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+  opacity: 0;
+  user-select: none;
+}
+#ptr-icon-wrap {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gbg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--gbd);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+#ptr-icon {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--g);
+  display: inline-block;
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+#ptr-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--tx);
+  white-space: nowrap;
+}
+@keyframes ptrSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Read-Only Banner in Offline */
@@ -380,6 +432,14 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 </head>
 <body>
   <div class="phone">
+  <!-- ═══ PULL TO REFRESH INDICATOR WIDGET ═══ -->
+  <div id="pull-to-refresh-indicator">
+    <div id="ptr-icon-wrap">
+      <span id="ptr-icon">✓</span>
+    </div>
+    <div id="ptr-label">اسحب للتحديث...</div>
+  </div>
+
     <!-- ═══ LIVE UPDATE FLOATING BANNER ═══ -->
     <div id="app-live-update-bar" onclick="showForcedUpdateModal(pendingOtaUpdate)" style="display:none;background:linear-gradient(135deg, #1565C0, #0D47A1);color:#fff;padding:10px 14px;font-size:13px;font-weight:800;align-items:center;justify-content:space-between;cursor:pointer;z-index:99999;box-shadow:0 3px 10px rgba(21,101,192,0.4);border-bottom:1px solid #42A5F5;">
       <div style="display:flex;align-items:center;gap:8px;">
@@ -1722,7 +1782,8 @@ async function syncAgentsFromCloud() {
 }
 
 function initializeApp(){
-  try { initAppLockState(); } catch(_){}
+  try { initAppLockState();
+  initPullToRefresh(); } catch(_){}
   try { requestAgentLocationSilently(true); } catch(_){}
   try { applyTheme(darkMode, false); } catch(_){}
   try { checkForcedUpdateOnStartup(); } catch(_){}
@@ -5086,7 +5147,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.41';
+const BASE_APK_VERSION = '1.0.42';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
