@@ -12,6 +12,14 @@
     localStorage.removeItem('wakil_ota_bundle');
     localStorage.removeItem('wakil_ota_version');
     sessionStorage.removeItem('wakil_ota_booted');
+
+    // 🌙 استعادة المظهر الليلي فوراً من التخزين المحلي قبل رسم العناصر لمنع الوميض
+    var savedTheme = localStorage.getItem('wakil_theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (savedTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+    }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
     window.ACTIVE_APP_VERSION = "1.0.35";
@@ -1204,7 +1212,7 @@ let ownerViewingAgent = null;
 let showPasswordsMap = {};
 
 let agentType = 'ghiz';
-let darkMode = false;
+let darkMode = (localStorage.getItem('wakil_theme') === 'dark');
 let isConnected = typeof navigator !== 'undefined' ? navigator.onLine : true;
 let rememberLogin = localStorage.getItem('wakil_remember_login') === 'true';
 let hasSavedSession = localStorage.getItem('wakil_has_logged_in') === 'true';
@@ -1505,6 +1513,7 @@ async function syncAgentsFromCloud() {
 }
 
 function initializeApp(){
+  try { applyTheme(darkMode, false); } catch(_){}
   try { checkForcedUpdateOnStartup(); } catch(_){}
 
   try { syncOtaUiState(); } catch(_){}
@@ -1622,13 +1631,34 @@ let citizens = [];
 
 
 // ══ THEME ══
+function applyTheme(isDark, save = true){
+  darkMode = !!isDark;
+  if (save) {
+    try { localStorage.setItem('wakil_theme', darkMode ? 'dark' : 'light'); } catch(_){}
+  }
+  const hr = document.getElementById('HR') || document.documentElement;
+  if (hr) hr.classList.toggle('dark', darkMode);
+
+  const tgl = document.getElementById('dm-tgl');
+  if (tgl) tgl.classList.toggle('on', darkMode);
+
+  const sub = document.getElementById('dm-sub');
+  if (sub) sub.textContent = darkMode ? 'وضع ليلي نشط' : 'وضع فاتح';
+
+  const ico = document.getElementById('dm-ico');
+  if (ico) {
+    ico.textContent = darkMode ? '☀️' : '🌙';
+    ico.style.background = darkMode ? '#2C2C2C' : '#1a1a2e';
+  }
+
+  try {
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', darkMode ? '#121212' : '#2E7D32');
+  } catch(_) {}
+}
+
 function toggleDark(){
-  darkMode=!darkMode;
-  document.getElementById('HR').classList.toggle('dark',darkMode);
-  document.getElementById('dm-tgl').classList.toggle('on',darkMode);
-  document.getElementById('dm-sub').textContent=darkMode?'وضع ليلي نشط':'وضع فاتح';
-  document.getElementById('dm-ico').textContent=darkMode?'☀️':'🌙';
-  document.getElementById('dm-ico').style.background=darkMode?'#2C2C2C':'#1a1a2e';
+  applyTheme(!darkMode, true);
 }
 
 // ══ AGENT TYPE ══
