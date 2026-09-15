@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.39";
+    var compiledVersion = "1.0.40";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.39";
+    window.ACTIVE_APP_VERSION = "1.0.40";
   }
 })();
 </script>
@@ -409,6 +409,10 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
           </div>
           <div id="err" class="err">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
           <button class="btn-g" onclick="doLogin()">تسجيل الدخول ›</button>
+          <button type="button" id="btn-login-bio" onclick="triggerBiometricLogin()" style="width:100%;margin-top:2px;background:var(--gbg);border:1.5px solid var(--gbd);color:var(--g);border-radius:14px;padding:12px;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:transform .15s;">
+            <span style="font-size:22px;">👆</span>
+            <span id="txt-login-bio">دخول سريع ببصمة الهاتف (المالك والوكيل)</span>
+          </button>
           <button class="btn-forgot" onclick="showMod('m-forgot')">هل نسيت اسم الوكالة أو كلمة المرور؟</button>
         </div>
 
@@ -438,11 +442,17 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
     <!-- ═══ HOME ═══ -->
     <div class="screen" id="sc-home">
       <div class="bar">
-        <button class="bar-icon" onclick="showMod('m-import')">📂</button>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="bar-icon" onclick="showMod('m-import')" title="استيراد وتحديث السجلات">📂</button>
+          <div class="bar-title">وكيل</div>
+          <div id="type-badge"></div>
+        </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <div id="app-net-pill" class="online-pill"><span class="online-dot"></span>أونلاين</div>
-          <div id="type-badge"></div>
-          <div class="bar-title">وكيل</div>
+          <button class="bar-icon" id="btn-notifications" onclick="openNotificationsModal()" style="position:relative;background:var(--ib);color:var(--tx);font-size:18px;border-radius:12px;padding:6px 10px;" title="الإشعارات والتعاميم الإدارية">
+            🔔
+            <span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:#E53935;color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;font-weight:900;border:1.5px solid var(--card);line-height:1.2;">0</span>
+          </button>
         </div>
       </div>
 
@@ -846,6 +856,27 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 
     <!-- MODALS -->
     <!-- ═══ MODAL: MANDATORY / FORCED APP UPDATE (تحديث إلزامي بمنتصف الشاشة) ═══ -->
+    <!-- ═══ MODAL: NOTIFICATIONS / ALL ANNOUNCEMENTS (مركز الإشعارات والتعاميم) ═══ -->
+    <div class="overlay" id="m-notifications" onclick="closeMod('m-notifications',event)">
+      <div class="modal" onclick="event.stopPropagation()" style="width:92%;max-width:440px;max-height:85vh;display:flex;flex-direction:column;border-radius:24px;padding:20px 18px;background:var(--card);box-shadow:0 20px 45px rgba(0,0,0,0.5);border:1.5px solid var(--bd);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--bd);">
+          <div style="display:flex;align-items:center;gap:8px;font-size:17px;font-weight:900;color:var(--tx);">
+            <span style="font-size:24px;">🔔</span>
+            <span>مركز الإشعارات والتعاميم الإدارية</span>
+          </div>
+          <button type="button" onclick="closeMod('m-notifications')" style="background:var(--ib);color:var(--tx);border:none;font-size:16px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+        </div>
+
+        <div id="notifications-modal-list" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:10px;padding-right:2px;max-height:55vh;">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;">
+          <button type="button" class="btn-close" onclick="closeMod('m-notifications')" style="margin:0;width:100%;padding:12px;font-size:14px;font-weight:800;border-radius:14px;">إغلاق النافذة ✖️</button>
+        </div>
+      </div>
+    </div>
+
     <div class="overlay" id="m-forced-update" style="z-index:999999;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;display:none;">
       <div class="modal" style="width:90%;max-width:380px;border-radius:24px;padding:26px 20px;text-align:center;box-shadow:0 20px 45px rgba(0,0,0,0.6);border:1.5px solid var(--gbd);background:var(--card);">
         
@@ -873,7 +904,10 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         <button id="btn-apply-forced-update" onclick="applyForcedOtaUpdate()" style="width:100%;background:linear-gradient(135deg, #2E7D32, #1B5E20);color:#fff;border:none;border-radius:16px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(46,125,50,0.35);display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 8px;">
           <span>⚡ تحديث وتثبيت فوري ومباشر الآن 📲</span>
         </button>
-        <button type="button" onclick="dismissUpdateModal()" style="width:100%;background:var(--ib);color:var(--tx2);border:1.5px solid var(--bd);border-radius:16px;padding:12px;font-size:13.5px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <button type="button" onclick="openDirectApkInBrowser()" style="width:100%;background:var(--gbg);color:var(--g);border:1.5px solid var(--gbd);border-radius:16px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
+          <span>🌐 فتح رابط التنزيل المباشر للموبايل (APK)</span>
+        </button>
+        <button type="button" onclick="dismissUpdateModal()" style="width:100%;background:var(--ib);color:var(--tx2);border:1.5px solid var(--bd);border-radius:16px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
           <span>تذكيري لاحقاً ومتابعة العمل ✖️</span>
         </button>
 
@@ -2258,6 +2292,33 @@ function lockAppNow() {
   }
 }
 
+function triggerBiometricLogin() {
+  if (window.AndroidNativeApp && window.AndroidNativeApp.authenticateBiometric) {
+    window._biometricPendingAction = 'login';
+    window.AndroidNativeApp.authenticateBiometric();
+  } else {
+    // محاكاة / متصفح: الدخول التلقائي للمالك أو الوكيل الأخير
+    const lastRole = localStorage.getItem('wakil_last_known_role') || localStorage.getItem('wakil_user_role') || 'owner';
+    if (lastRole === 'owner') {
+      loginAsOwner();
+      toast('👑 أهلاً بك يا مالك التطبيق! تم الدخول ببصمة الهاتف بنجاح', false, 'green');
+    } else {
+      if (!currentAgent && allAgents && allAgents.length) currentAgent = allAgents[0];
+      if (currentAgent) {
+        loginAsAgent(currentAgent);
+        toast(`🛒 أهلاً بك (${currentAgent.name})! تم الدخول بالبصمة بنجاح`, false, 'green');
+      } else {
+        loginAsOwner();
+      }
+    }
+  }
+}
+
+function openDirectApkInBrowser() {
+  const url = (pendingOtaUpdate && pendingOtaUpdate.downloadUrl) ? pendingOtaUpdate.downloadUrl : 'https://wakil-api.onrender.com/wakil.apk';
+  window.open(url, '_system');
+}
+
 function unlockApp() {
   isAppLocked = false;
   enteredPinDigits = '';
@@ -2266,6 +2327,23 @@ function unlockApp() {
   const screen = document.getElementById('app-lock-screen');
   if (screen) {
     screen.style.display = 'none';
+  }
+
+  // إذا تم فتح القفل وكان المستخدم في شاشة تسجيل الدخول، ندخله فوراً لحسابه (المالك أولاً)
+  const scLogin = document.getElementById('sc-login');
+  if (scLogin && (scLogin.style.display !== 'none' || scLogin.classList.contains('active'))) {
+    const lastRole = localStorage.getItem('wakil_last_known_role') || localStorage.getItem('wakil_user_role') || 'owner';
+    if (lastRole === 'owner') {
+      loginAsOwner();
+      toast('👑 أهلاً بك يا مالك المنظومة! تم فتح التطبيق ببصمتك بنجاح', false, 'green');
+    } else {
+      if (!currentAgent && allAgents && allAgents.length) currentAgent = allAgents[0];
+      if (currentAgent) {
+        loginAsAgent(currentAgent);
+      } else {
+        loginAsOwner();
+      }
+    }
   }
 }
 
@@ -2341,6 +2419,25 @@ async function triggerBiometricAuth(force = false) {
 
 // Global Android Biometric Callbacks
 window.onBiometricSuccess = function() {
+  if (window._biometricPendingAction === 'login') {
+    window._biometricPendingAction = null;
+    const lastRole = localStorage.getItem('wakil_last_known_role') || localStorage.getItem('wakil_user_role') || 'owner';
+    if (lastRole === 'owner') {
+      loginAsOwner();
+      toast('👑 أهلاً بك يا مالك التطبيق! تم تسجيل الدخول ببصمة الهاتف بنجاح', false, 'green');
+    } else {
+      if (!currentAgent && allAgents && allAgents.length) currentAgent = allAgents[0];
+      if (currentAgent) {
+        loginAsAgent(currentAgent);
+        toast(`🛒 أهلاً بك (${currentAgent.name})! تم الدخول بالبصمة بنجاح`, false, 'green');
+      } else {
+        loginAsOwner();
+        toast('👑 أهلاً بك يا مالك التطبيق! تم تسجيل الدخول بالبصمة بنجاح', false, 'green');
+      }
+    }
+    return;
+  }
+
   if (window._biometricPendingAction === 'toggle_bio' || window._biometricPendingAction === 'toggle_lock') {
     window._biometricPendingAction = null;
     appLockEnabled = true;
@@ -2635,6 +2732,7 @@ function loginAsOwner(){
   ownerViewingAgent = null;
   currentAgent = null;
   localStorage.setItem('wakil_user_role', 'owner');
+  localStorage.setItem('wakil_last_known_role', 'owner');
   localStorage.setItem('wakil_has_logged_in', 'true');
   localStorage.removeItem('wakil_current_agent');
   if (rememberLogin) localStorage.setItem('wakil_remember_login', 'true');
@@ -4926,7 +5024,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.39';
+const BASE_APK_VERSION = '1.0.40';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -5042,6 +5140,13 @@ async function applyForcedOtaUpdate() {
         btn.disabled = false;
         btn.style.background = '#2E7D32';
         btn.innerHTML = '<span>✅ اضغط هنا لتثبيت التحديث الآن 📲</span>';
+        btn.onclick = function() {
+          if (window.AndroidNativeApp && window.AndroidNativeApp.installPendingApk) {
+            window.AndroidNativeApp.installPendingApk();
+          } else {
+            openDirectApkInBrowser();
+          }
+        };
       }
     };
 
@@ -5978,7 +6083,56 @@ async function toggleBroadcastActiveStatus(id) {
   }
 }
 
-// ── عرض التعاميم الحية للوكلاء فقط على الشاشة الرئيسية ──
+// ── مركز الإشعارات والتعاميم الإدارية ──
+window.activeAnnouncements = [];
+
+function openNotificationsModal() {
+  renderNotificationsModalContent();
+  showMod('m-notifications');
+}
+
+function renderNotificationsModalContent() {
+  const container = document.getElementById('notifications-modal-list');
+  if (!container) return;
+
+  const list = window.activeAnnouncements || [];
+  if (!list.length) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--mt);">
+        <div style="font-size:42px;margin-bottom:10px;">📭</div>
+        <div style="font-size:15px;font-weight:800;color:var(--tx);margin-bottom:4px;">لا توجد تعاميم أو إشعارات حالياً</div>
+        <div style="font-size:12px;">أي تعاميم إدارية تصدر ستظهر هنا مباشرة فور نشرها</div>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = list.map(ann => {
+    const isUrgent = (ann.priority === 'urgent');
+    const isSpecific = (ann.targetType === 'specific');
+    return `
+      <div style="background:${isUrgent ? 'linear-gradient(135deg, #FFEBEE, #FFCDD2)' : 'linear-gradient(135deg, #E3F2FD, #BBDEFB)'};border:1.5px solid ${isUrgent ? '#EF5350' : '#42A5F5'};border-radius:16px;padding:14px;box-shadow:0 3px 10px rgba(0,0,0,0.05);text-align:right;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px;">
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:900;color:${isUrgent ? '#C62828' : '#0D47A1'};">
+            <span>${isUrgent ? '🚨' : '📢'}</span>
+            <span>${escapeHtml(ann.title || (isUrgent ? 'تعميم عاجل وهام' : 'تعميم إداري رسمي'))}</span>
+          </span>
+          <div style="display:flex;align-items:center;gap:4px;">
+            ${isSpecific ? `<span style="font-size:10px;font-weight:800;background:#E1F5FE;color:#0277BD;border:1px solid #B3E5FC;padding:2px 6px;border-radius:6px;">🎯 ${escapeHtml(ann.targetNames || 'توجيه خاص')}</span>` : ''}
+            <span style="font-size:10px;font-weight:700;color:var(--mt);background:rgba(255,255,255,0.7);padding:2px 6px;border-radius:6px;">
+              ${formatTimeAgo(ann.createdAt)}
+            </span>
+          </div>
+        </div>
+        <div style="font-size:13px;font-weight:700;color:#263238;line-height:1.6;white-space:pre-wrap;">
+          ${escapeHtml(ann.text || '')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── عرض تعميم واحد فقط بالواجهة والباقي يذهب للإشعارات (أعلى اليسار) ──
 function renderBroadcastBanner(announcements) {
   const agentBanner = document.getElementById('home-broadcast-banner');
   const ownerBanner = document.getElementById('owner-broadcast-banner');
@@ -6000,38 +6154,61 @@ function renderBroadcastBanner(announcements) {
   }
 
   const list = Array.isArray(announcements) ? announcements : (announcements && announcements.active && announcements.text ? [announcements] : []);
+  window.activeAnnouncements = list;
 
-  const html = list.map(ann => {
-    const isUrgent = (ann.priority === 'urgent');
-    const isSpecific = (ann.targetType === 'specific');
-    return `
-      <div style="background:${isUrgent ? 'linear-gradient(135deg, #FFEBEE, #FFCDD2)' : 'linear-gradient(135deg, #E3F2FD, #BBDEFB)'};border:1.5px solid ${isUrgent ? '#EF5350' : '#42A5F5'};border-radius:14px;padding:12px 14px;margin-bottom:8px;box-shadow:0 3px 10px rgba(0,0,0,0.06);text-align:right;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
-          <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:900;color:${isUrgent ? '#C62828' : '#0D47A1'};">
-            <span>${isUrgent ? '🚨' : '📢'}</span>
-            <span>${escapeHtml(ann.title || (isUrgent ? 'تعميم عاجل وهام' : 'تعميم إداري رسمي'))}</span>
-          </span>
-          <div style="display:flex;align-items:center;gap:4px;">
-            ${isSpecific ? `<span style="font-size:10px;font-weight:800;background:#E1F5FE;color:#0277BD;border:1px solid #B3E5FC;padding:2px 6px;border-radius:6px;">🎯 ${escapeHtml(ann.targetNames || 'توجيه خاص')}</span>` : ''}
-            <span style="font-size:10px;font-weight:700;color:var(--mt);background:rgba(255,255,255,0.7);padding:2px 6px;border-radius:6px;">
-              ${formatTimeAgo(ann.createdAt)}
-            </span>
-          </div>
-        </div>
-        <div style="font-size:13px;font-weight:700;color:#263238;line-height:1.55;white-space:pre-wrap;">
-          ${escapeHtml(ann.text || '')}
-        </div>
-      </div>
-    `;
-  }).join('');
+  // تحديث شارة الإشعارات في أعلى اليسار 🔔
+  const notifBadge = document.getElementById('notif-badge');
+  if (notifBadge) {
+    if (list.length > 0) {
+      notifBadge.textContent = String(list.length);
+      notifBadge.style.display = 'inline-block';
+    } else {
+      notifBadge.style.display = 'none';
+    }
+  }
 
   if (agentBanner) {
     if (!list.length) {
       agentBanner.style.display = 'none';
       agentBanner.innerHTML = '';
     } else {
+      // عرض تعميم واحد فقط (الأحدث) على الواجهة الرئيسية كما طلب المستخدم بدقة
+      const latestAnn = list[0];
+      const isUrgent = (latestAnn.priority === 'urgent');
+      const isSpecific = (latestAnn.targetType === 'specific');
+      const hasMore = list.length > 1;
+
+      let bannerHtml = `
+        <div style="background:${isUrgent ? 'linear-gradient(135deg, #FFEBEE, #FFCDD2)' : 'linear-gradient(135deg, #E3F2FD, #BBDEFB)'};border:1.5px solid ${isUrgent ? '#EF5350' : '#42A5F5'};border-radius:14px;padding:12px 14px;box-shadow:0 3px 10px rgba(0,0,0,0.06);text-align:right;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:900;color:${isUrgent ? '#C62828' : '#0D47A1'};">
+              <span>${isUrgent ? '🚨' : '📢'}</span>
+              <span>${escapeHtml(latestAnn.title || (isUrgent ? 'تعميم عاجل وهام' : 'تعميم إداري رسمي'))}</span>
+            </span>
+            <div style="display:flex;align-items:center;gap:4px;">
+              ${isSpecific ? `<span style="font-size:10px;font-weight:800;background:#E1F5FE;color:#0277BD;border:1px solid #B3E5FC;padding:2px 6px;border-radius:6px;">🎯 ${escapeHtml(latestAnn.targetNames || 'توجيه خاص')}</span>` : ''}
+              <span style="font-size:10px;font-weight:700;color:var(--mt);background:rgba(255,255,255,0.7);padding:2px 6px;border-radius:6px;">
+                ${formatTimeAgo(latestAnn.createdAt)}
+              </span>
+            </div>
+          </div>
+          <div style="font-size:13px;font-weight:700;color:#263238;line-height:1.55;white-space:pre-wrap;">
+            ${escapeHtml(latestAnn.text || '')}
+          </div>
+          ${hasMore ? `
+            <div onclick="openNotificationsModal()" style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:11.5px;font-weight:800;color:#1565C0;">
+              <span style="display:flex;align-items:center;gap:5px;">
+                <span>🔔</span>
+                <span>يوجد (${list.length - 1}) تعاميم إضافية أخرى...</span>
+              </span>
+              <span style="text-decoration:underline;">عرض الكل في الإشعارات ‹</span>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
       agentBanner.style.display = 'block';
-      agentBanner.innerHTML = html;
+      agentBanner.innerHTML = bannerHtml;
     }
   }
 }
