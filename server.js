@@ -27,8 +27,8 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.37';
-const APP_VERSION_CODE = 37;
+const APP_VERSION = '1.0.38';
+const APP_VERSION_CODE = 38;
 let APK_DOWNLOAD_URL = 'https://files.catbox.moe/qwwcrf.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
@@ -326,7 +326,7 @@ app.get('/api/app-version', (req, res) => {
     versionCode: APP_VERSION_CODE,
     bundleUrl: 'https://wakil-api.onrender.com/index.html',
     downloadUrl: APK_DOWNLOAD_URL,
-    notes: 'إصدار v1.0.37: نظام تتبع دوام الوكلاء السري، قفل التطبيق بالبصمة ورمز PIN كواتساب، ومحرك التحديث الداخلي المباشر.',
+    notes: 'إصدار v1.0.38: إصلاح كامل لتمرير وتحكم الصفحة الرئيسية للوكلاء، دعم بصمة الإصبع وبصمة الوجه المدمجة في نظام أندرويد (طريقة SuperKey ومصرف الرافدين)، وتحديثات استقرار شاملة.',
     updatedAt: new Date().toISOString()
   });
 });
