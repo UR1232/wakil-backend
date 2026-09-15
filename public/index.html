@@ -4260,8 +4260,8 @@ async function applyForcedOtaUpdate() {
 
   sessionStorage.removeItem('wakil_update_dismissed');
 
-  // 1. التنزيل والتثبيت المباشر من داخل التطبيق على أجهزة أندرويد دون فتح المتصفح
-  if (window.AndroidNativeApp && typeof window.AndroidNativeApp.downloadAndInstallApk === 'function') {
+  // 1. التنزيل والتثبيت المباشر الداخلي عبر جسر الأندرويد الأصلي
+  if (window.AndroidNativeApp && window.AndroidNativeApp.downloadAndInstallApk) {
     if (btn) {
       btn.disabled = true;
       btn.innerHTML = '<span id="update-download-text">⏳ جاري تنزيل التحديث... 0%</span>';
@@ -4276,7 +4276,7 @@ async function applyForcedOtaUpdate() {
 
     window.onUpdateDownloadComplete = function() {
       const t = document.getElementById('update-download-text');
-      if (t) t.textContent = '✅ اكتمل التنزيل! جاري فتح التثبيت...';
+      if (t) t.textContent = '✅ اكتمل التنزيل 100%! جاري فتح التثبيت...';
       if (btn) {
         btn.disabled = false;
         btn.style.background = '#2E7D32';
@@ -4285,47 +4285,74 @@ async function applyForcedOtaUpdate() {
     };
 
     window.onUpdateDownloadError = function(err) {
-      if (btn) {
-        btn.disabled = false;
-        btn.style.background = '#C62828';
-        btn.innerHTML = '<span>❌ تعذر التنزيل المباشر — اضغط للتحميل عبر المتصفح</span>';
-        btn.onclick = () => { window.open(apkUrl, '_system'); };
-      }
-      toast('تعذر التنزيل التلقائي، جاري التحويل للمتصفح...', false, 'orange');
-      setTimeout(() => { window.open(apkUrl, '_system'); }, 1200);
+      console.warn('Native download error, falling back to stream download:', err);
+      startStreamDownload();
     };
 
     try {
       window.AndroidNativeApp.downloadAndInstallApk(apkUrl, verName);
       return;
     } catch(err) {
-      console.warn('Native update failed, falling back to browser:', err);
+      console.warn('Native call failed, falling back to stream download:', err);
     }
   }
 
-  // 2. للمتصفحات أو الأجهزة التي لا تدعم الجسر المباشر
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<span>جاري فتح رابط تنزيل التحديث... 📥</span>';
-    btn.style.opacity = '0.85';
-  }
+  // 2. محرك التحميل التدريجي المباشر داخل الواجهة بنسبة مئوية (In-App Stream Downloader)
+  startStreamDownload();
 
-  setTimeout(() => {
-    try {
-      if (window.cordova && window.cordova.InAppBrowser) {
-        window.cordova.InAppBrowser.open(apkUrl, '_system');
-      } else {
-        window.open(apkUrl, '_system') || (window.location.href = apkUrl);
-      }
-    } catch(_) {
-      window.location.href = apkUrl;
-    }
+  async function startStreamDownload() {
     if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = '<span>✅ بدأ التنزيل! اضغط هنا لإعادة التنزيل 📥</span>';
-      btn.style.opacity = '1';
+      btn.disabled = true;
+      btn.innerHTML = '<span id="update-download-text">⏳ جاري تنزيل التحديث... 0%</span>';
+      btn.style.opacity = '0.9';
     }
-  }, 400);
+
+    try {
+      const res = await fetch(apkUrl);
+      if (!res.ok) throw new Error('فشل جلب ملف التحديث (' + res.status + ')');
+      
+      const contentLength = +res.headers.get('Content-Length') || 6935886;
+      const reader = res.body.getReader();
+      let received = 0;
+      let chunks = [];
+
+      while(true) {
+        const {done, value} = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        const pct = Math.min(100, Math.round((received / contentLength) * 100));
+        const t = document.getElementById('update-download-text');
+        if (t) t.textContent = '⏳ جاري تنزيل التحديث... ' + pct + '%';
+        if (btn) btn.style.background = 'linear-gradient(to left, #2E7D32 ' + pct + '%, #1565C0 ' + pct + '%)';
+      }
+
+      const blob = new Blob(chunks, { type: 'application/vnd.android.package-archive' });
+      const blobUrl = URL.createObjectURL(blob);
+
+      if (btn) {
+        btn.disabled = false;
+        btn.style.background = '#2E7D32';
+        btn.innerHTML = '<span>✅ اكتمل التحميل 100%! اضغط هنا لتثبيت التحديث الآن 📲</span>';
+        btn.onclick = () => {
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = 'wakil_v' + verName + '.apk';
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => a.remove(), 1500);
+        };
+      }
+    } catch(streamErr) {
+      console.error('Stream download error:', streamErr);
+      if (btn) {
+        btn.disabled = false;
+        btn.style.background = '#C62828';
+        btn.innerHTML = '<span>⚠️ تعذر التنزيل المباشر — اضغط للتحميل عبر المتصفح</span>';
+        btn.onclick = () => { window.open(apkUrl, '_system'); };
+      }
+    }
+  }
 }
 
 async function checkForcedUpdateOnStartup() {
