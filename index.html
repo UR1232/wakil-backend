@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.51";
+    var compiledVersion = "1.0.52";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.51";
+    window.ACTIVE_APP_VERSION = "1.0.52";
   }
 })();
 </script>
@@ -493,10 +493,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
             <span class="online-pill" id="login-net-badge"><span class="online-dot"></span>أونلاين</span>
           </div>
         </div>
-        <div style="display:flex;gap:8px;">
-          <div class="pill pill-g" id="pg" onclick="setType('ghiz')">🛒 وكيل غذائية</div>
-          <div class="pill pill-off" id="pt" onclick="setType('tahn')">🌾 وكيل طحين</div>
-        </div>
+        
 
         <!-- ONLINE REGULAR LOGIN FORM -->
         <div class="login-card" id="login-card-online">
@@ -1096,7 +1093,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
       </div>
     </div>
 
-            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.51) ═══ -->
+            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.52) ═══ -->
     <div class="overlay" id="m-switch-accounts" onclick="closeMod('m-switch-accounts',event)">
       <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;width:92%;padding:20px;border-radius:24px;">
         <div class="modal-t" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -2087,9 +2084,11 @@ function toggleDark(){
 
 // ══ AGENT TYPE ══
 function setType(t){
-  agentType=t;
-  document.getElementById('pg').className='pill '+(t==='ghiz'?'pill-g':'pill-off');
-  document.getElementById('pt').className='pill '+(t==='tahn'?'pill-t':'pill-off');
+  agentType = t;
+  const pg = document.getElementById('pg');
+  const pt = document.getElementById('pt');
+  if (pg) pg.className = 'pill ' + (t === 'ghiz' ? 'pill-g' : 'pill-off');
+  if (pt) pt.className = 'pill ' + (t === 'tahn' ? 'pill-t' : 'pill-off');
 }
 function getItems(){return agentType==='ghiz'?ITEMS_GHIZ:ITEMS_TAHN;}
 
@@ -2956,26 +2955,26 @@ async function doLogin(){
   }
   localStorage.setItem('wakil_remember_login', rememberLogin ? 'true' : 'false');
 
-  // 1. فحص دخول المالك (Owner) فوري محلي 0ms
-  const isOwner = (u.toLowerCase() === 'admin' || u.toLowerCase() === 'owner') && (p === 'admin2026' || rawP === 'admin2026');
+  // 1. فحص دخول المالك (Owner) فوري محلي 0ms (مطابقة دقيقة وحساسة لحالة الأحرف كابيتال/سمول Case-Sensitive)
+  const isOwner = (u === 'admin' || rawU === 'admin' || u === 'owner' || rawU === 'owner') && (p === 'admin2026' || rawP === 'admin2026');
   if (isOwner) {
     loginAsOwner();
     return;
   }
 
-  // 2. فحص دخول الوكلاء محلياً (فوري 0ms: باسم المستخدم أو رمز الوكالة أو اسم الوكيل)
+  // 2. فحص دخول الوكلاء محلياً (مطابقة دقيقة وحساسة لحالة الأحرف كابيتال/سمول Case-Sensitive 100%)
   const matchedAgent = allAgents.find(ag => {
-    const agUser = normalizeArabicDigits(ag.username).toLowerCase();
-    const agAgency = normalizeArabicDigits(ag.agencyNumber);
-    const agName = (ag.name || '').trim().toLowerCase();
-    const agPass = normalizeArabicDigits(ag.password);
+    const agUser = normalizeArabicDigits(ag.username || '').trim();
+    const agAgency = normalizeArabicDigits(String(ag.agencyNumber || '')).trim();
+    const agName = (ag.name || '').trim();
+    const agPass = normalizeArabicDigits(ag.password || '').trim();
 
+    // مطابقة اسم المستخدم وكلمة المرور بدقة تامة وبنفس حالة الأحرف (كابيتال / سمول)
     const userMatches = (
-      agUser === u.toLowerCase() || 
-      agAgency === u || 
-      agName === rawU.toLowerCase() || 
-      ag.id.toLowerCase() === u.toLowerCase() ||
-      ag.id.toLowerCase() === ('agent_' + u.toLowerCase())
+      (agUser && (agUser === u || ag.username === rawU)) || 
+      (agAgency && (agAgency === u || String(ag.agencyNumber) === rawU)) || 
+      (agName && (agName === rawU)) || 
+      (ag.id && (ag.id === rawU || ag.id === ('agent_' + rawU)))
     );
 
     let passMatches = (agPass === p || ag.password === rawP);
@@ -4364,7 +4363,7 @@ function executeRenameMonth(){
 }
 
 
-// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.51) ══
+// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.52) ══
 function saveLocalState() {
   try {
     const agency = (ownerViewingAgent && ownerViewingAgent.agencyNumber) ? ownerViewingAgent.agencyNumber : (currentAgent ? currentAgent.agencyNumber : '868');
@@ -4471,7 +4470,7 @@ function loadLocalState() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.51) ═══
+// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.52) ═══
 // 🔒 قاعدة صارمة: تظهر فقط الحسابات التي سجل الدخول بها المستخدم أو أضافها يدوياً (غذائية + طحين)
 
 function getSavedAccounts() {
@@ -4768,9 +4767,9 @@ async function submitAddAccountToSwitcher() {
   const currentIsGhiz = (currentAgent && (currentAgent.type === 'ghiz' || currentAgent.type === 'غذائية'));
   const currentIsTahn = (currentAgent && (currentAgent.type === 'tahn' || currentAgent.type === 'طحين'));
 
-  // 1. فحص الحساب محلياً في allAgents أولاً
+  // 1. فحص الحساب محلياً في allAgents أولاً (مع مطابقة دقيقة لحالة الأحرف)
   let matchedAgent = (allAgents || []).find(a => 
-    (a.username && a.username.toLowerCase() === u.toLowerCase()) || 
+    (a.username && (a.username === u || a.username === rawU)) || 
     String(a.agencyNumber) === u
   );
 
@@ -5001,7 +5000,7 @@ function hasEdits(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.51) ══
+// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.52) ══
 // ══════════════════════════════════════════════════════════════════
 
 function getCitizenRequiredItemKeys(c) {
@@ -6214,7 +6213,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.51';
+const BASE_APK_VERSION = '1.0.52';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -8577,7 +8576,7 @@ window.addEventListener('afterprint', () => {
 <script id="wakil-ptr-engine">
 (function() {
   'use strict';
-  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.51) ═══
+  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.52) ═══
   const topContainer = document.getElementById('ptr-indicator-top');
   const topPill = document.getElementById('ptr-pill-top');
   const topIcon = document.getElementById('ptr-icon-top');

@@ -27,9 +27,9 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.51';
-const APP_VERSION_CODE = 51;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/4gvbga.apk';
+const APP_VERSION = '1.0.52';
+const APP_VERSION_CODE = 52;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/y6xk3n.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
 function normalizeDigits(str) {
@@ -386,23 +386,23 @@ app.post('/api/sessions/clear-revoke', (req, res) => {
   res.json({ success: true, message: 'Revocation cleared' });
 });
 
-// ══ 1. AUTHENTICATION (تسجيل الدخول الذكي مع تسجيل الجهاز والجلسة) ══
+// ══ 1. AUTHENTICATION (تسجيل الدخول الذكي مع تمييز دقيق بين الأحرف الكبيرة والصغيرة Case-Sensitive) ══
 app.post('/api/login', (req, res) => {
   const { username, password, agentType, deviceInfo } = req.body;
 
   const rawU = (username || '').trim();
   const rawP = (password || '').trim();
-  const u = normalizeDigits(rawU).toLowerCase();
+  const u = normalizeDigits(rawU); // تمييز دقيق لحالة الأحرف دون تحويل لـ lowercase
   const p = normalizeDigits(rawP);
 
   const devId = (deviceInfo && deviceInfo.deviceId) || ('dev_' + Math.random().toString(36).substr(2, 8));
   const devName = (deviceInfo && deviceInfo.deviceName) || 'هاتف غير معروف';
   const devPlat = (deviceInfo && deviceInfo.platform) || 'Android';
 
-  // 1. فحص حساب الأونر / المالك العام
+  // 1. فحص حساب الأونر / المالك العام (مطابقة تامة لحالة الأحرف كابيتال/سمول)
   const owner = getOwnerConfig();
   const ownerPass = normalizeDigits(owner.password);
-  if ((u === owner.username.toLowerCase() || u === 'owner' || u === 'admin') && (p === ownerPass || rawP === owner.password)) {
+  if ((rawU === owner.username || u === normalizeDigits(owner.username) || rawU === 'owner' || rawU === 'admin') && (p === ownerPass || rawP === owner.password)) {
     const sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
     const sessionToken = 'owner_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
     
@@ -441,20 +441,20 @@ app.post('/api/login', (req, res) => {
     });
   }
 
-  // 2. فحص حسابات الوكلاء المسجلين (مرونة كاملة: اسم المستخدم أو رمز الوكالة أو اسم الوكيل)
+  // 2. فحص حسابات الوكلاء المسجلين (مطابقة دقيقة وحساسة لحالة الأحرف كابيتال/سمول Case-Sensitive 100%)
   const agents = getAgents();
   const matched = agents.find(ag => {
-    const agUser = normalizeDigits(ag.username).toLowerCase();
-    const agAgency = normalizeDigits(ag.agencyNumber);
-    const agName = (ag.name || '').trim().toLowerCase();
-    const agPass = normalizeDigits(ag.password);
+    const agUser = normalizeDigits(ag.username || '').trim();
+    const agAgency = normalizeDigits(String(ag.agencyNumber || '')).trim();
+    const agName = (ag.name || '').trim();
+    const agPass = normalizeDigits(ag.password || '').trim();
 
+    // مطابقة اسم المستخدم بدقة تامة وبنفس حالة الأحرف (كابيتال / سمول)
     const userMatches = (
-      agUser === u || 
-      agAgency === u || 
-      agName === rawU.toLowerCase() || 
-      ag.id.toLowerCase() === u ||
-      ag.id.toLowerCase() === ('agent_' + u)
+      (agUser && (agUser === u || ag.username === rawU)) || 
+      (agAgency && (agAgency === u || String(ag.agencyNumber) === rawU)) || 
+      (agName && (agName === rawU)) || 
+      (ag.id && (ag.id === rawU || ag.id === ('agent_' + rawU)))
     );
 
     let passMatches = (agPass === p || ag.password === rawP);
@@ -782,7 +782,7 @@ app.post('/api/sessions/revoke', (req, res) => {
   const agents = getAgents();
   const matchedAg = agents.find(a => 
     (agencyNumber && String(a.agencyNumber) === String(agencyNumber)) ||
-    (username && a.username && a.username.toLowerCase() === username.toLowerCase())
+    (username && a.username && (a.username === username || a.username === rawU))
   );
 
   const isOwnerAuth = (p === owner.password);
