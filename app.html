@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.54";
+    var compiledVersion = "1.0.55";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.54";
+    window.ACTIVE_APP_VERSION = "1.0.55";
   }
 })();
 </script>
@@ -1035,7 +1035,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
       </div>
     </div>
 
-            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.54) ═══ -->
+            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.55) ═══ -->
     <div class="overlay" id="m-switch-accounts" onclick="closeMod('m-switch-accounts',event)">
       <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;width:92%;padding:20px;border-radius:24px;">
         <div class="modal-t" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -1547,7 +1547,7 @@ function escapeHtml(str) {
 }
 
 
-// 🧹 مسح وتصفير كافة الحسابات القديمة والتجريبية وحساب Aa نهائياً (v1.0.54)
+// 🧹 مسح وتصفير كافة الحسابات القديمة والتجريبية وحساب Aa نهائياً (v1.0.55)
 (function purgeLegacyAccountsV1053() {
   try {
     if (localStorage.getItem('wakil_purged_v1053') !== 'true') {
@@ -1567,7 +1567,7 @@ function escapeHtml(str) {
       localStorage.removeItem('wakil_app_bio');
       localStorage.removeItem('wakil_lock_timeout');
       localStorage.setItem('wakil_purged_v1054', 'true');
-      console.log('🧹 Purged all legacy & demo accounts for v1.0.54');
+      console.log('🧹 Purged all legacy & demo accounts for v1.0.55');
     }
   } catch(_) {}
 })();
@@ -2388,7 +2388,7 @@ async function submitChangeVaultPin() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ APP LOCK & BIOMETRIC COMPLETELY DISABLED (v1.0.54) ══
+// ══ APP LOCK & BIOMETRIC COMPLETELY DISABLED (v1.0.55) ══
 // 🔓 التطبيق يفتح مباشرة بدون بصمة أو رمز PIN أو شاشة قفل نهائياً
 try {
   localStorage.removeItem('wakil_app_lock');
@@ -2420,6 +2420,54 @@ function unlockApp() {}
 function updateLoginBioButtonVisibility() {
   const btn = document.getElementById('btn-login-bio');
   if (btn) btn.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', cleanupDuplicateLoginElements);
+
+function getLoginInputValue(id) {
+  const el = document.getElementById(id);
+  if (el && el.value && el.value.trim()) return el.value.trim();
+  const all = document.querySelectorAll('#' + id);
+  for (let i = all.length - 1; i >= 0; i--) {
+    const v = (all[i].value || '').trim();
+    if (v) return v;
+  }
+  return (el ? el.value : '').trim();
+}
+
+function cleanupDuplicateLoginElements() {
+  try {
+    const eyeButtons = document.querySelectorAll('#btn-toggle-login-pass');
+    if (eyeButtons.length > 1) {
+      for (let i = 1; i < eyeButtons.length; i++) {
+        eyeButtons[i].remove();
+      }
+    }
+    const userInputs = document.querySelectorAll('#fu');
+    if (userInputs.length > 1) {
+      for (let i = 1; i < userInputs.length; i++) {
+        userInputs[i].remove();
+      }
+    }
+    const passInputs = document.querySelectorAll('#fp');
+    if (passInputs.length > 1) {
+      for (let i = 1; i < passInputs.length; i++) {
+        passInputs[i].remove();
+      }
+    }
+  } catch(_) {}
+}
+
+function saveAgents() {
+  try {
+    localStorage.setItem('wakil_all_agents', JSON.stringify(allAgents || []));
+    localStorage.setItem('wakil_agents_cache', JSON.stringify(allAgents || []));
+  } catch(_) {}
+}
+
+function openDirectApkInBrowser() {
+  const url = (pendingOtaUpdate && pendingOtaUpdate.downloadUrl) ? pendingOtaUpdate.downloadUrl : 'https://wakil-api.onrender.com/wakil.apk';
+  window.open(url, '_system');
 }
 
 document.addEventListener('DOMContentLoaded', cleanupDuplicateLoginElements);
@@ -3906,7 +3954,7 @@ function executeRenameMonth(){
 }
 
 
-// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.54) ══
+// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.55) ══
 function saveLocalState() {
   try {
     const agency = (ownerViewingAgent && ownerViewingAgent.agencyNumber) ? ownerViewingAgent.agencyNumber : (currentAgent ? currentAgent.agencyNumber : '868');
@@ -4003,7 +4051,7 @@ function loadLocalState() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.54) ═══
+// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.55) ═══
 // 🔒 قاعدة صارمة: تظهر فقط الحسابات التي سجل الدخول بها المستخدم أو أضافها يدوياً (غذائية + طحين)
 
 function getSavedAccounts() {
@@ -4533,7 +4581,7 @@ function hasEdits(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.54) ══
+// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.55) ══
 // ══════════════════════════════════════════════════════════════════
 
 function getCitizenRequiredItemKeys(c) {
@@ -5746,7 +5794,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.54';
+const BASE_APK_VERSION = '1.0.55';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -8049,7 +8097,7 @@ window.addEventListener('afterprint', () => {
   <script id="wakil-ptr-engine">
 (function() {
   'use strict';
-  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.54) ═══
+  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.55) ═══
   const topContainer = document.getElementById('ptr-indicator-top');
   const topPill = document.getElementById('ptr-pill-top');
   const topIcon = document.getElementById('ptr-icon-top');
