@@ -27,9 +27,9 @@ const ANNOUNCEMENT_FILE = path.join(__dirname, 'announcement.json');
 const ANNOUNCEMENTS_LIST_FILE = path.join(__dirname, 'announcements.json');
 const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
-const APP_VERSION = '1.0.52';
-const APP_VERSION_CODE = 52;
-let APK_DOWNLOAD_URL = 'https://files.catbox.moe/y6xk3n.apk';
+const APP_VERSION = '1.0.53';
+const APP_VERSION_CODE = 53;
+let APK_DOWNLOAD_URL = 'https://files.catbox.moe/1ywz9i.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
 function normalizeDigits(str) {
@@ -191,22 +191,7 @@ function getAgents() {
   if (fs.existsSync(AGENTS_FILE)) {
     try { list = JSON.parse(fs.readFileSync(AGENTS_FILE, 'utf8')); } catch (_) { list = []; }
   }
-  // Ensure default agent 868 is always present
-  if (!list.some(a => String(a.agencyNumber) === '868')) {
-    list.unshift({
-      id: 'agent_868',
-      username: 'user_868',
-      password: '0000',
-      name: 'فاضل عباس كريم',
-      agencyNumber: '868',
-      licenseNumber: '000699',
-      type: 'ghiz',
-      governorate: 'ذي قار',
-      branch: 'فرع تموين ذي قار',
-      createdAt: '2026-09-12T05:54:11.801Z',
-      isFrozen: false
-    });
-  }
+  if (!Array.isArray(list)) list = [];
   return list;
 }
 
@@ -269,25 +254,10 @@ function saveArchiveByAgency(agency = '868', list = []) {
 }
 
 
-// تهيئة قاعدة البيانات بالوكيل الافتراضي والـ 1042 مواطن
+// تهيئة قاعدة البيانات النظيفة للمنظومة
 function initData() {
+  // تصفير الوكلاء التجريبيين - البدء بقائمة فارغة تماماً
   const agents = getAgents();
-  if (agents.length === 0) {
-    saveAgents([
-      {
-        id: 'agent_868',
-        username: 'user',
-        password: '0000',
-        name: 'فاضل عباس كريم',
-        agencyNumber: '868',
-        licenseNumber: '000699',
-        type: 'ghiz',
-        governorate: 'ذي قار',
-        branch: 'فرع تموين ذي قار',
-        createdAt: new Date().toISOString()
-      }
-    ]);
-  }
 
   const map = getAllCitizensMap();
   if (!map['868'] || map['868'].length < 1000) {
@@ -1056,6 +1026,9 @@ app.post('/api/owner/agents/:id/reset-password', (req, res) => {
   if (!newPassword || !newPassword.trim()) {
     return res.status(400).json({ success: false, message: 'يرجى إدخال كلمة المرور الجديدة' });
   }
+  if (newPassword.trim().length < 8) {
+    return res.status(400).json({ success: false, message: 'يجب أن تتكون كلمة المرور من 8 خانات على الأقل (أرقام أو حروف أو 8 أصفار 00000000)' });
+  }
 
   const agents = getAgents();
   const ag = agents.find(a => a.id === id || String(a.agencyNumber) === id);
@@ -1343,6 +1316,10 @@ app.post('/api/owner/agents', (req, res) => {
     return res.status(400).json({ success: false, message: 'يرجى إدخال كافة الحقول المطلوبة (الاسم، اليوزر، الباسورد، رمز الوكالة)' });
   }
 
+  if (password.trim().length < 8) {
+    return res.status(400).json({ success: false, message: 'يجب أن تتكون كلمة المرور من 8 خانات على الأقل (أرقام أو حروف أو 8 أصفار 00000000)' });
+  }
+
   const agents = getAgents();
   const uClean = username.trim();
   const codeClean = String(agencyNumber).trim();
@@ -1395,6 +1372,10 @@ app.put('/api/owner/agents/:id', (req, res) => {
   const { name, username, password, type, governorate, branch, licenseNumber } = req.body;
   const current = agents[idx];
 
+  if (password !== undefined && password.trim().length < 8) {
+    return res.status(400).json({ success: false, message: 'يجب أن تتكون كلمة المرور من 8 خانات على الأقل (أرقام أو حروف أو 8 أصفار 00000000)' });
+  }
+
   if (username && username.trim().toLowerCase() !== current.username.toLowerCase()) {
     if (agents.some((a, i) => i !== idx && a.username.toLowerCase() === username.trim().toLowerCase())) {
       return res.status(400).json({ success: false, message: 'اسم المستخدم مستخدم لوكيل آخر' });
@@ -1418,6 +1399,17 @@ app.put('/api/owner/agents/:id', (req, res) => {
 });
 
 // حذف وكيل
+
+// ══ PURGE ALL AGENTS (تصفير ومسح كافة حسابات الوكلاء بطلب المالك) ══
+app.post('/api/owner/agents/purge-all', (req, res) => {
+  saveAgents([]);
+  let sessions = getSessions();
+  sessions = sessions.filter(s => s.userRole === 'owner');
+  saveSessions(sessions);
+  console.log('🧹 All agents purged from server by Owner.');
+  res.json({ success: true, message: 'تم مسح وتصفير كافة حسابات الوكلاء من السيرفر بنجاح' });
+});
+
 app.delete('/api/owner/agents/:id', (req, res) => {
   const id = req.params.id;
   let agents = getAgents();

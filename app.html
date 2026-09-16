@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.52";
+    var compiledVersion = "1.0.53";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.52";
+    window.ACTIVE_APP_VERSION = "1.0.53";
   }
 })();
 </script>
@@ -1093,7 +1093,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
       </div>
     </div>
 
-            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.52) ═══ -->
+            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.53) ═══ -->
     <div class="overlay" id="m-switch-accounts" onclick="closeMod('m-switch-accounts',event)">
       <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;width:92%;padding:20px;border-radius:24px;">
         <div class="modal-t" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -1383,14 +1383,14 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 
             <div>
               <div style="display:flex;justify-content:space-between;align-items:center;">
-                <label style="font-size:11px;font-weight:700;color:var(--tx2);">كلمة المرور (Password):</label>
-                <button onclick="generateRandomPassForAdd()" style="background:transparent;border:none;color:var(--g);font-size:11px;font-weight:700;cursor:pointer;">🎲 توليد 4 أرقام</button>
+                <label style="font-size:11px;font-weight:700;color:var(--tx2);">كلمة المرور (8 خانات على الأقل):</label>
+                <button type="button" onclick="generateRandomPassForAdd()" style="background:transparent;border:none;color:var(--g);font-size:11px;font-weight:700;cursor:pointer;">🎲 توليد 8 أرقام</button>
               </div>
               <div style="position:relative;display:flex;align-items:center;">
-                <input id="add-ag-pass" type="text" maxlength="4" pattern="[0-9]*" inputmode="numeric" class="srch-i" placeholder="0000" style="width:100%;font-family:monospace;font-size:18px;font-weight:900;letter-spacing:6px;text-align:center;padding:9px 12px;color:var(--g);background:var(--card);border:1.5px solid var(--g);outline:none;border-radius:10px;"/>
+                <input id="add-ag-pass" type="text" maxlength="32" class="srch-i" placeholder="00000000" style="width:100%;font-family:monospace;font-size:16px;font-weight:900;letter-spacing:4px;text-align:center;padding:9px 12px;color:var(--g);background:var(--card);border:1.5px solid var(--g);outline:none;border-radius:10px;"/>
               </div>
               <div style="font-size:11px;color:var(--mt);margin-top:4px;">
-                💡 كلمة المرور 4 أرقام حصراً (الافتراضية: 0000 أو اضغط توليد 4 أرقام)
+                💡 كلمة المرور 8 خانات على الأقل (الافتراضية: 00000000 أو توليد 8 أرقام أو كتابة أحرف وأرقام)
               </div>
             </div>
           </div>
@@ -1441,17 +1441,17 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
 
             <div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-                <label style="font-size:11.5px;font-weight:800;color:var(--tx);">🔑 كلمة مرور الوكيل (4 أرقام):</label>
-                <button type="button" onclick="generateRandomPassForEditAgent()" style="background:var(--gbg);border:1px solid var(--gbd);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:800;color:var(--g);cursor:pointer;">🎲 توليد 4 أرقام</button>
+                <label style="font-size:11.5px;font-weight:800;color:var(--tx);">🔑 كلمة مرور الوكيل (8 خانات على الأقل):</label>
+                <button type="button" onclick="generateRandomPassForEditAgent()" style="background:var(--gbg);border:1px solid var(--gbd);border-radius:8px;padding:3px 9px;font-size:11px;font-weight:800;color:var(--g);cursor:pointer;">🎲 توليد 8 أرقام</button>
               </div>
               <div style="position:relative;display:flex;align-items:center;">
-                <input id="edit-ag-pass" type="text" maxlength="4" pattern="[0-9]*" inputmode="numeric" class="srch-i" placeholder="0000" style="width:100%;font-family:monospace;font-size:20px;font-weight:900;letter-spacing:8px;text-align:center;padding:11px 40px 11px 12px;color:var(--g);background:var(--card);border:2px solid var(--g);outline:none;border-radius:12px;"/>
+                <input id="edit-ag-pass" type="text" maxlength="32" class="srch-i" placeholder="00000000" style="width:100%;font-family:monospace;font-size:17px;font-weight:900;letter-spacing:4px;text-align:center;padding:11px 40px 11px 12px;color:var(--g);background:var(--card);border:2px solid var(--g);outline:none;border-radius:12px;"/>
                 <button type="button" onclick="toggleEditAgentPassVisibility()" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:18px;color:var(--mt);padding:4px;" title="إظهار / إخفاء">
                   <span id="edit-ag-pass-eye">👁️</span>
                 </button>
               </div>
               <div style="font-size:11px;color:var(--mt);margin-top:4px;display:flex;align-items:center;gap:4px;">
-                <span>💡</span><span>كلمة المرور ظاهرة لك مباشرة ويمكنك تغييرها لأي 4 أرقام (مثل: 0000 أو 1234)</span>
+                <span>💡</span><span>كلمة المرور ظاهرة لك مباشرة (8 خانات على الأقل: مثل 00000000 أو توليد 8 أرقام أو أحرف)</span>
               </div>
             </div>
           </div>
@@ -1604,22 +1604,33 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+
+// 🧹 مسح وتصفير كافة الحسابات القديمة والتجريبية وحساب Aa نهائياً (v1.0.53)
+(function purgeLegacyAccountsV1053() {
+  try {
+    if (localStorage.getItem('wakil_purged_v1053') !== 'true') {
+      localStorage.removeItem('wakil_saved_accounts');
+      localStorage.removeItem('wakil_agents_cache');
+      localStorage.removeItem('wakil_backup_agents_cache');
+      localStorage.removeItem('wakil_all_agents');
+      
+      const role = localStorage.getItem('wakil_user_role');
+      if (role !== 'owner') {
+        localStorage.removeItem('wakil_current_agent');
+        localStorage.removeItem('wakil_has_logged_in');
+        localStorage.removeItem('wakil_remember_login');
+      }
+      localStorage.setItem('wakil_purged_v1053', 'true');
+      console.log('🧹 Purged all legacy & demo accounts for v1.0.53');
+    }
+  } catch(_) {}
+})();
+
 // ══ STATE (OWNER & MULTI-AGENT ARCHITECTURE) ══
-const CREDS = { user: 'user', pass: '00000000' };
 const OWNER_CREDS = { user: 'admin', pass: 'admin2026' };
 
 let currentUserRole = localStorage.getItem('wakil_user_role') || 'agent'; // 'owner' or 'agent'
-let currentAgent = {
-  id: 'agent_868',
-  name: 'فاضل عباس كريم',
-  agencyNumber: '868',
-  licenseNumber: '000699',
-  type: 'ghiz',
-  governorate: 'ذي قار',
-  branch: 'فرع تموين ذي قار',
-  username: 'user',
-  password: '0000'
-};
+let currentAgent = null;
 let allAgents = [];
 let ownerViewingAgent = null;
 let showPasswordsMap = {};
@@ -3429,7 +3440,7 @@ function renderAgents(filterText = ''){
 
 function agentCardHTML(ag) {
   const isPassVisible = !!showPasswordsMap[ag.id];
-  let cleanPass = ag.password || '0000'; if (cleanPass === '00000000') cleanPass = '0000'; const passDisplay = isPassVisible ? cleanPass : '••••';
+  let cleanPass = ag.password || '00000000'; const passDisplay = isPassVisible ? cleanPass : '••••••••';
   const isGhiz = ag.type === 'ghiz';
   const isFrozen = !!ag.isFrozen;
 
@@ -3554,7 +3565,7 @@ function toggleAgentPassword(agId){
   const ag = allAgents.find(a => a.id === agId);
   const el = document.getElementById('pass-' + agId);
   if (el && ag) {
-    el.textContent = showPasswordsMap[agId] ? (ag.password === '00000000' ? '0000' : ag.password) : '••••';
+    el.textContent = showPasswordsMap[agId] ? (ag.password || '00000000') : '••••••••';
   }
 }
 
@@ -3570,13 +3581,13 @@ function openAddAgentModal(){
   document.getElementById('add-ag-name').value = '';
   document.getElementById('add-ag-code').value = '';
   document.getElementById('add-ag-user').value = '';
-  document.getElementById('add-ag-pass').value = '0000';
+  document.getElementById('add-ag-pass').value = '00000000';
   showMod('m-add-agent');
 }
 
 function generateRandomPassForAdd(){
-  const rand4 = String(Math.floor(1000 + Math.random() * 9000));
-  document.getElementById('add-ag-pass').value = rand4;
+  const rand8 = String(Math.floor(10000000 + Math.random() * 90000000));
+  document.getElementById('add-ag-pass').value = rand8;
 }
 
 async function submitNewAgent(){
@@ -3594,8 +3605,8 @@ async function submitNewAgent(){
     return;
   }
 
-  if (password.length !== 4 || !/^\d{4}$/.test(password)) {
-    toast('⚠️ يجب أن تكون كلمة المرور مكونة من 4 أرقام حصراً (مثال: 0000 أو 1234)', true);
+  if (password.length < 8) {
+    toast('⚠️ يجب أن تتكون كلمة المرور من 8 خانات على الأقل (أرقام أو حروف أو 8 أصفار 00000000)', true);
     return;
   }
 
@@ -3662,10 +3673,10 @@ function toggleEditAgentPassVisibility() {
 }
 
 function generateRandomPassForEditAgent() {
-  const rand4 = String(Math.floor(1000 + Math.random() * 9000));
+  const rand8 = String(Math.floor(10000000 + Math.random() * 90000000));
   const inp = document.getElementById('edit-ag-pass');
   if (inp) {
-    inp.value = rand4;
+    inp.value = rand8;
     inp.type = 'text';
     const eye = document.getElementById('edit-ag-pass-eye');
     if (eye) eye.textContent = '👁️';
@@ -3681,8 +3692,8 @@ function openEditAgentModal(agId){
   document.getElementById('edit-ag-type').value = ag.type || 'ghiz';
   document.getElementById('edit-ag-user').value = ag.username || '';
   
-  let pass = normalizeArabicDigits(ag.password || '0000');
-  if (pass === '00000000' || !pass) pass = '0000';
+  let pass = normalizeArabicDigits(ag.password || '00000000');
+  if (!pass) pass = '00000000';
   const passInp = document.getElementById('edit-ag-pass');
   if (passInp) {
     passInp.value = pass;
@@ -3711,8 +3722,8 @@ async function submitEditAgent(){
     return;
   }
 
-  if (password.length !== 4 || !/^\d{4}$/.test(password)) {
-    toast('⚠️ يجب أن تكون كلمة المرور مكونة من 4 أرقام حصراً (مثال: 0000 أو 1234)', true);
+  if (password.length < 8) {
+    toast('⚠️ يجب أن تتكون كلمة المرور من 8 خانات على الأقل (أرقام أو حروف أو 8 أصفار 00000000)', true);
     return;
   }
 
@@ -3903,15 +3914,12 @@ async function syncOwnerAgentsFromServer(){
     const res = await fetch('https://wakil-api.onrender.com/api/owner/agents', { signal: AbortSignal.timeout(6000) });
     if (res.ok) {
       const data = await res.json();
-      if (Array.isArray(data.agents) && data.agents.length > 0) {
-        data.agents.forEach(cloudAg => {
-          const idx = allAgents.findIndex(a => a.username.toLowerCase() === cloudAg.username.toLowerCase() || a.agencyNumber === cloudAg.agencyNumber);
-          if (idx === -1) {
-            allAgents.push(cloudAg);
-          } else {
-            allAgents[idx] = { ...allAgents[idx], ...cloudAg };
-          }
-        });
+      if (Array.isArray(data.agents)) {
+        if (data.agents.length === 0) {
+          allAgents = [];
+        } else {
+          allAgents = data.agents;
+        }
         saveLocalState();
         renderAgents();
       }
@@ -4363,7 +4371,7 @@ function executeRenameMonth(){
 }
 
 
-// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.52) ══
+// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.53) ══
 function saveLocalState() {
   try {
     const agency = (ownerViewingAgent && ownerViewingAgent.agencyNumber) ? ownerViewingAgent.agencyNumber : (currentAgent ? currentAgent.agencyNumber : '868');
@@ -4403,18 +4411,8 @@ function loadLocalState() {
     if (rawAgents) allAgents = JSON.parse(rawAgents);
   } catch(_) {}
 
-  if (!allAgents || !allAgents.length) {
-    allAgents = [{
-      id: 'agent_868',
-      username: 'user',
-      password: '00000000',
-      name: 'فاضل عباس كريم',
-      agencyNumber: '868',
-      licenseNumber: '000699',
-      type: 'ghiz',
-      governorate: 'ذي قار',
-      branch: 'فرع تموين ذي قار'
-    }];
+  if (!allAgents || !Array.isArray(allAgents)) {
+    allAgents = [];
   }
 
   try {
@@ -4470,7 +4468,7 @@ function loadLocalState() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.52) ═══
+// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.53) ═══
 // 🔒 قاعدة صارمة: تظهر فقط الحسابات التي سجل الدخول بها المستخدم أو أضافها يدوياً (غذائية + طحين)
 
 function getSavedAccounts() {
@@ -5000,7 +4998,7 @@ function hasEdits(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.52) ══
+// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.53) ══
 // ══════════════════════════════════════════════════════════════════
 
 function getCitizenRequiredItemKeys(c) {
@@ -6213,7 +6211,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.52';
+const BASE_APK_VERSION = '1.0.53';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -7853,8 +7851,8 @@ function openQuickResetPassModal(agId, agName) {
 }
 
 function generateRandomPassForReset() {
-  const randNum = Math.floor(100000 + Math.random() * 900000);
-  document.getElementById('reset-pwd-new-input').value = String(Math.floor(1000 + Math.random() * 9000));
+  const rand8 = String(Math.floor(10000000 + Math.random() * 90000000));
+  document.getElementById('reset-pwd-new-input').value = rand8;
 }
 
 async function submitQuickResetPassword() {
@@ -7863,6 +7861,10 @@ async function submitQuickResetPassword() {
 
   if (!newPass) {
     toast('⚠️ يرجى كتابة كلمة المرور الجديدة', true);
+    return;
+  }
+  if (newPass.length < 8) {
+    toast('⚠️ يجب أن تتكون كلمة المرور من 8 خانات على الأقل (أرقام أو حروف أو 8 أصفار 00000000)', true);
     return;
   }
 
@@ -8576,7 +8578,7 @@ window.addEventListener('afterprint', () => {
 <script id="wakil-ptr-engine">
 (function() {
   'use strict';
-  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.52) ═══
+  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.53) ═══
   const topContainer = document.getElementById('ptr-indicator-top');
   const topPill = document.getElementById('ptr-pill-top');
   const topIcon = document.getElementById('ptr-icon-top');
