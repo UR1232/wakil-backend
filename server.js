@@ -29,7 +29,7 @@ const REVOKED_FILE = path.join(__dirname, 'revoked_sessions.json');
 
 const APP_VERSION = '1.0.55';
 const APP_VERSION_CODE = 55;
-let APK_DOWNLOAD_URL = 'https://tmpfiles.org/dl/wiw1qZagtBLq/app-release.apk';
+let APK_DOWNLOAD_URL = 'https://tmpfiles.org/dl/w2woqqarvm0U/wakil-v1.0.55.apk';
 
 // دالة تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية قياسية
 function normalizeDigits(str) {
