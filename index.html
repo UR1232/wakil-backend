@@ -4,7 +4,7 @@
 <script id="wakil-ota-boot">
 (function(){
   try {
-    var compiledVersion = "1.0.53";
+    var compiledVersion = "1.0.54";
     window.COMPILED_APP_VERSION = compiledVersion;
     window.ACTIVE_APP_VERSION = compiledVersion;
 
@@ -22,7 +22,7 @@
     }
   } catch(e) {
     console.warn("OTA boot cleanup:", e);
-    window.ACTIVE_APP_VERSION = "1.0.53";
+    window.ACTIVE_APP_VERSION = "1.0.54";
   }
 })();
 </script>
@@ -516,10 +516,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
           </div>
           <div id="err" class="err">❌ اسم المستخدم أو كلمة المرور غير صحيحة</div>
           <button class="btn-g" onclick="doLogin()">تسجيل الدخول ›</button>
-          <button type="button" id="btn-login-bio" onclick="triggerBiometricLogin()" style="display:none;width:100%;margin-top:2px;background:var(--gbg);border:1.5px solid var(--gbd);color:var(--g);border-radius:14px;padding:12px;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:transform .15s;">
-            <span style="font-size:22px;">👆</span>
-            <span id="txt-login-bio">دخول سريع ببصمة الهاتف (المالك والوكيل)</span>
-          </button>
+          
           <button class="btn-forgot" onclick="showMod('m-forgot')">هل نسيت اسم الوكالة أو كلمة المرور؟</button>
         </div>
 
@@ -714,61 +711,6 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
         </div>
 
         
-        <!-- ═══ APP LOCK (WHATSAPP STYLE) ═══ -->
-        <div class="sgroup">
-          <div class="sgroup-title">أمان وقفل التطبيق 🔒 (مثل واتساب)</div>
-          
-          <div class="srow" onclick="toggleAppLockSetting()">
-            <div class="srow-L">
-              <div class="srow-ico" id="lock-setting-ico" style="background:#E8F5E9;color:#2E7D32;">🔒</div>
-              <div>
-                <div class="srow-t">قفل التطبيق برمز أمان / بصمة</div>
-                <div class="srow-s" id="lock-setting-sub">معطل — التطبيق يفتح مباشرة</div>
-              </div>
-            </div>
-            <button class="toggle" id="tgl-app-lock" onclick="event.stopPropagation();toggleAppLockSetting()"></button>
-          </div>
-
-          <div id="app-lock-options" style="display:none;">
-            <div class="srow" onclick="openSetAppPinModal()">
-              <div class="srow-L">
-                <div class="srow-ico" style="background:#E3F2FD;color:#1565C0;">🔢</div>
-                <div>
-                  <div class="srow-t">رمز المرور السري (PIN)</div>
-                  <div class="srow-s" id="app-pin-status-sub">اضغط لتعيين رمز سري من 4 أرقام</div>
-                </div>
-              </div>
-              <button class="add-btn" style="background:#1565C0;padding:6px 12px;font-size:11.5px;" onclick="event.stopPropagation();openSetAppPinModal();">تعيين ✏️</button>
-            </div>
-
-            <div class="srow" onclick="toggleBioSetting()">
-              <div class="srow-L">
-                <div class="srow-ico" style="background:#F3E5F5;color:#6A1B9A;">👆</div>
-                <div>
-                  <div class="srow-t">استخدام بصمة الإصبع / الوجه</div>
-                  <div class="srow-s" id="bio-status-sub">فتح التطبيق مباشرة ببصمة الجهاز</div>
-                </div>
-              </div>
-              <button class="toggle" id="tgl-app-bio" onclick="event.stopPropagation();toggleBioSetting()"></button>
-            </div>
-
-            <div class="srow">
-              <div class="srow-L">
-                <div class="srow-ico" style="background:#FFF3E0;color:#E65100;">⏱️</div>
-                <div>
-                  <div class="srow-t">القفل التلقائي</div>
-                  <div class="srow-s">وقت إعادة قفل التطبيق بعد الخروج</div>
-                </div>
-              </div>
-              <select id="sel-lock-timeout" onchange="setLockTimeoutSetting(this.value)" style="background:var(--ib);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:6px 10px;font-weight:700;font-size:12px;">
-                <option value="0">فوراً</option>
-                <option value="60000">بعد دقيقة واحدة</option>
-                <option value="300000">بعد 5 دقائق</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
         <!-- ═══ SECRET GEO VAULT (FOR OWNER) ═══ -->
         <div class="sgroup" id="group-owner-geo-vault" style="display:none;">
           <div class="sgroup-title">الإدارة والتدقيق</div>
@@ -1093,7 +1035,7 @@ html,body{position:fixed;inset:0;width:100%;height:100%;margin:0;padding:0;overf
       </div>
     </div>
 
-            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.53) ═══ -->
+            <!-- ═══ MODAL: SWITCH ACCOUNTS (تبديل الحسابات v1.0.54) ═══ -->
     <div class="overlay" id="m-switch-accounts" onclick="closeMod('m-switch-accounts',event)">
       <div class="modal" onclick="event.stopPropagation()" style="max-width:440px;width:92%;padding:20px;border-radius:24px;">
         <div class="modal-t" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
@@ -1605,7 +1547,7 @@ function escapeHtml(str) {
 }
 
 
-// 🧹 مسح وتصفير كافة الحسابات القديمة والتجريبية وحساب Aa نهائياً (v1.0.53)
+// 🧹 مسح وتصفير كافة الحسابات القديمة والتجريبية وحساب Aa نهائياً (v1.0.54)
 (function purgeLegacyAccountsV1053() {
   try {
     if (localStorage.getItem('wakil_purged_v1053') !== 'true') {
@@ -1620,8 +1562,12 @@ function escapeHtml(str) {
         localStorage.removeItem('wakil_has_logged_in');
         localStorage.removeItem('wakil_remember_login');
       }
-      localStorage.setItem('wakil_purged_v1053', 'true');
-      console.log('🧹 Purged all legacy & demo accounts for v1.0.53');
+      localStorage.removeItem('wakil_app_lock');
+      localStorage.removeItem('wakil_app_pin');
+      localStorage.removeItem('wakil_app_bio');
+      localStorage.removeItem('wakil_lock_timeout');
+      localStorage.setItem('wakil_purged_v1054', 'true');
+      console.log('🧹 Purged all legacy & demo accounts for v1.0.54');
     }
   } catch(_) {}
 })();
@@ -2442,451 +2388,40 @@ async function submitChangeVaultPin() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ 3. WHATSAPP-STYLE APP LOCK (قفل التطبيق بالبصمة أو الـ PIN) ══
-// ══════════════════════════════════════════════════════════════════
+// ══ APP LOCK & BIOMETRIC COMPLETELY DISABLED (v1.0.54) ══
+// 🔓 التطبيق يفتح مباشرة بدون بصمة أو رمز PIN أو شاشة قفل نهائياً
+try {
+  localStorage.removeItem('wakil_app_lock');
+  localStorage.removeItem('wakil_app_pin');
+  localStorage.removeItem('wakil_app_bio');
+  localStorage.removeItem('wakil_lock_timeout');
+  localStorage.removeItem('wakil_last_leave_time');
+} catch(_) {}
 
-let appLockEnabled = (localStorage.getItem('wakil_app_lock') === 'true');
-let appLockPin = localStorage.getItem('wakil_app_pin') || '';
-let appBioEnabled = (localStorage.getItem('wakil_app_bio') !== 'false');
-let lockTimeoutMs = parseInt(localStorage.getItem('wakil_lock_timeout') || '0', 10);
-let enteredPinDigits = '';
+let appLockEnabled = false;
+let appLockPin = '';
+let appBioEnabled = false;
 let isAppLocked = false;
-let lastBackgroundTime = 0;
 
 function initAppLockState() {
-  appLockEnabled = (localStorage.getItem('wakil_app_lock') === 'true');
-  appLockPin = localStorage.getItem('wakil_app_pin') || '';
-  appBioEnabled = (localStorage.getItem('wakil_app_bio') === 'true');
-  lockTimeoutMs = parseInt(localStorage.getItem('wakil_lock_timeout') || '0', 10);
-
-  // Sync Settings UI
-  const tglLock = document.getElementById('tgl-app-lock');
-  const lockSub = document.getElementById('lock-setting-sub');
-  const lockIco = document.getElementById('lock-setting-ico');
-  const optBox = document.getElementById('app-lock-options');
-  const tglBio = document.getElementById('tgl-app-bio');
-  const selTimeout = document.getElementById('sel-lock-timeout');
-  const pinSub = document.getElementById('app-pin-status-sub');
-  const bioSub = document.getElementById('bio-status-sub');
-
-  if (tglLock) tglLock.classList.toggle('on', appLockEnabled);
-  if (lockSub) {
-    if (appLockEnabled) {
-      lockSub.textContent = appBioEnabled ? 'مفعل 🔒 — محمي ببصمة الهاتف / الوجه' : 'مفعل 🔒 — محمي برمز PIN';
-    } else {
-      lockSub.textContent = 'معطل — التطبيق يفتح مباشرة';
-    }
-  }
-  if (lockIco) {
-    lockIco.style.background = appLockEnabled ? '#E8F5E9' : '#F5F5F5';
-    lockIco.style.color = appLockEnabled ? '#2E7D32' : '#757575';
-  }
-  if (optBox) optBox.style.display = appLockEnabled ? 'block' : 'none';
-  if (tglBio) tglBio.classList.toggle('on', appBioEnabled);
-  if (bioSub) {
-    bioSub.textContent = appBioEnabled ? 'مفعلة 👆 — فتح فوري ببصمة الهاتف' : 'معطلة — اضغط لتفعيل بصمة الهاتف';
-  }
-  if (selTimeout) selTimeout.value = String(lockTimeoutMs);
-  if (pinSub) pinSub.textContent = appLockPin ? 'الرمز مفعل (••••) — اضغط للتغيير' : 'لم يتم تعيين رمز (اختياري)';
-
-  // Check if owner geo vault row should be shown
-  const geoVaultGroup = document.getElementById('group-owner-geo-vault');
-  if (geoVaultGroup) {
-    geoVaultGroup.style.display = (currentUserRole === 'owner') ? 'block' : 'none';
-  }
-
-  // Lock on startup if enabled
-  if (appLockEnabled && (appBioEnabled || (appLockPin && appLockPin.length === 4))) {
-    lockAppNow();
-  }
-}
-
-function toggleAppLockSetting() {
-  if (!appLockEnabled) {
-    // If native Android is available and secure, activate biometric directly
-    if (window.AndroidNativeApp && window.AndroidNativeApp.isDeviceSecure && window.AndroidNativeApp.isDeviceSecure()) {
-      window._biometricPendingAction = 'toggle_lock';
-      triggerBiometricAuth(true);
-      return;
-    }
-    // Otherwise, if PIN is set, enable; if not, open PIN modal
-    if (!appLockPin) {
-      openSetAppPinModal();
-      return;
-    }
-    appLockEnabled = true;
-    localStorage.setItem('wakil_app_lock', 'true');
-    toast('🔒 تم تفعيل قفل التطبيق بنجاح', false, 'green');
-    initAppLockState();
-  } else {
-    appLockEnabled = false;
-    appBioEnabled = false;
-    localStorage.setItem('wakil_app_lock', 'false');
-    localStorage.setItem('wakil_app_bio', 'false');
-    toast('🔓 تم إلغاء قفل التطبيق', false, 'orange');
-    initAppLockState();
-  }
-}
-
-function openSetAppPinModal() {
-  const inp = document.getElementById('set-pin-input');
-  if (inp) inp.value = '';
-  showMod('m-set-app-pin');
-  setTimeout(() => { if (inp) inp.focus(); }, 300);
-}
-
-function saveAppLockPin() {
-  const inp = document.getElementById('set-pin-input');
-  const pin = normalizeArabicDigits((inp ? inp.value : '').trim());
-  if (!pin || pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-    toast('⚠️ يرجى إدخال رمز مكون من 4 أرقام حصراً', true);
-    return;
-  }
-  appLockPin = pin;
-  localStorage.setItem('wakil_app_pin', pin);
-  appLockEnabled = true;
-  localStorage.setItem('wakil_app_lock', 'true');
-  closeMod('m-set-app-pin');
-  initAppLockState();
-  toast('✅ تم تعيين رمز الأمان وتفعيل القفل بنجاح', false, 'green');
-}
-
-function toggleBioSetting() {
-  if (!appBioEnabled) {
-    // Attempting to ENABLE Biometric Authentication
-    if (window.AndroidNativeApp) {
-      if (window.AndroidNativeApp.isDeviceSecure && !window.AndroidNativeApp.isDeviceSecure()) {
-        toast('⚠️ يرجى تفعيل بصمة الإصبع أو قفل الشاشة في إعدادات هاتفك أولاً', true);
-        return;
-      }
-      window._biometricPendingAction = 'toggle_bio';
-      triggerBiometricAuth(true);
-    } else {
-      // In browser / emulator
-      appBioEnabled = true;
-      appLockEnabled = true;
-      localStorage.setItem('wakil_app_bio', 'true');
-      localStorage.setItem('wakil_app_lock', 'true');
-      initAppLockState();
-      toast('✅ تم تفعيل بصمة الجهاز وقفل التطبيق بنجاح 👆', false, 'green');
-    }
-  } else {
-    // Disabling Biometric Authentication
-    appBioEnabled = false;
-    localStorage.setItem('wakil_app_bio', 'false');
-    initAppLockState();
-    toast('تم تعطيل بصمة الإصبع', false, 'orange');
-  }
-}
-
-function setLockTimeoutSetting(val) {
-  lockTimeoutMs = parseInt(val, 10);
-  localStorage.setItem('wakil_lock_timeout', String(lockTimeoutMs));
-  toast('⏱️ تم تحديث وقت القفل التلقائي', false, 'blue');
-}
-
-function lockAppNow() {
-  isAppLocked = true;
-  enteredPinDigits = '';
-  updateLockPinDots();
-
+  appLockEnabled = false;
+  appLockPin = '';
+  appBioEnabled = false;
+  isAppLocked = false;
   const screen = document.getElementById('app-lock-screen');
-  if (screen) {
-    screen.style.display = 'flex';
-  }
-
-  const btnBioUnlock = document.getElementById('btn-main-bio-unlock');
-  if (btnBioUnlock) {
-    btnBioUnlock.style.display = appBioEnabled ? 'flex' : 'none';
-  }
-
-  const pinSection = document.getElementById('lock-pin-section');
-  if (pinSection) {
-    // If PIN is set, always show keypad. If no PIN and bio is on, hide keypad or show as fallback
-    pinSection.style.display = (appLockPin && appLockPin.length === 4) ? 'flex' : (appBioEnabled ? 'none' : 'flex');
-  }
-
-  const prompt = document.getElementById('lock-screen-prompt');
-  if (prompt) {
-    if (appBioEnabled && (!appLockPin || appLockPin.length !== 4)) {
-      prompt.textContent = 'المس مستشعر البصمة أو استخدم بصمة الوجه لفتح التطبيق';
-    } else if (appBioEnabled && appLockPin) {
-      prompt.textContent = 'المس مستشعر البصمة أو أدخل رمز PIN للدخول';
-    } else {
-      prompt.textContent = 'أدخل رمز PIN المكون من 4 أرقام لفتح التطبيق';
-    }
-  }
-
-  // If biometric is enabled, auto-trigger it immediately
-  if (appBioEnabled) {
-    setTimeout(() => {
-      triggerBiometricAuth();
-    }, 350);
-  }
+  if (screen) screen.style.display = 'none';
 }
 
-
+function lockAppNow() {}
+function onAppForegroundCheck() {}
+function triggerBiometricLogin() {}
+function triggerBiometricAuth() {}
+function unlockApp() {}
 function updateLoginBioButtonVisibility() {
   const btn = document.getElementById('btn-login-bio');
-  if (!btn) return;
-  const hasLoggedIn = localStorage.getItem('wakil_has_logged_in') === 'true';
-  const savedRole = localStorage.getItem('wakil_last_known_role') || localStorage.getItem('wakil_user_role');
-  const savedAgent = localStorage.getItem('wakil_current_agent');
-  if (hasLoggedIn && (savedRole === 'owner' || savedAgent)) {
-    btn.style.display = 'flex';
-  } else {
-    btn.style.display = 'none';
-  }
+  if (btn) btn.style.display = 'none';
 }
 
-function triggerBiometricLogin() {
-  const hasLoggedIn = localStorage.getItem('wakil_has_logged_in') === 'true';
-  const savedRole = localStorage.getItem('wakil_last_known_role') || localStorage.getItem('wakil_user_role');
-  const savedAgentStr = localStorage.getItem('wakil_current_agent');
-
-  if (!hasLoggedIn || (!savedRole && !savedAgentStr)) {
-    toast('⚠️ يرجى تسجيل الدخول باسم المستخدم وكلمة المرور أولاً لربط بصمتك بحسابك', true);
-    updateLoginBioButtonVisibility();
-    return;
-  }
-
-  if (window.AndroidNativeApp && window.AndroidNativeApp.authenticateBiometric) {
-    window._biometricPendingAction = 'login';
-    window.AndroidNativeApp.authenticateBiometric();
-  } else {
-    // محاكاة / متصفح: الدخول التلقائي للمالك أو الوكيل المحفوظ فقط
-    if (savedRole === 'owner') {
-      loginAsOwner();
-      toast('👑 أهلاً بك يا مالك التطبيق! تم الدخول ببصمة الهاتف بنجاح', false, 'green');
-    } else if (savedAgentStr) {
-      try {
-        const ag = JSON.parse(savedAgentStr);
-        loginAsAgent(ag);
-        toast(`🛒 أهلاً بك (${ag.name})! تم الدخول بالبصمة بنجاح`, false, 'green');
-      } catch(_) {
-        toast('⚠️ يرجى تسجيل الدخول يدوياً أولاً', true);
-      }
-    } else {
-      toast('⚠️ لا يوجد حساب محفوظ مسبقاً للبصمة', true);
-    }
-  }
-}
-
-function openDirectApkInBrowser() {
-  const url = (pendingOtaUpdate && pendingOtaUpdate.downloadUrl) ? pendingOtaUpdate.downloadUrl : 'https://wakil-api.onrender.com/wakil.apk';
-  window.open(url, '_system');
-}
-
-function unlockApp() {
-  isAppLocked = false;
-  enteredPinDigits = '';
-  updateLockPinDots();
-
-  const screen = document.getElementById('app-lock-screen');
-  if (screen) {
-    screen.style.display = 'none';
-  }
-
-  // إذا تم فتح القفل وكان المستخدم في شاشة تسجيل الدخول، ندخله فوراً لحسابه (المالك أولاً)
-  const scLogin = document.getElementById('sc-login');
-  if (scLogin && (scLogin.style.display !== 'none' || scLogin.classList.contains('active'))) {
-    const lastRole = localStorage.getItem('wakil_last_known_role') || localStorage.getItem('wakil_user_role') || 'owner';
-    if (lastRole === 'owner') {
-      loginAsOwner();
-      toast('👑 أهلاً بك يا مالك المنظومة! تم فتح التطبيق ببصمتك بنجاح', false, 'green');
-    } else {
-      if (!currentAgent && allAgents && allAgents.length) currentAgent = allAgents[0];
-      if (currentAgent) {
-        loginAsAgent(currentAgent);
-      } else {
-        loginAsOwner();
-      }
-    }
-  }
-}
-
-function enterLockPinDigit(digit) {
-  if (enteredPinDigits.length >= 4) return;
-  enteredPinDigits += digit;
-  updateLockPinDots();
-
-  if (enteredPinDigits.length === 4) {
-    setTimeout(checkEnteredPin, 150);
-  }
-}
-
-function backspaceLockPin() {
-  if (enteredPinDigits.length > 0) {
-    enteredPinDigits = enteredPinDigits.slice(0, -1);
-    updateLockPinDots();
-  }
-}
-
-function updateLockPinDots() {
-  for (let i = 0; i < 4; i++) {
-    const dot = document.getElementById('pdot-' + i);
-    if (dot) {
-      dot.classList.toggle('filled', i < enteredPinDigits.length);
-    }
-  }
-}
-
-function checkEnteredPin() {
-  if (enteredPinDigits === appLockPin) {
-    unlockApp();
-  } else {
-    // Error shake animation
-    const dots = document.getElementById('lock-pin-dots');
-    if (dots) {
-      dots.style.animation = 'shake 0.35s ease';
-      setTimeout(() => dots.style.animation = '', 400);
-    }
-    toast('❌ رمز المرور غير صحيح', true);
-    enteredPinDigits = '';
-    updateLockPinDots();
-  }
-}
-
-async function triggerBiometricAuth(force = false) {
-  if (!isAppLocked && !force && !window._biometricPendingAction) return;
-
-  // 1. Modern Native Android BiometricPrompt (SuperKey / Rafidain style)
-  if (window.AndroidNativeApp && window.AndroidNativeApp.authenticateBiometric) {
-    try {
-      console.log('👆 Triggering native Android BiometricPrompt...');
-      window.AndroidNativeApp.authenticateBiometric();
-      return;
-    } catch (e) {
-      console.warn('Native biometric call failed:', e);
-      toast('⚠️ تعذر تشغيل مستشعر البصمة: ' + e.message, true);
-    }
-  }
-
-  // 2. Fallback: Browser WebAuthn / Simulation
-  if (force || window._biometricPendingAction) {
-    if (window._biometricPendingAction) {
-      window.onBiometricSuccess();
-    }
-    return;
-  }
-
-  if (isAppLocked) {
-    unlockApp();
-  }
-}
-
-// Global Android Biometric Callbacks
-window.onBiometricSuccess = function() {
-  if (window._biometricPendingAction === 'login') {
-    window._biometricPendingAction = null;
-    const hasLoggedIn = localStorage.getItem('wakil_has_logged_in') === 'true';
-    const lastRole = localStorage.getItem('wakil_last_known_role') || localStorage.getItem('wakil_user_role');
-    const savedAgentStr = localStorage.getItem('wakil_current_agent');
-
-    if (hasLoggedIn && lastRole === 'owner') {
-      loginAsOwner();
-      toast('👑 أهلاً بك يا مالك التطبيق! تم تسجيل الدخول ببصمة الهاتف بنجاح', false, 'green');
-    } else if (hasLoggedIn && savedAgentStr) {
-      try {
-        const ag = JSON.parse(savedAgentStr);
-        loginAsAgent(ag);
-        toast(`🛒 أهلاً بك (${ag.name})! تم الدخول بالبصمة بنجاح`, false, 'green');
-      } catch(_) {
-        toast('⚠️ يرجى تسجيل الدخول باسم المستخدم وكلمة المرور', true);
-      }
-    } else {
-      toast('⚠️ يرجى تسجيل الدخول يدوياً أولاً لربط بصمة الهاتف بحسابك', true);
-      updateLoginBioButtonVisibility();
-    }
-    return;
-  }
-
-  if (window._biometricPendingAction === 'toggle_bio' || window._biometricPendingAction === 'toggle_lock') {
-    window._biometricPendingAction = null;
-    appLockEnabled = true;
-    appBioEnabled = true;
-    localStorage.setItem('wakil_app_lock', 'true');
-    localStorage.setItem('wakil_app_bio', 'true');
-    initAppLockState();
-    toast('✅ تم التحقق وتفعيل حماية التطبيق ببصمة الهاتف بنجاح 🔒', false, 'green');
-    return;
-  }
-  unlockApp();
-  toast('🔓 تم فتح التطبيق ببصمة الجهاز بنجاح', false, 'green');
-};
-
-window.onBiometricFailed = function(reason) {
-  if (window._biometricPendingAction) {
-    window._biometricPendingAction = null;
-    if (reason === 'device_not_secure') {
-      toast('⚠️ يرجى تفعيل بصمة أو قفل الشاشة في إعدادات هاتفك أولاً', true);
-    } else {
-      toast('⚠️ تم إلغاء البصمة، لم يتم تفعيل القفل', false, 'orange');
-    }
-    initAppLockState();
-    return;
-  }
-  if (isAppLocked) {
-    toast('⚠️ يرجى لمس البصمة أو تأكيد حماية الهاتف لفتح التطبيق', true);
-  }
-};
-
-function onAppForegroundCheck() {
-  if (!appLockEnabled || (!appBioEnabled && (!appLockPin || appLockPin.length !== 4))) return;
-  const elapsed = Date.now() - lastBackgroundTime;
-  if (elapsed >= lockTimeoutMs && !isAppLocked) {
-    lockAppNow();
-  }
-}
-
-// Background / Foreground listeners
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    lastBackgroundTime = Date.now();
-  } else {
-    onAppForegroundCheck();
-  }
-});
-document.addEventListener('pause', () => { lastBackgroundTime = Date.now(); });
-document.addEventListener('resume', () => { onAppForegroundCheck(); });
-
-// ══ LOGIN / LOGOUT ══
-
-// تحويل الأرقام العربية والفارسية إلى أرقام إنجليزية
-
-function getLoginInputValue(id) {
-  const el = document.getElementById(id);
-  if (el && el.value && el.value.trim()) return el.value.trim();
-  const all = document.querySelectorAll('#' + id);
-  for (let i = all.length - 1; i >= 0; i--) {
-    const v = (all[i].value || '').trim();
-    if (v) return v;
-  }
-  return (el ? el.value : '').trim();
-}
-
-function cleanupDuplicateLoginElements() {
-  try {
-    const eyeButtons = document.querySelectorAll('#btn-toggle-login-pass');
-    if (eyeButtons.length > 1) {
-      for (let i = 1; i < eyeButtons.length; i++) {
-        eyeButtons[i].remove();
-      }
-    }
-    const userInputs = document.querySelectorAll('#fu');
-    if (userInputs.length > 1) {
-      for (let i = 1; i < userInputs.length; i++) {
-        userInputs[i].remove();
-      }
-    }
-    const passInputs = document.querySelectorAll('#fp');
-    if (passInputs.length > 1) {
-      for (let i = 1; i < passInputs.length; i++) {
-        passInputs[i].remove();
-      }
-    }
-  } catch(_) {}
-}
 document.addEventListener('DOMContentLoaded', cleanupDuplicateLoginElements);
 
 function normalizeArabicDigits(str) {
@@ -4371,7 +3906,7 @@ function executeRenameMonth(){
 }
 
 
-// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.53) ══
+// ══ PERSISTENCE & LOCAL STORAGE WITH ZERO-LOSS MULTI-BACKUP (v1.0.54) ══
 function saveLocalState() {
   try {
     const agency = (ownerViewingAgent && ownerViewingAgent.agencyNumber) ? ownerViewingAgent.agencyNumber : (currentAgent ? currentAgent.agencyNumber : '868');
@@ -4468,7 +4003,7 @@ function loadLocalState() {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.53) ═══
+// ══ MULTI-ACCOUNT SWITCHER ENGINE (تبديل الحسابات v1.0.54) ═══
 // 🔒 قاعدة صارمة: تظهر فقط الحسابات التي سجل الدخول بها المستخدم أو أضافها يدوياً (غذائية + طحين)
 
 function getSavedAccounts() {
@@ -4998,7 +4533,7 @@ function hasEdits(){
 }
 
 // ══════════════════════════════════════════════════════════════════
-// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.53) ══
+// ══ HELPER FUNCTIONS: CITIZEN RATIONS & RECIPIENTS (v1.0.54) ══
 // ══════════════════════════════════════════════════════════════════
 
 function getCitizenRequiredItemKeys(c) {
@@ -6211,7 +5746,7 @@ function toast(msg,r,type=''){
 }
 
 // ══ APP LIVE OTA & FORCED UPDATE ENGINE ══
-const BASE_APK_VERSION = '1.0.53';
+const BASE_APK_VERSION = '1.0.54';
 let CURRENT_LIVE_VERSION = window.ACTIVE_APP_VERSION || BASE_APK_VERSION;
 let pendingOtaUpdate = null;
 
@@ -8426,52 +7961,7 @@ window.addEventListener('afterprint', () => {
   
 
   <!-- ══════════════════════════════════════════════════════════════ -->
-  <!-- ══ APP LOCK OVERLAY (قفل التطبيق بالبصمة ورمز PIN كواتساب) ══ -->
-  <!-- ══════════════════════════════════════════════════════════════ -->
-  <div id="app-lock-screen" class="overlay" style="display:none;z-index:99999999;background:var(--bg);flex-direction:column;align-items:center;justify-content:center;padding:24px;position:fixed;inset:0;">
-    <div style="width:84px;height:84px;background:var(--gbg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;color:var(--g);margin-bottom:16px;box-shadow:0 8px 24px rgba(46,125,50,0.28);border:2px solid var(--gbd);">
-      🔒
-    </div>
-    <div style="font-size:24px;font-weight:900;color:var(--tx);margin-bottom:8px;">تطبيق وكيل محمي</div>
-    <div style="font-size:13.5px;color:var(--tx2);margin-bottom:28px;text-align:center;max-width:280px;line-height:1.5;" id="lock-screen-prompt">
-      استخدم بصمة الإصبع، بصمة الوجه، أو حماية هاتفك للدخول
-    </div>
-
-    <!-- Main Biometric Unlock Button (SuperKey / Rafidain Style) -->
-    <button id="btn-main-bio-unlock" onclick="triggerBiometricAuth()" style="width:100%;max-width:300px;background:linear-gradient(135deg, #2E7D32, #1B5E20);color:#fff;border:none;border-radius:18px;padding:16px 20px;font-size:16px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;box-shadow:0 6px 20px rgba(46,125,50,0.4);cursor:pointer;transition:transform .15s;">
-      <span style="font-size:26px;">👆</span>
-      <span>فتح ببصمة الهاتف / الوجه</span>
-    </button>
-
-    <!-- Alternative PIN / Keypad Toggle -->
-    <div id="lock-pin-section" style="display:flex;flex-direction:column;align-items:center;width:100%;">
-      <!-- PIN Dots -->
-      <div style="display:flex;gap:14px;margin-bottom:20px;" id="lock-pin-dots">
-        <div class="pin-dot" id="pdot-0"></div>
-        <div class="pin-dot" id="pdot-1"></div>
-        <div class="pin-dot" id="pdot-2"></div>
-        <div class="pin-dot" id="pdot-3"></div>
-      </div>
-
-      <!-- Numeric Keypad -->
-      <div style="display:grid;grid-template-columns:repeat(3, 72px);gap:12px;margin-bottom:14px;">
-        <button class="numpad-btn" onclick="enterLockPinDigit('1')">1</button>
-        <button class="numpad-btn" onclick="enterLockPinDigit('2')">2</button>
-        <button class="numpad-btn" onclick="enterLockPinDigit('3')">3</button>
-        <button class="numpad-btn" onclick="enterLockPinDigit('4')">4</button>
-        <button class="numpad-btn" onclick="enterLockPinDigit('5')">5</button>
-        <button class="numpad-btn" onclick="enterLockPinDigit('6')">6</button>
-        <button class="numpad-btn" onclick="enterLockPinDigit('7')">7</button>
-        <button class="numpad-btn" onclick="enterLockPinDigit('8')">8</button>
-        <button class="numpad-btn" onclick="enterLockPinDigit('9')">9</button>
-        <button class="numpad-btn" id="btn-lock-bio" onclick="triggerBiometricAuth()" title="بصمة الإصبع" style="font-size:26px;">👆</button>
-        <button class="numpad-btn" onclick="enterLockPinDigit('0')">0</button>
-        <button class="numpad-btn" onclick="backspaceLockPin()" title="مسح" style="font-size:22px;">⌫</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div id="app-lock-screen" style="display:none !important;"></div>
   <!-- ══ GEO VAULT MODALS (سجل المواقع الجغرافي المشفر للأونر) ══ -->
   <!-- ══════════════════════════════════════════════════════════════ -->
   
@@ -8556,29 +8046,10 @@ window.addEventListener('afterprint', () => {
     </div>
   </div>
 
-  <!-- 5. Set App Lock PIN Modal -->
-  <div class="overlay" id="m-set-app-pin" style="display:none;z-index:999999;">
-    <div class="modal" style="width:90%;max-width:350px;border-radius:22px;padding:22px;text-align:center;background:var(--card);border:1.5px solid var(--bd);">
-      <div style="width:54px;height:54px;background:#E3F2FD;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:24px;">
-        🔢
-      </div>
-      <div style="font-size:17px;font-weight:900;color:var(--tx);margin-bottom:6px;">تعيين رمز PIN لقفل التطبيق</div>
-      <div style="font-size:12px;color:var(--tx2);margin-bottom:16px;">أدخل رمزاً مكوناً من 4 أرقام لقفل التطبيق</div>
-
-      <input type="password" maxlength="4" pattern="[0-9]*" inputmode="numeric" id="set-pin-input" placeholder="••••" style="width:140px;padding:12px;border:2px solid var(--g);border-radius:12px;background:var(--ib);color:var(--tx);font-size:24px;margin:0 auto 16px;text-align:center;letter-spacing:10px;font-weight:900;outline:none;display:block;">
-
-      <div style="display:flex;gap:8px;">
-        <button class="btn-g" onclick="saveAppLockPin()" style="flex:1;background:var(--g);color:#fff;border-radius:12px;padding:12px;font-weight:800;">تأكيد وحفظ 💾</button>
-        <button type="button" onclick="closeMod('m-set-app-pin')" style="flex:1;background:var(--ib);color:var(--tx2);border:1px solid var(--bd);border-radius:12px;padding:12px;font-weight:700;">إلغاء</button>
-      </div>
-    </div>
-  </div>
-
-
-<script id="wakil-ptr-engine">
+  <script id="wakil-ptr-engine">
 (function() {
   'use strict';
-  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.53) ═══
+  // ═══ PULL-TO-REFRESH ENGINE (PULL-DOWN ONLY v1.0.54) ═══
   const topContainer = document.getElementById('ptr-indicator-top');
   const topPill = document.getElementById('ptr-pill-top');
   const topIcon = document.getElementById('ptr-icon-top');
